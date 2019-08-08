@@ -22,18 +22,28 @@ contract Escrow {
         _;
     }
 
+
+    /**
+     * @dev Throws if called by any account other than the credit token contract.
+     */
+    modifier onlyRecipient() {
+        require(msg.sender == recipient, "The caller is not the recipient");
+        _;
+    }
+
     ERC20 public paymentToken;
     address public operator;
-
+    address public recipient;
 
     uint256 public unlocked;
     uint256 public withdrawn;
     uint256 public capacity;
 
-    constructor(ERC20 _paymentToken, uint256 _capacity, address _operator) public {
+    constructor(ERC20 _paymentToken, uint256 _capacity, address _operator, address _recipient) public {
         paymentToken = _paymentToken;
         capacity = _capacity;
         operator = _operator;
+        recipient = _recipient;
     }
 
 
@@ -49,11 +59,11 @@ contract Escrow {
      * @dev Withdraw part of the escrow reserved for receiver
      * @param _amount The amount of funds intended to be taken out
      */
-    function withdraw(uint256 _amount) public {
+    function withdraw(address _recipient, uint256 _amount) public onlyRecipient {
         withdrawn = withdrawn.add(_amount);
         require(withdrawn <= unlocked, "Cannot withdraw more funds than has been unlocked");
 
-        require(paymentToken.transfer(msg.sender, _amount));
+        require(paymentToken.transfer(_recipient, _amount));
 
         emit Withdrawn(msg.sender, _amount);
     }
