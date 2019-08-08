@@ -26,6 +26,21 @@ contract FluidToken is ERC20 {
 
     }
 
+    /**
+     * Can transfer non-zero amounts only.
+     * After the transfer we update both the token balance and the amount redeemed.
+     */
+    function transfer(address recipient, uint256 amount) public returns (bool) {
+        uint256 redeemedProRata = amount.mul(_redeemed[msg.sender]).div(balanceOf(msg.sender));
+
+        _redeemed[msg.sender] = _redeemed[msg.sender].sub(redeemedProRata);
+        _redeemed[recipient] = _redeemed[recipient].add(redeemedProRata);
+
+        _transfer(msg.sender, recipient, amount);
+
+        return true;
+    }
+
     function redeem(uint256 _amount) public {
         uint256 available = getAvailableToRedeem();
         require(_amount <= available);
