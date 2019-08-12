@@ -10,9 +10,7 @@ import './FluidToken.sol';
  */
 contract FluidEscrow is Escrow {
 
-
     FluidToken public creditToken;
-
 
     constructor(ERC20 _paymentToken, uint256 _capacity, address _operator) public
         Escrow(_paymentToken, _capacity, _operator, address(new FluidToken(_capacity))) {

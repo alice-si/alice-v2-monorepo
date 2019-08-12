@@ -5,7 +5,7 @@ import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
 
 /**
  * @title Escrow
- * @dev Contract dedicated to hole funds until impact is validated.
+ * @dev Contract dedicated to hold funds until impact is validated.
  *
  */
 contract Escrow {
