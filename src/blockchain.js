@@ -34,7 +34,7 @@ const validator = web3.eth.accounts[3]
 
 state.accounts.main = {address: main, balance: 0, ic: 0, ip: 0};
 state.accounts.funder = {address: funder, balance: 0, ic: 0, ip: 0};
-state.accounts.ifu = {address: main, balance: 0, ic: 0, ip: 0};
+state.accounts.ifu = {address: null, balance: 0, ic: 0, ip: 0};
 state.accounts.investor = {address: investor, balance: 0, ic: 0, ip: 0};
 state.accounts.escrow = {address: null, balance: 0, unlocked: 0, ic: 0, ip: 0};
 
@@ -50,13 +50,22 @@ const Blockchain = {
     await this.a.updateBalances()
   },
   deployIF: async() => {
-    console.log("Deploying Impact Futures");
+    console.log("Deploying Impact Futures...");
     impactFutures = await ImpactFutures.new(gbp.address, 10, 100, validator, main, {from: main, gas: 6000000});
     impactPromises = await ImpactPromise.at(await impactFutures.impactPromise());
     impactCredits = await FluidToken.at(await impactFutures.impactCredit());
     escrow = await Escrow.at(await impactFutures.escrow());
     state.accounts.escrow.address = escrow.address;
+    state.accounts.ifu.address = impactFutures.address;
     console.log("ESCROW: " + escrow.address);
+
+    state.logs.push({
+      message: 'Deployed impact futures contract to address: ' + impactFutures.address,
+      icon: 'all_inclusive',
+      code: 'ImpactFutures.new(' + gbp.address + ', 10, 100, ' + validator + ', ' + main  +')',
+      tx: impactFutures.transactionHash,
+      gas: 2077540
+    });
 
     await this.a.updateBalances()
   },
@@ -68,17 +77,44 @@ const Blockchain = {
   fund: async(amount) => {
     console.log("Funding: " + amount + " from: " + funder);
     await gbp.approve(impactFutures.address, amount, {from: funder});
-    await impactFutures.fund(amount, {from: funder, gas: 5000000});
+    let tx = await impactFutures.fund(amount, {from: funder, gas: 5000000});
+
+    state.logs.push({
+      message: 'Impact Futures funded with ' + amount + ' GBP donation',
+      icon: 'all_inclusive',
+      code: 'impactFutures.fund(' + amount +')',
+      tx: impactFutures.transactionHash,
+      gas: tx.receipt.cumulativeGasUsed
+    });
+
     await this.a.updateBalances()
   },
-  deposit: async (account) => {
-    await gbp.mint(account.address, 100, {from: main});
+  deposit: async (account, label) => {
+    let tx = await gbp.mint(account.address, 100, {from: main});
+    console.log(tx);
+    state.logs.push({
+      message: 'Deposited 100 GBP to the ' + label + ' account',
+      icon: 'add_circle_outline',
+      code: 'gbp.mint(' + account.address + ', 100)',
+      tx: tx.tx,
+      gas: tx.receipt.cumulativeGasUsed
+    });
     await this.a.updateBalances()
   },
   invest: async (amount) => {
     console.log("Investing: " + amount);
-    await gbp.transfer(main, amount*0.7, {from: investor});
-    await impactCredits.transfer(investor, amount, {from: main});
+    let invested = amount*0.7;
+    await gbp.transfer(main, invested, {from: investor});
+    let tx = await impactCredits.transfer(investor, amount, {from: main});
+
+    state.logs.push({
+      message: 'Invested ' + invested + ' GBP to buy ' + amount + ' of impact credits',
+      icon: 'attach_money',
+      code: 'impactCredits.transfer(' + investor + ', ' + amount + ')',
+      tx: tx.tx,
+      gas: tx.receipt.cumulativeGasUsed
+    });
+
     await this.a.updateBalances()
   },
   validate: async () => {

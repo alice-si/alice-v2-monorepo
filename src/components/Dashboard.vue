@@ -1,149 +1,192 @@
 /* eslint-disable */
 <template>
-  <div class="dashboard">
+  <md-app>
+    <md-app-toolbar class="md-primary">
 
-    <md-card md-with-hover>
-      <md-ripple>
-        <md-card-header style="background-color: #00c0ef">
-          <div class="md-title"> <md-icon class="md-size-2x card-icon" >input</md-icon> Investor</div>
-          <!--<div class="md-subhead">Subtitle here</div>-->
-        </md-card-header>
+      <span class="md-title">Impact Futures Protocol Demo</span>
+    </md-app-toolbar>
 
-        <div class="stats">
-          Address: <span class="address">{{investor.address}}</span> <br/>
-          Balance: <span class="value">{{investor.balance}} GBP</span> <br/>
-          Impact Promises: <span class="value">{{investor.ip}}</span> <br/>
-          Impact Credits: <span class="value">{{investor.ic}}</span>
+    <md-app-content>
+      <div class="dashboard">
+
+        <div>
+          <md-card md-with-hover>
+            <md-ripple>
+              <md-card-header style="background-color: #00c0ef">
+                <div class="md-title">
+                  <md-icon class="md-size-2x card-icon">attach_money</md-icon>
+                  Investor
+                </div>
+                <div class="md-subhead">{{investor.address}}</div>
+              </md-card-header>
+
+
+              <md-card-content>
+                Investor provides working capital.
+
+                <div class="stats">
+                  Balance: <span class="value">{{investor.balance}} GBP</span> <br/>
+                  Impact Promises: <span class="value">{{investor.ip}}</span> <br/>
+                  Impact Credits: <span class="value">{{investor.ic}}</span>
+                </div>
+              </md-card-content>
+
+              <md-card-actions>
+                <md-button @click="deposit(investor, 'investor')">Deposit</md-button>
+                <md-button @click="invest()">Invest</md-button>
+              </md-card-actions>
+            </md-ripple>
+          </md-card>
+
+          <div style="width: 100px;  display: inline-block;"></div>
+
+          <md-card md-with-hover>
+            <md-ripple>
+              <md-card-header style="background-color: #1cb8c4">
+                <div class="md-title">
+                  <md-icon class="md-size-2x card-icon">all_inclusive</md-icon>
+                  Impact Futures
+                </div>
+                <div class="md-subhead">{{ifu.address}}</div>
+              </md-card-header>
+
+
+              <md-card-content>
+
+                Impact Futures manages the flow of funds.
+
+                <div class="stats" v-if="escrow.address">
+                  Escrow: <span class="value">{{escrow.balance}} ({{escrow.unlocked}}) GBP</span> <br/>
+                  Working capital: <span class="value">{{main.balance}} GBP</span> <br/>
+                  Impact Promises: <span class="value">{{ifu.ip}}</span> <br/>
+                  Impact Credits: <span class="value">{{ifu.ic}}</span>
+                </div>
+
+              </md-card-content>
+
+              <md-card-actions>
+                <md-button @click="validate()">Validate</md-button>
+                <md-button @click="deployIF()">Create</md-button>
+              </md-card-actions>
+            </md-ripple>
+          </md-card>
+
+
+          <div style="width: 100px;  display: inline-block;"></div>
+
+          <md-card md-with-hover>
+            <md-ripple>
+              <md-card-header style="background-color: #874FD8">
+                <div class="md-title">
+                  <md-icon class="md-size-2x card-icon">people_outline</md-icon>
+                  Funder
+                </div>
+                <div class="md-subhead">{{funder.address}}</div>
+              </md-card-header>
+
+
+              <md-card-content>
+                A funder pays the final bill for the outcome.
+
+                <div class="stats">
+                  Balance: <span class="value">{{funder.balance}} GBP</span> <br/>
+                  Impact Promises: <span class="value">{{funder.ip}}</span> <br/>
+                  Impact Credits: <span class="value">{{funder.ic}}</span>
+                </div>
+              </md-card-content>
+
+              <md-card-actions>
+                <md-button @click="deposit(funder, 'funder')">Deposit</md-button>
+                <md-button @click="fund()">Fund</md-button>
+              </md-card-actions>
+            </md-ripple>
+          </md-card>
         </div>
 
-        <md-card-content>
-          Description who the funder is.
-        </md-card-content>
+        <div class="logs">
+          <div class="md-toolbar md-primary md-theme-dark md-dense md-elevation-0">
+            <span class="md-title">Logs</span>
+          </div>
 
-        <md-card-actions>
-          <md-button @click="deposit(investor)">Deposit</md-button>
-          <md-button @click="invest()">Invest</md-button>
-        </md-card-actions>
-      </md-ripple>
-    </md-card>
+          <md-list>
+            <md-list-item md-expand v-for="log in logs" v-bind:key="log.tx">
+              <md-icon>{{log.icon}}</md-icon>
+              <span class="md-list-item-text">{{log.message}}</span>
 
-    <div style="width: 100px;  display: inline-block;"></div>
+              <md-list slot="md-expand">
+                <md-list-item class="md-inset">{{log.code}}</md-list-item>
+                <md-list-item class="md-inset">Transaction hash: {{log.tx}}</md-list-item>
+                <md-list-item class="md-inset">Gas used: {{log.gas}}</md-list-item>
+              </md-list>
 
-    <md-card md-with-hover>
-      <md-ripple>
-        <md-card-header style="background-color: #00c0ef">
-          <div class="md-title"> <md-icon class="md-size-2x card-icon" >input</md-icon> Impact Futures</div>
-          <!--<div class="md-subhead">Subtitle here</div>-->
-        </md-card-header>
-
-        <div class="stats" v-if="escrow.address">
-          Address: <span class="address">{{ifu.address}}</span> <br/>
-          Escrow: <span class="value">{{escrow.balance}} ({{escrow.unlocked}}) GBP</span> <br/>
-          Working capital: <span class="value">{{main.balance}} GBP</span> <br/>
-          Impact Promises: <span class="value">{{ifu.ip}}</span> <br/>
-          Impact Credits: <span class="value">{{ifu.ic}}</span>
+            </md-list-item>
+          </md-list>
         </div>
-
-        <md-card-content>
-          A funder pays the final bill for the outcome.
-        </md-card-content>
-
-        <md-card-actions>
-          <md-button @click="validate()">Validate</md-button>
-          <md-button @click="deployIF()">Create</md-button>
-        </md-card-actions>
-      </md-ripple>
-    </md-card>
-
-
-
-    <div style="width: 100px;  display: inline-block;"></div>
-
-    <md-card md-with-hover>
-      <md-ripple>
-        <md-card-header style="background-color: #00c0ef">
-          <div class="md-title"> <md-icon class="md-size-2x card-icon" >input</md-icon> Funder</div>
-          <!--<div class="md-subhead">Subtitle here</div>-->
-        </md-card-header>
-
-        <div class="stats">
-          Address: <span class="address">{{funder.address}}</span> <br/>
-          Balance: <span class="value">{{funder.balance}} GBP</span> <br/>
-          Impact Promises: <span class="value">{{funder.ip}}</span> <br/>
-          Impact Credits: <span class="value">{{funder.ic}}</span>
-        </div>
-
-        <md-card-content>
-          Description who the funder is.
-        </md-card-content>
-
-        <md-card-actions>
-          <md-button @click="deposit(funder)">Deposit</md-button>
-          <md-button @click="fund()">Fund</md-button>
-        </md-card-actions>
-      </md-ripple>
-    </md-card>
-
-  </div>
+      </div>
+    </md-app-content>
+  </md-app>
 </template>
 
 <script>
-import Blockchain from '@/blockchain'
-import State from '@/state'
+  import Blockchain from '@/blockchain'
+  import State from '@/state'
 
-export default {
-  name: 'dashboard',
-  data () {
-    return {
-      funder: State.accounts.funder,
-      investor: State.accounts.investor,
-      ifu: State.accounts.ifu,
-      escrow: State.accounts.escrow,
-      main: State.accounts.main
-    }
-  },
-  beforeCreate: function () {
-    Blockchain.deploy()
-    // Users.init().then(() => {
-    //   Users.exists(window.web3.eth.accounts[0]).then((exists) => {
-    //     if (exists) {
-    //       Users.authenticate().then(pseudo => {
-    //         this.pseudo = pseudo
-    //       })
-    //     }
-    //   })
-    // }).catch(err => {
-    //   console.log(err)
-    // })
-  },
-  methods: {
-    deposit: async function (account) {
-      await Blockchain.deposit(account)
+  export default {
+    name: 'dashboard',
+    data() {
+      return {
+        funder: State.accounts.funder,
+        investor: State.accounts.investor,
+        ifu: State.accounts.ifu,
+        escrow: State.accounts.escrow,
+        main: State.accounts.main,
+        logs: State.logs
+      }
     },
-    fund: async function() {
-      await Blockchain.fund(100);
+    beforeCreate: function () {
+      Blockchain.deploy()
     },
-    invest: async function() {
-      await Blockchain.invest(100);
-    },
-    validate: async function() {
-      await Blockchain.validate(100);
-    },
-    deployIF: async function() {
-      await Blockchain.deployIF();
+    methods: {
+      deposit: async function (account, label) {
+        await Blockchain.deposit(account, label)
+      },
+      fund: async function () {
+        await Blockchain.fund(100);
+      },
+      invest: async function () {
+        await Blockchain.invest(100);
+      },
+      validate: async function () {
+        await Blockchain.validate(100);
+      },
+      deployIF: async function () {
+        await Blockchain.deployIF();
+      }
     }
   }
-}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style lang="scss" scoped>
+<style lang="scss">
+  #app {
+    margin-top: 0px !important;
+  }
+
+  .md-app-content {
+    padding: 16px 0 16px 0;
+  }
+
   .md-card {
-    width: 320px;
+    width: 300px;
     margin: 4px;
     display: inline-block;
     vertical-align: top;
   }
+
+  .md-app-content .md-card {
+    margin: 0px;
+  }
+
 
   .stats {
     text-align: left;
@@ -163,8 +206,9 @@ export default {
     color: white;
   }
 
-  .md-subhead {
+  .md-card .md-subhead {
     color: white;
+    font-size: 12px;
   }
 
   .card-icon {
@@ -172,9 +216,13 @@ export default {
   }
 
   .md-card-content {
-    padding-top: 20px;
+    padding-top: 15px !important;
+    height: 150px;
   }
 
+  .md-subhead {
+    font-size: 11px;
+  }
 
   .md-card-example {
     .md-subhead {
@@ -192,4 +240,41 @@ export default {
       }
     }
   }
+
+  .logs {
+    margin-top: 30px;
+    width: 1120px;
+    display: inline-block;
+    border: 1px solid rgba(#000, .12);
+  }
+
+  .md-list {
+    max-width: 100%;
+    vertical-align: top;
+  }
+
+  .md-list-item-container {
+    font-size: 14px;
+  }
+
+  .md-list-item-content {
+    min-height: 32px !important;
+  }
+
+  .md-toolbar {
+    background-color: #616161;
+  }
+
+  .md-toolbar .md-title {
+    margin: 0;
+    margin-left: 8px;
+    overflow: hidden;
+    font-weight: 400;
+    letter-spacing: .02em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: top;
+  }
+
+
 </style>
