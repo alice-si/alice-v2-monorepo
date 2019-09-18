@@ -20,8 +20,9 @@ contract('Fluid Token', function ([owner, operator, receiver, unauthorised]) {
 
 
   it("should deposit", async function () {
-    gbp.mint(escrow.address, 1000);
-    (await gbp.balanceOf(escrow.address)).should.be.bignumber.equal('1000');
+    gbp.mint(escrow.address, 500);
+    (await gbp.balanceOf(escrow.address)).should.be.bignumber.equal('500');
+    (await escrow.funded()).should.be.bignumber.equal('500');
   });
 
 
@@ -57,7 +58,9 @@ contract('Fluid Token', function ([owner, operator, receiver, unauthorised]) {
 
     (await fluidToken.balanceOf(receiver)).should.be.bignumber.equal('100');
     (await fluidToken.getAvailableToRedeem({from: receiver})).should.be.bignumber.equal('5');
+
     (await gbp.balanceOf(receiver)).should.be.bignumber.equal('5');
+    (await gbp.balanceOf(escrow.address)).should.be.bignumber.equal('495');
   });
 
 
@@ -66,7 +69,9 @@ contract('Fluid Token', function ([owner, operator, receiver, unauthorised]) {
 
     (await fluidToken.balanceOf(receiver)).should.be.bignumber.equal('100');
     (await fluidToken.getAvailableToRedeem({from: receiver})).should.be.bignumber.equal('0');
+
     (await gbp.balanceOf(receiver)).should.be.bignumber.equal('10');
+    (await gbp.balanceOf(escrow.address)).should.be.bignumber.equal('490');
   });
 
 
@@ -84,7 +89,17 @@ contract('Fluid Token', function ([owner, operator, receiver, unauthorised]) {
 
     (await fluidToken.balanceOf(receiver)).should.be.bignumber.equal('100');
     (await fluidToken.getAvailableToRedeem({from: receiver})).should.be.bignumber.equal('0');
+
     (await gbp.balanceOf(receiver)).should.be.bignumber.equal('30');
+    (await gbp.balanceOf(escrow.address)).should.be.bignumber.equal('470');
+  });
+
+  it("should unlock more than escrow balance", async function () {
+    await escrow.unlock(300, {from: operator});
+
+    (await escrow.unlocked()).should.be.bignumber.equal('600');
+    (await fluidToken.getAvailableToRedeem({from: owner})).should.be.bignumber.equal('450');
+    (await fluidToken.getAvailableToRedeem({from: receiver})).should.be.bignumber.equal('20');
   });
 
 

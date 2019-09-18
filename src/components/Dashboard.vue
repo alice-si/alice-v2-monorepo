@@ -27,13 +27,14 @@
                 <div class="stats">
                   Balance: <span class="value">{{investor.balance}} GBP</span> <br/>
                   Impact Promises: <span class="value">{{investor.ip}}</span> <br/>
-                  Impact Credits: <span class="value">{{investor.ic}}</span>
+                  Impact Credits: <span class="value">{{investor.ic}} ({{investor.available}})</span>
                 </div>
               </md-card-content>
 
               <md-card-actions>
                 <md-button @click="deposit(investor, 'investor')">Deposit</md-button>
                 <md-button @click="invest()">Invest</md-button>
+                <md-button @click="redeem()">Redeem</md-button>
               </md-card-actions>
             </md-ripple>
           </md-card>
@@ -58,15 +59,18 @@
                 <div class="stats" v-if="escrow.address">
                   Escrow: <span class="value">{{escrow.balance}} ({{escrow.unlocked}}) GBP</span> <br/>
                   Working capital: <span class="value">{{main.balance}} GBP</span> <br/>
-                  Impact Promises: <span class="value">{{ifu.ip}}</span> <br/>
-                  Impact Credits: <span class="value">{{ifu.ic}}</span>
+                  Impact Credits: <span class="value">{{main.ic}}</span> <br/>
+                  Discount: <span class="value">30%</span> <br/>
+                </div>
+
+                <div class="create-if-box" v-else>
+                  <md-button class="md-primary create-if md-raised" @click="deployIF()">Create impact futures</md-button>
                 </div>
 
               </md-card-content>
 
               <md-card-actions>
-                <md-button @click="validate()">Validate</md-button>
-                <md-button @click="deployIF()">Create</md-button>
+                <md-button @click="validate()">{{escrow.address ? 'Validate' : ''}}</md-button>
               </md-card-actions>
             </md-ripple>
           </md-card>
@@ -104,7 +108,7 @@
         </div>
 
         <div class="logs">
-          <div class="md-toolbar md-primary md-theme-dark md-dense md-elevation-0">
+          <div class="md-toolbar md-primary md-dense md-elevation-0">
             <span class="md-title">Logs</span>
           </div>
 
@@ -155,6 +159,10 @@
       },
       invest: async function () {
         await Blockchain.invest(100);
+      },
+      redeem: async function () {
+        let amount = this.investor.available;
+        await Blockchain.redeem(amount);
       },
       validate: async function () {
         await Blockchain.validate(100);
@@ -222,6 +230,7 @@
 
   .md-subhead {
     font-size: 11px;
+    height: 15px;
   }
 
   .md-card-example {
@@ -274,6 +283,15 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     vertical-align: top;
+  }
+
+  .create-if-box {
+    padding-top: 30px;
+  }
+
+  .create-if {
+    background-color: #1cb8c4;
+    color: white;
   }
 
 

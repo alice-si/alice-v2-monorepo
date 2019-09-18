@@ -67,4 +67,8 @@ contract Escrow {
 
         emit Withdrawn(msg.sender, _amount);
     }
+
+    function funded() public view returns(uint256) {
+      return paymentToken.balanceOf(address(this)).add(withdrawn);
+    }
 }

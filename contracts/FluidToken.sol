@@ -6,10 +6,12 @@ pragma solidity ^0.5.2;
 
 import 'openzeppelin-solidity/contracts/token/ERC20/ERC20.sol';
 import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
+import 'openzeppelin-solidity/contracts/math/Math.sol';
 import './Escrow.sol';
 
 contract FluidToken is ERC20 {
     using SafeMath for uint256;
+
 
     /**
     * @dev Emitted when tokens are redeemed for funds locked in the escrow
@@ -52,7 +54,8 @@ contract FluidToken is ERC20 {
 
 
     function getAvailableToRedeem() public view returns(uint256) {
-        uint256 available = escrow.unlocked().mul(balanceOf(msg.sender)).sub(escrow.capacity().mul(_redeemed[msg.sender]));
+        uint256 potential = Math.min(escrow.unlocked(), escrow.funded());
+        uint256 available = potential.mul(balanceOf(msg.sender)).sub(escrow.capacity().mul(_redeemed[msg.sender]));
         available = available.div(escrow.capacity());
         return available;
     }

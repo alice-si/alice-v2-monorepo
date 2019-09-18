@@ -10,6 +10,8 @@ import 'vue-material/dist/vue-material.min.css'
 Vue.config.productionTip = false
 Vue.use(VueMaterial)
 
+
+
 window.addEventListener('load', function () {
   if (typeof web3 !== 'undefined') {
     console.log('Web3 injected browser: OK.')
