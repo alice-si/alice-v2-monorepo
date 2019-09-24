@@ -13,10 +13,6 @@ Vue.use(VueMaterial)
 
 
 window.addEventListener('load', function () {
-  let host = window.location.hostname;
-  let providerUrl =  (host === 'localhost') ? 'localhost:8545' : 'http://ganache.demo.alice.si:80';
-  window.web3 = new Web3(new Web3.providers.HttpProvider(providerUrl));
-
   /* eslint-disable no-new */
   new Vue({
     el: '#app',

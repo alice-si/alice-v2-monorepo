@@ -2,6 +2,7 @@
 import state from "@/state";
 import contract from 'truffle-contract'
 import GBP_JSON from '@contracts/DigitalGBPToken.json'
+import M_JSON from '@contracts/Migrations.json'
 import IF_JSON from '@contracts/ImpactFutures.json'
 import IP_JSON from '@contracts/ImpactPromise.json'
 import FT_JSON from '@contracts/FluidToken.json'
@@ -9,8 +10,12 @@ import ESCROW_JSON from '@contracts/Escrow.json'
 
 import {default as Web3} from 'web3'
 
-const ganacheProvider = new Web3.providers.HttpProvider('http://localhost:8545')
-const web3 = new Web3(ganacheProvider)
+const WEB3_PROVIDER = 'http://ganache.demo.alice.si:80';
+
+const ganacheProvider = new Web3.providers.HttpProvider(WEB3_PROVIDER);
+const web3 = new Web3(ganacheProvider);
+
+console.log(window.web3);
 
 var setup = function(json) {
   let c = contract(json);
@@ -19,6 +24,7 @@ var setup = function(json) {
 }
 
 const GBP = setup(GBP_JSON)
+const M = setup(M_JSON)
 const ImpactFutures = setup(IF_JSON)
 const ImpactPromise = setup(IP_JSON)
 const FluidToken = setup(FT_JSON)
@@ -101,9 +107,9 @@ const Blockchain = {
     });
     await this.a.updateBalances()
   },
-  invest: async (amount) => {
+  invest: async (amount, discount) => {
     console.log("Investing: " + amount);
-    let invested = amount*0.7;
+    let invested = amount * (1-discount/100);
     await gbp.transfer(main, invested, {from: investor});
     let tx = await impactCredits.transfer(investor, amount, {from: main});
 
