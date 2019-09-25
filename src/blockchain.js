@@ -3,7 +3,7 @@ import state from "@/state";
 import contract from 'truffle-contract'
 import GBP_JSON from '@contracts/DigitalGBPToken.json'
 import M_JSON from '@contracts/Migrations.json'
-import IF_JSON from '@contracts/ImpactFutures.json'
+import IF_JSON from '@contracts/ImpactFuturesMock.json'
 import IP_JSON from '@contracts/ImpactPromise.json'
 import FT_JSON from '@contracts/FluidToken.json'
 import ESCROW_JSON from '@contracts/Escrow.json'
@@ -57,7 +57,7 @@ const Blockchain = {
   },
   deployIF: async(number, price) => {
     console.log("Deploying Impact Futures for: " + number + " of outcomes with price: " + price);
-    impactFutures = await ImpactFutures.new(gbp.address, number, price, validator, main, {from: main, gas: 6000000});
+    impactFutures = await ImpactFutures.new(gbp.address, number, price, validator, main, 1, {from: main, gas: 6700000});
     impactPromises = await ImpactPromise.at(await impactFutures.impactPromise());
     impactCredits = await FluidToken.at(await impactFutures.impactCredit());
     escrow = await Escrow.at(await impactFutures.escrow());
@@ -90,12 +90,26 @@ const Blockchain = {
       message: 'Impact Futures funded with ' + amount + ' GBP donation',
       icon: 'people_outline',
       code: 'impactFutures.fund(' + amount +')',
-      tx: impactFutures.transactionHash,
+      tx: tx.tx,
       gas: tx.receipt.cumulativeGasUsed
     });
 
     await this.a.updateBalances()
     await this.a.updateImpact()
+  },
+  refund: async(amount) => {
+    console.log("Refunding...");
+    let tx = await impactFutures.refund({from: funder, gas: 5000000});
+
+    state.logs.push({
+      message: 'Impact Futures refunded',
+      icon: 'people_outline',
+      code: 'impactFutures.refund()',
+      tx: tx.tx,
+      gas: tx.receipt.cumulativeGasUsed
+    });
+
+    await this.a.updateBalances()
   },
   deposit: async (account, label) => {
     let tx = await gbp.mint(account.address, 100, {from: main});
@@ -155,6 +169,20 @@ const Blockchain = {
 
     await this.a.updateBalances()
   },
+  finalize: async () => {
+    console.log("Finalizing...");
+    let tx = await impactFutures.setEnd({from: main});
+
+    state.logs.push({
+      message: 'Finalizing impact futures',
+      icon: 'cancel_presentation',
+      code: 'impactFutures.setEnd()',
+      tx: tx.tx,
+      gas: tx.receipt.cumulativeGasUsed
+    });
+
+    await this.a.updateImpact();
+  },
   updateBalances: async () => {
     console.log('Updating balances...');
     for(const account of Object.values(state.accounts)) {
@@ -184,6 +212,7 @@ const Blockchain = {
       state.impact.all = (await impactFutures.outcomesNumber()).valueOf();
       state.impact.validated = (await impactFutures.validatedNumber()).valueOf();
       state.impact.remaining = state.impact.all - state.accounts.escrow.balance / state.impact.price;
+      state.impact.ended = (await impactFutures.hasEnded());
     }
   }
 }

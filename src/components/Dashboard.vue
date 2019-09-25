@@ -141,6 +141,7 @@
               <md-card-actions>
                 <md-button @click="deposit(funder, 'funder')">Deposit</md-button>
                 <md-button @click="fund()">Fund</md-button>
+                <md-button @click="refund()">Refund</md-button>
               </md-card-actions>
             </md-ripple>
           </md-card>
@@ -151,7 +152,7 @@
             <md-card-header style="background-color: #1cb8c4">
               <div class="md-title">
                 <md-icon class="md-size-2x card-icon">all_inclusive</md-icon>
-                Impact Futures
+                Impact Futures {{impact.ended ? '[x]' : ''}}
               </div>
               <div class="md-subhead">{{ifu.address}}</div>
             </md-card-header>
@@ -170,7 +171,8 @@
             </md-card-content>
 
             <md-card-actions>
-              <md-button @click="validate()">{{escrow.address ? 'Validate' : ''}}</md-button>
+              <md-button @click="validate()">Validate</md-button>
+              <md-button @click="finalize()">Finalize</md-button>
             </md-card-actions>
           </md-ripple>
         </md-card>
@@ -219,6 +221,9 @@
       fund: async function () {
         await Blockchain.fund(100);
       },
+      refund: async function () {
+        await Blockchain.refund();
+      },
       invest: async function () {
         await Blockchain.invest(100, this.discount);
       },
@@ -228,6 +233,9 @@
       },
       validate: async function () {
         await Blockchain.validate(100);
+      },
+      finalize: async function () {
+        await Blockchain.finalize();
       },
       deployIF: async function () {
         await Blockchain.deployIF(this.outcomesNumber, this.outcomesPrice);

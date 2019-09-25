@@ -8,7 +8,8 @@ let state = {
     price: null,
     all: null,
     validated: null,
-    remaining: null
+    remaining: null,
+    ended: false
   },
   logs: [
 
