@@ -1,10 +1,11 @@
 var Escrow = artifacts.require("Escrow");
-var ImpactFutures = artifacts.require("ImpactFutures");
+var ImpactFutures = artifacts.require("ImpactFuturesMock");
 var ImpactPromise = artifacts.require("ImpactPromise");
 var FluidToken = artifacts.require("FluidToken");
 var GBP = artifacts.require("DigitalGBPToken");
 
 require("./test-setup");
+const { time } = require('openzeppelin-test-helpers');
 
 contract('Impact Futures', function ([owner, validator, funder, investor, unauthorised]) {
   var escrow;
@@ -15,7 +16,8 @@ contract('Impact Futures', function ([owner, validator, funder, investor, unauth
 
   before("deploy escrow and token contracts", async function () {
     gbp = await GBP.new();
-    impactFutures = await ImpactFutures.new(gbp.address, 10, 100, validator, owner);
+    let end = await time.latest() + time.duration.years(1);
+    impactFutures = await ImpactFutures.new(gbp.address, 10, 100, validator, owner, end);
 
     impactCredit = await FluidToken.at(await impactFutures.impactCredit());
     (await impactCredit.balanceOf(owner)).should.be.bignumber.equal('1000');
@@ -36,12 +38,12 @@ contract('Impact Futures', function ([owner, validator, funder, investor, unauth
   });
 
   it("should fund", async function () {
-    await gbp.mint(funder, 100);
-    await gbp.approve(impactFutures.address, 100, {from: funder});
-    await impactFutures.fund(100, {from: funder});
+    await gbp.mint(funder, 200);
+    await gbp.approve(impactFutures.address, 200, {from: funder});
+    await impactFutures.fund(200, {from: funder});
 
-    (await impactPromise.balanceOf(funder)).should.be.bignumber.equal('100');
-    (await gbp.balanceOf(escrow.address)).should.be.bignumber.equal('100');
+    (await impactPromise.balanceOf(funder)).should.be.bignumber.equal('200');
+    (await gbp.balanceOf(escrow.address)).should.be.bignumber.equal('200');
   });
 
 
@@ -58,7 +60,21 @@ contract('Impact Futures', function ([owner, validator, funder, investor, unauth
 
     (await gbp.balanceOf(investor)).should.be.bignumber.equal('10');
     (await impactCredit.getAvailableToRedeem({from: investor})).should.be.bignumber.equal('0');
+    (await gbp.balanceOf(escrow.address)).should.be.bignumber.equal('190');
+  });
+
+  it("should return remaining funds", async function () {
+    await impactFutures.setEnd();
+    (await impactFutures.hasEnded()).should.be.true;
+
+    (await impactPromise.balanceOf(funder)).should.be.bignumber.equal('200');
+    (await gbp.balanceOf(escrow.address)).should.be.bignumber.equal('190');
+
+    await impactFutures.refund({from: funder});
+
     (await gbp.balanceOf(escrow.address)).should.be.bignumber.equal('90');
+    (await gbp.balanceOf(funder)).should.be.bignumber.equal('100');
+    (await impactPromise.balanceOf(funder)).should.be.bignumber.equal('0');
   });
 
 });

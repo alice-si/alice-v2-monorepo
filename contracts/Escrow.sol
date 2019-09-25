@@ -31,6 +31,7 @@ contract Escrow {
         _;
     }
 
+
     ERC20 public paymentToken;
     address public operator;
     address public recipient;
@@ -66,6 +67,11 @@ contract Escrow {
         require(paymentToken.transfer(_recipient, _amount));
 
         emit Withdrawn(msg.sender, _amount);
+    }
+
+    function refund(address _recipient, uint256 _amount) public onlyOperator {
+      withdrawn = withdrawn.add(_amount);
+      require(paymentToken.transfer(_recipient, _amount));
     }
 
     function funded() public view returns(uint256) {

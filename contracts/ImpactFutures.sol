@@ -48,14 +48,16 @@ contract ImpactFutures {
     uint256 public validatedNumber;
     uint256 public outcomePrice;
     uint256 public budget;
+    uint256 public end;
 
-    constructor(ERC20 _paymentToken, uint256 _outcomesNumber, uint256 _outcomesPrice, address _validator, address _manager) public {
+    constructor(ERC20 _paymentToken, uint256 _outcomesNumber, uint256 _outcomesPrice, address _validator, address _manager, uint256 _end) public {
         paymentToken = _paymentToken;
         outcomesNumber = _outcomesNumber;
         outcomePrice = _outcomesPrice;
         budget = outcomePrice.mul(outcomesNumber);
         validator = _validator;
         manager = _manager;
+        end = _end;
 
         escrow = new FluidEscrow(_paymentToken, budget, address(this));
         impactPromise = new ImpactPromise();
@@ -65,6 +67,7 @@ contract ImpactFutures {
 
 
     function fund(uint256 _amount) public {
+        require(!hasEnded());
         require(paymentToken.balanceOf(address(escrow)).add(_amount) <= budget, "The funding amount exceed allowed impact budget");
         paymentToken.transferFrom(msg.sender, address(escrow), _amount);
         impactPromise.mint(msg.sender, _amount);
@@ -80,19 +83,20 @@ contract ImpactFutures {
     }
 
 
-    function finalize(uint256 _amount) public onlyManager {
-//        unlocked = unlocked.add(_amount);
-//        require(unlocked <= capacity, "Cannot unlock more than the max capacity of the escrow");
-//
-//        emit Unlocked(_amount);
+    function hasEnded() public view returns(bool) {
+      return now > end;
     }
 
 
-    function refund(uint256 _amount) public onlyManager {
-//        unlocked = unlocked.add(_amount);
-//        require(unlocked <= capacity, "Cannot unlock more than the max capacity of the escrow");
-//
-//        emit Unlocked(_amount);
+    function refund() public {
+      require(hasEnded());
+      uint256 remaining = escrow.funded().sub(escrow.unlocked());
+      uint256 balance = impactPromise.balanceOf(msg.sender);
+
+      uint256 val = remaining.mul(balance).div(impactPromise.totalSupply());
+
+      impactPromise.burnAll(msg.sender);
+      escrow.refund(msg.sender, val);
     }
 
 }
