@@ -4,6 +4,12 @@ let state = {
   balance: {
     investor: 10
   },
+  impact: {
+    price: null,
+    all: null,
+    validated: null,
+    remaining: null
+  },
   logs: [
 
   ]

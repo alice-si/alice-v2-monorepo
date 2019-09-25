@@ -78,26 +78,40 @@
               </md-card-header>
 
 
-              <md-card-content>
+              <md-card-content v-if="escrow.address">
 
                 Manages Impact Futures.
 
-                <div class="stats" v-if="escrow.address">
+                <div class="stats">
                   Working capital: <span class="value">{{main.balance}} GBP</span> <br/>
                   Impact Credits: <span class="value">{{main.ic}}</span> <br/>
                   Discount: <span class="value">{{discount}}%</span> <br/>
                 </div>
 
-                <div class="create-if-box" v-else>
-                  <md-button class="md-primary create-if md-raised" @click="deployIF()">Create impact futures</md-button>
+              </md-card-content>
+
+              <md-card-content v-else>
+                <div class="creator">
+                  <md-field>
+                    <label>Number of outcomes</label>
+                    <md-input v-model="outcomesNumber"></md-input>
+                  </md-field>
+                  <md-field>
+                    <label>Price per outcome</label>
+                    <md-input v-model="outcomesPrice"></md-input>
+                  </md-field>
                 </div>
 
               </md-card-content>
 
-              <md-card-actions >
-                <md-button @click="changeDiscount(10)">{{escrow.address ? 'DISCOUNT +' : ''}}</md-button>
-                <md-button @click="changeDiscount(-10)">{{escrow.address ? 'DISCOUNT -' : ''}}</md-button>
+              <md-card-actions v-if="escrow.address">
+                <md-button @click="changeDiscount(10)">DISCOUNT +</md-button>
+                <md-button @click="changeDiscount(-10)">DISCOUNT -</md-button>
               </md-card-actions>
+              <div class="create-if-box" v-else>
+                <md-button class="md-primary create-if md-raised" @click="deployIF()">Create impact futures</md-button>
+              </div>
+
             </md-ripple>
           </md-card>
 
@@ -147,8 +161,9 @@
 
               Manages the flow of funds.
 
-              <div class="stats" >
+              <div class="stats">
                 Escrow: <span class="value">{{escrow.balance}} ({{escrow.unlocked}}) GBP</span> <br/>
+                Impact Promises: <span class="value">{{impact.remaining}} x {{impact.price}} GBP</span> <br/>
               </div>
 
 
@@ -162,9 +177,9 @@
 
 
         <!--<div class="logs">-->
-          <!--<div class="md-toolbar md-primary md-dense md-elevation-0">-->
-            <!--<span class="md-title">Logs</span>-->
-          <!--</div>-->
+        <!--<div class="md-toolbar md-primary md-dense md-elevation-0">-->
+        <!--<span class="md-title">Logs</span>-->
+        <!--</div>-->
         <!--</div>-->
 
 
@@ -187,8 +202,11 @@
         escrow: State.accounts.escrow,
         main: State.accounts.main,
         logs: State.logs,
+        impact: State.impact,
         showSidepanel: false,
-        discount: 50
+        discount: 50,
+        outcomesNumber: null,
+        outcomesPrice: null,
       }
     },
     beforeCreate: function () {
@@ -212,7 +230,7 @@
         await Blockchain.validate(100);
       },
       deployIF: async function () {
-        await Blockchain.deployIF();
+        await Blockchain.deployIF(this.outcomesNumber, this.outcomesPrice);
       },
       changeDiscount: async function (change) {
         this.discount += change;
@@ -244,7 +262,6 @@
   .md-card-actions {
     padding: 0 6px 6px 6px;
   }
-
 
   .stats {
     text-align: left;
@@ -312,8 +329,6 @@
     border: 1px solid rgba(#000, .12);
   }
 
-
-
   .md-list {
     max-width: 100%;
     vertical-align: top;
@@ -343,7 +358,7 @@
   }
 
   .create-if-box {
-    padding-top: 20px;
+    margin-top: -5px;
   }
 
   .create-if {
@@ -351,10 +366,32 @@
     color: white;
   }
 
-
   .md-drawer {
     background-color: white;
     width: 700px;
   }
+
+  .md-field {
+    margin: 0;
+  }
+
+  .md-field label {
+    font-size: 14px;
+    margin: 0;
+  }
+
+  .md-field .md-input {
+    border-bottom: 1px solid #1cb8c4;
+    height: 28px;
+  }
+
+  .md-field.md-has-value .md-input {
+    font-size: 12px;
+  }
+
+  .creator {
+    padding: 0 20px 0 20px;
+  }
+
 
 </style>

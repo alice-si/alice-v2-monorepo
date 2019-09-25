@@ -45,6 +45,7 @@ contract ImpactFutures {
     address public manager;
 
     uint256 public outcomesNumber;
+    uint256 public validatedNumber;
     uint256 public outcomePrice;
     uint256 public budget;
 
@@ -74,6 +75,7 @@ contract ImpactFutures {
 
     function validateOutcome() public onlyValidator {
         escrow.unlock(outcomePrice);
+        validatedNumber = validatedNumber.add(1);
         emit Validated(outcomePrice);
     }
 

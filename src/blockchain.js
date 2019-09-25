@@ -55,9 +55,9 @@ const Blockchain = {
     gbp = await GBP.new({from: main, gas: 5000000});
     await this.a.updateBalances()
   },
-  deployIF: async() => {
-    console.log("Deploying Impact Futures...");
-    impactFutures = await ImpactFutures.new(gbp.address, 10, 100, validator, main, {from: main, gas: 6000000});
+  deployIF: async(number, price) => {
+    console.log("Deploying Impact Futures for: " + number + " of outcomes with price: " + price);
+    impactFutures = await ImpactFutures.new(gbp.address, number, price, validator, main, {from: main, gas: 6000000});
     impactPromises = await ImpactPromise.at(await impactFutures.impactPromise());
     impactCredits = await FluidToken.at(await impactFutures.impactCredit());
     escrow = await Escrow.at(await impactFutures.escrow());
@@ -74,6 +74,7 @@ const Blockchain = {
     });
 
     await this.a.updateBalances()
+    await this.a.updateImpact()
   },
   test: () => {
     console.log('Test')
@@ -94,6 +95,7 @@ const Blockchain = {
     });
 
     await this.a.updateBalances()
+    await this.a.updateImpact()
   },
   deposit: async (account, label) => {
     let tx = await gbp.mint(account.address, 100, {from: main});
@@ -174,6 +176,15 @@ const Blockchain = {
     //   state.accounts.ifu.escrow.balance =   (await gbp.balanceOf(state.accounts.ifu.escrow.address)).valueOf();
     //   console.log("Escrow: " + state.accounts.ifu.escrow.balance);
     // }
+  },
+
+  updateImpact: async () => {
+    if (impactFutures) {
+      state.impact.price = (await impactFutures.outcomePrice()).valueOf();
+      state.impact.all = (await impactFutures.outcomesNumber()).valueOf();
+      state.impact.validated = (await impactFutures.validatedNumber()).valueOf();
+      state.impact.remaining = state.impact.all - state.accounts.escrow.balance / state.impact.price;
+    }
   }
 }
 
