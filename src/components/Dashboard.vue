@@ -332,7 +332,7 @@
 
   .logs {
     margin-top: 30px;
-    width: 1120px;
+    width: 1120px !important;
     display: inline-block;
     border: 1px solid rgba(#000, .12);
   }
@@ -366,7 +366,7 @@
   }
 
   .create-if-box {
-    margin-top: -5px;
+    margin-top: -5px !important;
   }
 
   .create-if {
@@ -380,21 +380,21 @@
   }
 
   .md-field {
-    margin: 0;
+    margin: 0 !important;
   }
 
   .md-field label {
-    font-size: 14px;
-    margin: 0;
+    font-size: 14px !important;
+    margin: 0 !important;
   }
 
   .md-field .md-input {
-    border-bottom: 1px solid #1cb8c4;
-    height: 28px;
+    border-bottom: 1px solid #1cb8c4 !important;
+    height: 28px !important;
   }
 
   .md-field.md-has-value .md-input {
-    font-size: 12px;
+    font-size: 12px !important;
   }
 
   .creator {
