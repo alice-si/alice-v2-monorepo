@@ -53,14 +53,16 @@
 
                 <div class="stats">
                   Balance: <span class="value">{{investor.balance}} GBP</span> <br/>
-                  Impact Credits: <span class="value">{{investor.ic}} ({{investor.available}})</span>
+                  <div v-if="impact.price">
+                  Impact Credits: <span class="value">{{investor.ic / impact.price}} x ${{impact.price}} (${{investor.available}})</span>
+                  </div>
                 </div>
               </md-card-content>
 
               <md-card-actions>
                 <md-button @click="deposit(investor, 'investor')">Deposit</md-button>
                 <md-button @click="invest()">Invest</md-button>
-                <md-button @click="redeem()">Redeem</md-button>
+                <md-button @click="redeem(investor.address)">Redeem</md-button>
               </md-card-actions>
             </md-ripple>
           </md-card>
@@ -83,8 +85,8 @@
                 Manages Impact Futures.
 
                 <div class="stats">
-                  Working capital: <span class="value">{{main.balance}} GBP</span> <br/>
-                  Impact Credits: <span class="value">{{main.ic}}</span> <br/>
+                  Working capital: <span class="value">${{main.balance}}</span> <br/>
+                  Impact Credits: <span class="value">{{main.ic / impact.price}} x ${{impact.price}} (${{main.available}})</span>
                   Discount: <span class="value">{{discount}}%</span> <br/>
                 </div>
 
@@ -93,11 +95,11 @@
               <md-card-content v-else>
                 <div class="creator">
                   <md-field>
-                    <label>Number of outcomes</label>
+                    <label>Number of promises</label>
                     <md-input v-model="outcomesNumber"></md-input>
                   </md-field>
                   <md-field>
-                    <label>Price per outcome</label>
+                    <label>Price per promise</label>
                     <md-input v-model="outcomesPrice"></md-input>
                   </md-field>
                 </div>
@@ -107,6 +109,7 @@
               <md-card-actions v-if="escrow.address">
                 <md-button @click="changeDiscount(10)">DISCOUNT +</md-button>
                 <md-button @click="changeDiscount(-10)">DISCOUNT -</md-button>
+                <md-button @click="redeem(main.address)">Redeem</md-button>
               </md-card-actions>
               <div class="create-if-box" v-else>
                 <md-button class="md-primary create-if md-raised" @click="deployIF()">Create impact futures</md-button>
@@ -133,8 +136,10 @@
                 Pays the final bill for the outcome.
 
                 <div class="stats">
-                  Balance: <span class="value">{{funder.balance}} GBP</span> <br/>
-                  Impact Promises: <span class="value">{{funder.ip}}</span> <br/>
+                  Balance: <span class="value">${{funder.balance}} </span> <br/>
+                  <div v-if="impact.price">
+                  Impact Promises: <span class="value">{{funder.ip / impact.price}} x ${{impact.price}}</span> <br/>
+                  </div>
                 </div>
               </md-card-content>
 
@@ -163,8 +168,9 @@
               Manages the flow of funds.
 
               <div class="stats">
-                Escrow: <span class="value">{{escrow.balance}} ({{escrow.unlocked}}) GBP</span> <br/>
-                Impact Promises: <span class="value">{{impact.remaining}} x {{impact.price}} GBP</span> <br/>
+                Escrow: <span class="value">${{escrow.balance}} </span> <br/>
+                Unfunded Promises: <span class="value">{{impact.remaining}} x ${{impact.price}}</span> <br/>
+                Validated Promises: <span class="value">{{impact.validated}} x ${{impact.price}}</span> <br/>
               </div>
 
 
@@ -227,9 +233,8 @@
       invest: async function () {
         await Blockchain.invest(100, this.discount);
       },
-      redeem: async function () {
-        let amount = this.investor.available;
-        await Blockchain.redeem(amount);
+      redeem: async function (account) {
+        await Blockchain.redeem(account);
       },
       validate: async function () {
         await Blockchain.validate(100);

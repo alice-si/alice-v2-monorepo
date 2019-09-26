@@ -38,7 +38,7 @@ const investor = web3.eth.accounts[1]
 const funder = web3.eth.accounts[2]
 const validator = web3.eth.accounts[3]
 
-state.accounts.main = {address: main, balance: 0, ic: 0, ip: 0};
+state.accounts.main = {address: main, balance: 0, ic: 0, ip: 0, available: 0};
 state.accounts.funder = {address: funder, balance: 0, ic: 0, ip: 0};
 state.accounts.ifu = {address: null, balance: 0, ic: 0, ip: 0};
 state.accounts.investor = {address: investor, balance: 0, ic: 0, ip: 0, available: 0};
@@ -139,16 +139,16 @@ const Blockchain = {
 
     await this.a.updateBalances()
   },
-  redeem: async (amount) => {
-    console.log("Redeeming: " + amount);
-    let available = await impactCredits.getAvailableToRedeem({from: investor});
+  redeem: async (account) => {
+    console.log("Redeeming from: " + account);
+    let available = await impactCredits.getAvailableToRedeem({from: account});
     console.log("Available: " + available);
-    let tx = await impactCredits.redeem(amount, {from: investor, gas: 1000000});
+    let tx = await impactCredits.redeem(available, {from: account, gas: 1000000});
 
     state.logs.push({
-      message: 'Redeemed ' + amount + ' impact credits',
+      message: 'Redeemed ' + available + ' impact credits',
       icon: 'attach_money',
-      code: 'impactCredits.redeem(' + amount + ')',
+      code: 'impactCredits.redeem(' + available + ')',
       tx: tx.tx,
       gas: tx.receipt.cumulativeGasUsed
     });
@@ -168,6 +168,7 @@ const Blockchain = {
     });
 
     await this.a.updateBalances()
+    await this.a.updateImpact()
   },
   finalize: async () => {
     console.log("Finalizing...");
@@ -199,6 +200,7 @@ const Blockchain = {
       state.accounts.escrow.unlocked = (await escrow.unlocked()).valueOf();
       console.log("Unlocked: " + state.accounts.escrow.unlocked);
       state.accounts.investor.available = (await impactCredits.getAvailableToRedeem({from: investor})).valueOf();
+      state.accounts.main.available = (await impactCredits.getAvailableToRedeem({from: main})).valueOf();
     }
     // if (state.accounts.ifu.escrow) {
     //   state.accounts.ifu.escrow.balance =   (await gbp.balanceOf(state.accounts.ifu.escrow.address)).valueOf();
@@ -211,7 +213,9 @@ const Blockchain = {
       state.impact.price = (await impactFutures.outcomePrice()).valueOf();
       state.impact.all = (await impactFutures.outcomesNumber()).valueOf();
       state.impact.validated = (await impactFutures.validatedNumber()).valueOf();
-      state.impact.remaining = state.impact.all - state.accounts.escrow.balance / state.impact.price;
+      console.log("Validated: " + state.impact.validated);
+      let promises = (await impactPromises.totalSupply()).valueOf();
+      state.impact.remaining = state.impact.all - promises / state.impact.price;
       state.impact.ended = (await impactFutures.hasEnded());
     }
   }

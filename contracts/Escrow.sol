@@ -38,6 +38,7 @@ contract Escrow {
 
     uint256 public unlocked;
     uint256 public withdrawn;
+    uint256 public refunded;
     uint256 public capacity;
 
     constructor(ERC20 _paymentToken, uint256 _capacity, address _operator, address _recipient) public {
@@ -70,7 +71,7 @@ contract Escrow {
     }
 
     function refund(address _recipient, uint256 _amount) public onlyOperator {
-      withdrawn = withdrawn.add(_amount);
+      refunded = refunded.add(_amount);
       require(paymentToken.transfer(_recipient, _amount));
     }
 
