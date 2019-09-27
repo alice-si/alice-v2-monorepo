@@ -52,7 +52,7 @@
                 Provides working capital.
 
                 <div class="stats">
-                  Balance: <span class="value">{{investor.balance}} GBP</span> <br/>
+                  Balance: <span class="value">${{investor.balance}}</span> <br/>
                   <div v-if="impact.price">
                   Impact Credits: <span class="value">{{investor.ic / impact.price}} x ${{impact.price}} (${{investor.available}})</span>
                   </div>

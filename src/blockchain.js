@@ -87,7 +87,7 @@ const Blockchain = {
     let tx = await impactFutures.fund(amount, {from: funder, gas: 5000000});
 
     state.logs.push({
-      message: 'Impact Futures funded with ' + amount + ' GBP donation',
+      message: 'Impact Futures funded with $' + amount + ' donation',
       icon: 'people_outline',
       code: 'impactFutures.fund(' + amount +')',
       tx: tx.tx,
@@ -115,9 +115,9 @@ const Blockchain = {
     let tx = await gbp.mint(account.address, 100, {from: main});
     console.log(tx);
     state.logs.push({
-      message: 'Deposited 100 GBP to the ' + label + ' account',
+      message: 'Deposited $100 to the ' + label + ' account',
       icon: 'add_circle_outline',
-      code: 'gbp.mint(' + account.address + ', 100)',
+      code: 'stableToken.mint(' + account.address + ', 100)',
       tx: tx.tx,
       gas: tx.receipt.cumulativeGasUsed
     });
@@ -130,7 +130,7 @@ const Blockchain = {
     let tx = await impactCredits.transfer(investor, amount, {from: main});
 
     state.logs.push({
-      message: 'Invested ' + invested + ' GBP to buy ' + amount + ' of impact credits',
+      message: 'Invested $' + invested + ' to buy ' + amount + ' of impact credits',
       icon: 'input',
       code: 'impactCredits.transfer(' + investor + ', ' + amount + ')',
       tx: tx.tx,
