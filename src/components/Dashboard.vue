@@ -13,7 +13,7 @@
     <md-app-content>
 
 
-      <div class="dashboard">
+      <div >
 
         <md-drawer class="md-right" :md-active.sync="showSidepanel">
           <md-toolbar class="md-transparent" md-elevation="0">
@@ -36,8 +36,8 @@
 
         </md-drawer>
 
-        <div>
-          <md-card md-with-hover>
+        <div class="dashboard">
+          <md-card class="card-left" md-with-hover>
             <md-ripple>
               <md-card-header style="background-color: #00c0ef">
                 <div class="md-title">
@@ -67,9 +67,7 @@
             </md-ripple>
           </md-card>
 
-          <div class="gutter"></div>
-
-          <md-card md-with-hover>
+          <md-card class="card-center" md-with-hover>
             <md-ripple>
               <md-card-header style="background-color: #1cb8c4">
                 <div class="md-title">
@@ -130,10 +128,7 @@
             </md-ripple>
           </md-card>
 
-
-          <div class="gutter"></div>
-
-          <md-card md-with-hover>
+          <md-card class="card-right" md-with-hover>
             <md-ripple>
               <md-card-header style="background-color: #874FD8">
                 <div class="md-title">
@@ -164,74 +159,73 @@
           </md-card>
         </div>
 
-        <div style="width: 400px;  display: inline-block;"></div>
+        <div class="dashboard">
+          <div class="md-card card-left"></div>
 
-        <md-card md-with-hover v-if="escrow.address">
-          <md-ripple>
-            <md-card-header style="background-color: #1cb8c4">
-              <div class="md-title">
-                <md-icon class="md-size-2x card-icon">all_inclusive</md-icon>
-                Impact Futures {{impact.ended ? '[x]' : ''}}
-              </div>
-              <div class="md-subhead">{{ifu.address}}</div>
-            </md-card-header>
-
-
-            <md-card-content>
-
-              Manages the flow of funds.
-
-              <div class="stats">
-                Escrow: <span class="value">${{escrow.balance}} </span> <br/>
-                Unfunded Promises: <span class="value">{{impact.remaining}} x ${{impact.price}}</span> <br/>
-                Validated Promises: <span class="value">{{impact.validated}} x ${{impact.price}}</span> <br/>
-              </div>
+          <md-card class="card-center" md-with-hover v-if="escrow.address">
+            <md-ripple>
+              <md-card-header style="background-color: #1cb8c4">
+                <div class="md-title">
+                  <md-icon class="md-size-2x card-icon">all_inclusive</md-icon>
+                  Impact Futures {{impact.ended ? '[x]' : ''}}
+                </div>
+                <div class="md-subhead">{{ifu.address}}</div>
+              </md-card-header>
 
 
-            </md-card-content>
+              <md-card-content>
 
-            <md-card-actions>
-              <md-button @click="finalize()">Finalize</md-button>
-            </md-card-actions>
-          </md-ripple>
-        </md-card>
+                Manages the flow of funds.
 
-        <div class="gutter"></div>
-
-        <md-card md-with-hover v-if="escrow.address">
-          <md-ripple>
-            <md-card-header style="background-color: #1cb8c4">
-              <div class="md-title">
-                <md-icon class="md-size-2x card-icon">all_inclusive</md-icon>
-                Validator
-              </div>
-              <div class="md-subhead">{{validator.address}}</div>
-            </md-card-header>
-
-
-            <md-card-content>
-
-              Verifies the impact.
-
-              <div class="stats">
-                <div v-for="claim in claims">
-                  {{claim}}
-                  <md-button @click="validate(claim)" class="md-fab md-micro md-plain">
-                    <md-icon>done</md-icon>
-                  </md-button>
+                <div class="stats">
+                  Escrow: <span class="value">${{escrow.balance}} </span> <br/>
+                  Unfunded Promises: <span class="value">{{impact.remaining}} x ${{impact.price}}</span> <br/>
+                  Validated Promises: <span class="value">{{impact.validated}} x ${{impact.price}}</span> <br/>
                 </div>
 
-              </div>
+
+              </md-card-content>
+
+              <md-card-actions>
+                <md-button @click="finalize()">Finalize</md-button>
+              </md-card-actions>
+            </md-ripple>
+          </md-card>
+
+          <md-card class="card-right" md-with-hover v-if="escrow.address">
+            <md-ripple>
+              <md-card-header style="background-color: #1cb8c4">
+                <div class="md-title">
+                  <md-icon class="md-size-2x card-icon">all_inclusive</md-icon>
+                  Validator
+                </div>
+                <div class="md-subhead">{{validator.address}}</div>
+              </md-card-header>
 
 
-            </md-card-content>
+              <md-card-content>
 
-            <md-card-actions>
-              <md-button ></md-button>
-            </md-card-actions>
-          </md-ripple>
-        </md-card>
+                Verifies the impact.
 
+                <div class="stats">
+                  <div v-for="claim in claims">
+                    {{claim}}
+                    <md-button @click="validate(claim)" class="md-fab md-micro md-plain">
+                      <md-icon>done</md-icon>
+                    </md-button>
+                  </div>
+
+                </div>
+
+
+              </md-card-content>
+
+              <md-card-actions>
+                <md-button ></md-button>
+              </md-card-actions>
+            </md-ripple>
+          </md-card>
+        </div>
 
       </div>
     </md-app-content>
@@ -312,10 +306,28 @@
     padding: 16px 0 16px 0;
   }
 
+  div.dashboard {
+    padding: 0 20px 0 20px;
+    width:100%;
+    text-align:center;
+  }
+
   .md-card {
-    width: 320px !important;
+    width: 28% !important;
     display: inline-block;
     vertical-align: top;
+  }
+
+  .md-card.card-left {
+    float:left;
+  }
+
+  .md-card.card-center {
+    margin:0 auto;
+  }
+
+  .md-card.card-right {
+    float:right;
   }
 
   .md-app-content .md-card {
