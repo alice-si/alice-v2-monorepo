@@ -43,6 +43,7 @@ state.accounts.funder = {address: funder, balance: 0, ic: 0, ip: 0};
 state.accounts.ifu = {address: null, balance: 0, ic: 0, ip: 0};
 state.accounts.investor = {address: investor, balance: 0, ic: 0, ip: 0, available: 0};
 state.accounts.escrow = {address: null, balance: 0, unlocked: 0, ic: 0, ip: 0};
+state.accounts.validator = {address: validator}
 
 
 var gbp, impactFutures, impactPromises, impactCredits, escrow;

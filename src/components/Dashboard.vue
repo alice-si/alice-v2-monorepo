@@ -67,7 +67,7 @@
             </md-ripple>
           </md-card>
 
-          <div style="width: 100px;  display: inline-block;"></div>
+          <div class="gutter"></div>
 
           <md-card md-with-hover>
             <md-ripple>
@@ -82,12 +82,26 @@
 
               <md-card-content v-if="escrow.address">
 
-                Manages Impact Futures.
+                Manages Impact Futures. {{impact.claimsCounter}} > {{impact.all}}
 
                 <div class="stats">
                   Working capital: <span class="value">${{main.balance}}</span> <br/>
                   Impact Credits: <span class="value">{{main.ic / impact.price}} x ${{impact.price}} (${{main.available}})</span>
-                  Discount: <span class="value">{{discount}}%</span> <br/>
+
+
+                  <div>
+                    Discount:
+                    <md-button @click="changeDiscount(-10)" class="md-fab md-micro md-plain">
+                      <md-icon>remove</md-icon>
+                    </md-button>
+
+                    <span class="value">{{discount}}%</span>
+
+                    <md-button @click="changeDiscount(10)" class="md-fab md-micro md-plain">
+                      <md-icon>add</md-icon>
+                    </md-button>
+                  </div>
+
                 </div>
 
               </md-card-content>
@@ -103,12 +117,10 @@
                     <md-input v-model="outcomesPrice"></md-input>
                   </md-field>
                 </div>
-
               </md-card-content>
 
               <md-card-actions v-if="escrow.address">
-                <md-button @click="changeDiscount(10)">DISCOUNT +</md-button>
-                <md-button @click="changeDiscount(-10)">DISCOUNT -</md-button>
+                <md-button @click="claimOutcome()" :disabled="impact.claimsCounter > impact.all">Claim outcome</md-button>
                 <md-button @click="redeem(main.address)">Redeem</md-button>
               </md-card-actions>
               <div class="create-if-box" v-else>
@@ -119,7 +131,7 @@
           </md-card>
 
 
-          <div style="width: 100px;  display: inline-block;"></div>
+          <div class="gutter"></div>
 
           <md-card md-with-hover>
             <md-ripple>
@@ -152,6 +164,8 @@
           </md-card>
         </div>
 
+        <div style="width: 400px;  display: inline-block;"></div>
+
         <md-card md-with-hover v-if="escrow.address">
           <md-ripple>
             <md-card-header style="background-color: #1cb8c4">
@@ -177,18 +191,46 @@
             </md-card-content>
 
             <md-card-actions>
-              <md-button @click="validate()">Validate</md-button>
               <md-button @click="finalize()">Finalize</md-button>
             </md-card-actions>
           </md-ripple>
         </md-card>
 
+        <div class="gutter"></div>
 
-        <!--<div class="logs">-->
-        <!--<div class="md-toolbar md-primary md-dense md-elevation-0">-->
-        <!--<span class="md-title">Logs</span>-->
-        <!--</div>-->
-        <!--</div>-->
+        <md-card md-with-hover v-if="escrow.address">
+          <md-ripple>
+            <md-card-header style="background-color: #1cb8c4">
+              <div class="md-title">
+                <md-icon class="md-size-2x card-icon">all_inclusive</md-icon>
+                Validator
+              </div>
+              <div class="md-subhead">{{validator.address}}</div>
+            </md-card-header>
+
+
+            <md-card-content>
+
+              Verifies the impact.
+
+              <div class="stats">
+                <div v-for="claim in claims">
+                  {{claim}}
+                  <md-button @click="validate(claim)" class="md-fab md-micro md-plain">
+                    <md-icon>done</md-icon>
+                  </md-button>
+                </div>
+
+              </div>
+
+
+            </md-card-content>
+
+            <md-card-actions>
+              <md-button ></md-button>
+            </md-card-actions>
+          </md-ripple>
+        </md-card>
 
 
       </div>
@@ -204,6 +246,7 @@
     name: 'dashboard',
     data() {
       return {
+        validator: State.accounts.validator,
         funder: State.accounts.funder,
         investor: State.accounts.investor,
         ifu: State.accounts.ifu,
@@ -215,6 +258,7 @@
         discount: 50,
         outcomesNumber: null,
         outcomesPrice: null,
+        claims: State.claims
       }
     },
     beforeCreate: function () {
@@ -236,8 +280,14 @@
       redeem: async function (account) {
         await Blockchain.redeem(account);
       },
-      validate: async function () {
+      validate: async function (claim) {
+        console.log("Validating: " + claim);
         await Blockchain.validate(100);
+        State.claims.splice(State.claims.indexOf(claim), 1);
+      },
+      claimOutcome: async function() {
+        console.log("Claiming outcome");
+        State.claims.push("Impact " + this.impact.claimsCounter++);
       },
       finalize: async function () {
         await Blockchain.finalize();
@@ -263,7 +313,7 @@
   }
 
   .md-card {
-    width: 300px;
+    width: 320px !important;
     display: inline-block;
     vertical-align: top;
   }
@@ -404,6 +454,34 @@
 
   .creator {
     padding: 0 20px 0 20px;
+  }
+
+  .md-fab {
+    background-color: #1cb8c4 !important;
+  }
+
+  .md-fab.md-mini {
+    width: 30px;
+    height: 30px;
+  }
+
+  .md-fab.md-micro {
+    width: 20px;
+    height: 20px;
+    margin: 0;
+  }
+
+  .md-fab.md-micro .md-icon {
+    font-size: 12px !important;
+  }
+
+  .md-fab .md-icon {
+    color: white !important;
+  }
+
+  div.gutter {
+    width: 80px;
+    display: inline-block;
   }
 
 
