@@ -80,7 +80,7 @@
 
               <md-card-content v-if="escrow.address">
 
-                Manages Impact Futures. {{impact.claimsCounter}} > {{impact.all}}
+                Creates impact futures.
 
                 <div class="stats">
                   Working capital: <span class="value">${{main.balance}}</span> <br/>
@@ -118,7 +118,7 @@
               </md-card-content>
 
               <md-card-actions v-if="escrow.address">
-                <md-button @click="claimOutcome()" :disabled="impact.claimsCounter > impact.all">Claim outcome</md-button>
+                <md-button @click="claimOutcome()" :disabled="impact.claimsCounter > impact.all">Submit Claim</md-button>
                 <md-button @click="redeem(main.address)">Redeem</md-button>
               </md-card-actions>
               <div class="create-if-box" v-else>
@@ -140,7 +140,7 @@
 
 
               <md-card-content>
-                Pays the final bill for the outcome.
+                Pays the final bill if promises are fulfilled.
 
                 <div class="stats">
                   Balance: <span class="value">${{funder.balance}} </span> <br/>
@@ -180,7 +180,7 @@
                 <div class="stats">
                   Escrow: <span class="value">${{escrow.balance}} </span> <br/>
                   Unfunded Promises: <span class="value">{{impact.remaining}} x ${{impact.price}}</span> <br/>
-                  Validated Promises: <span class="value">{{impact.validated}} x ${{impact.price}}</span> <br/>
+                  Fulfilled promises: <span class="value">{{impact.validated}} x ${{impact.price}}</span> <br/>
                 </div>
 
 
@@ -205,7 +205,7 @@
 
               <md-card-content>
 
-                Verifies the impact.
+                Verifies that impact promises have been fulfilled.
 
                 <div class="stats">
                   <div v-for="claim in claims">
@@ -281,7 +281,7 @@
       },
       claimOutcome: async function() {
         console.log("Claiming outcome");
-        State.claims.push("Impact " + this.impact.claimsCounter++);
+        State.claims.push("Impact promise " + this.impact.claimsCounter++);
       },
       finalize: async function () {
         await Blockchain.finalize();
@@ -391,7 +391,7 @@
         font-size: $size !important;
       }
 
-      span {
+      span {/;'/k'
         vertical-align: middle;
       }
     }
