@@ -13,12 +13,12 @@ contract('Escrow', function ([owner, operator, receiver, unauthorised]) {
   });
 
   it("should deposit", async function () {
-    gbp.mint(escrow.address, 1000);
+    await gbp.mint(escrow.address, 1000);
     (await gbp.balanceOf(escrow.address)).should.be.bignumber.equal('1000');
   });
 
   it("should not withdraw until unlocked", async function () {
-    await escrow.withdraw(receiver, 100, {from: receiver}).shouldBeReverted();
+    await escrow.withdraw(receiver, 100, {from: receiver}).shouldBeReverted("VM Exception while processing transaction: revert Cannot withdraw more funds than has been unlocked");
   });
 
   it("should not unlock from unauthorised until unlocked", async function () {

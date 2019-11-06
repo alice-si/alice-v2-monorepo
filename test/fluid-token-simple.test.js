@@ -20,7 +20,7 @@ contract('Fluid Token', function ([owner, operator, receiver, unauthorised]) {
 
 
   it("should deposit", async function () {
-    gbp.mint(escrow.address, 500);
+    await gbp.mint(escrow.address, 500);
     (await gbp.balanceOf(escrow.address)).should.be.bignumber.equal('500');
     (await escrow.funded()).should.be.bignumber.equal('500');
   });

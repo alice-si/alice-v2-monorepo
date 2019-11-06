@@ -17,8 +17,14 @@ chai.use(
   }
 );
 
-Promise.prototype.shouldBeReverted = async function () {
-  await this.should.be.rejectedWith('VM Exception while processing transaction: revert');
+Promise.prototype.shouldBeReverted = async function (reason) {
+  let networkId = await web3.eth.net.getId();
+  if (networkId == 31337) {//Buidler EVM
+    await this.should.be.rejectedWith(reason);
+  } else {
+    await this.should.be.rejectedWith('VM Exception while processing transaction: revert');
+  }
+
 };
 
 
