@@ -2,7 +2,6 @@
 import state from "@/state";
 import contract from 'truffle-contract'
 import GBP_JSON from '@contracts/DigitalGBPToken.json'
-import M_JSON from '@contracts/Migrations.json'
 import IF_JSON from '@contracts/ImpactFuturesMock.json'
 import IP_JSON from '@contracts/ImpactPromise.json'
 import FT_JSON from '@contracts/FluidToken.json'
@@ -15,44 +14,49 @@ const WEB3_PROVIDER = 'http://ganache.demo.alice.si:80';
 const ganacheProvider = new Web3.providers.HttpProvider(WEB3_PROVIDER);
 const web3 = new Web3(ganacheProvider);
 
-console.log(window.web3);
-
 var setup = function(json) {
   let c = contract(json);
   c.setProvider(ganacheProvider);
   return c;
-}
+};
 
 const GBP = setup(GBP_JSON)
-const M = setup(M_JSON)
 const ImpactFutures = setup(IF_JSON)
 const ImpactPromise = setup(IP_JSON)
 const FluidToken = setup(FT_JSON)
 const Escrow = setup(ESCROW_JSON)
 
 
-ImpactFutures.setProvider(ganacheProvider)
+ImpactFutures.setProvider(ganacheProvider);
 
-const main = web3.eth.accounts[0]
-const investor = web3.eth.accounts[1]
-const funder = web3.eth.accounts[2]
-const validator = web3.eth.accounts[3]
+var main, investor, funder, validator;
 
-state.accounts.main = {address: main, balance: 0, ic: 0, ip: 0, available: 0};
-state.accounts.funder = {address: funder, balance: 0, ic: 0, ip: 0};
+state.accounts.main = {address: null, balance: 0, ic: 0, ip: 0, available: 0};
+state.accounts.funder = {address: null, balance: 0, ic: 0, ip: 0};
 state.accounts.ifu = {address: null, balance: 0, ic: 0, ip: 0};
-state.accounts.investor = {address: investor, balance: 0, ic: 0, ip: 0, available: 0};
+state.accounts.investor = {address: null, balance: 0, ic: 0, ip: 0, available: 0};
 state.accounts.escrow = {address: null, balance: 0, unlocked: 0, ic: 0, ip: 0};
-state.accounts.validator = {address: validator}
+state.accounts.validator = {address: null};
 
+var init = function(accounts) {
+
+  main = accounts[0];
+  investor = accounts[1];
+  funder = accounts[2];
+  validator = accounts[3];
+
+  state.accounts.main.address = main;
+  state.accounts.funder.address = funder;
+  state.accounts.investor.address = investor;
+};
 
 var gbp, impactFutures, impactPromises, impactCredits, escrow;
-
-
 
 const Blockchain = {
 
   deploy: async () => {
+    let accounts = await web3.eth.getAccounts();
+    init(accounts);
     gbp = await GBP.new({from: main, gas: 5000000});
     await this.a.updateBalances()
   },
@@ -190,18 +194,18 @@ const Blockchain = {
     for(const account of Object.values(state.accounts)) {
       if (account.address) {
         console.log("Checking balance for: " + account.address);
-        account.balance = (await gbp.balanceOf(account.address)).valueOf();
+        account.balance = (await gbp.balanceOf(account.address)).toString();
         if (impactPromises && impactCredits) {
-          account.ip = (await impactPromises.balanceOf(account.address)).valueOf();
-          account.ic = (await impactCredits.balanceOf(account.address)).valueOf();
+          account.ip = (await impactPromises.balanceOf(account.address)).toString();
+          account.ic = (await impactCredits.balanceOf(account.address)).toString();
         }
       }
     };
     if (state.accounts.escrow.address) {
-      state.accounts.escrow.unlocked = (await escrow.unlocked()).valueOf();
+      state.accounts.escrow.unlocked = (await escrow.unlocked()).toString();
       console.log("Unlocked: " + state.accounts.escrow.unlocked);
-      state.accounts.investor.available = (await impactCredits.getAvailableToRedeem({from: investor})).valueOf();
-      state.accounts.main.available = (await impactCredits.getAvailableToRedeem({from: main})).valueOf();
+      state.accounts.investor.available = (await impactCredits.getAvailableToRedeem({from: investor})).toString();
+      state.accounts.main.available = (await impactCredits.getAvailableToRedeem({from: main})).toString();
     }
     // if (state.accounts.ifu.escrow) {
     //   state.accounts.ifu.escrow.balance =   (await gbp.balanceOf(state.accounts.ifu.escrow.address)).valueOf();
@@ -211,11 +215,11 @@ const Blockchain = {
 
   updateImpact: async () => {
     if (impactFutures) {
-      state.impact.price = (await impactFutures.outcomePrice()).valueOf();
-      state.impact.all = (await impactFutures.outcomesNumber()).valueOf();
-      state.impact.validated = (await impactFutures.validatedNumber()).valueOf();
+      state.impact.price = (await impactFutures.outcomePrice()).toString();
+      state.impact.all = (await impactFutures.outcomesNumber()).toString();
+      state.impact.validated = (await impactFutures.validatedNumber()).toString();
       console.log("Validated: " + state.impact.validated);
-      let promises = (await impactPromises.totalSupply()).valueOf();
+      let promises = (await impactPromises.totalSupply()).toString();
       state.impact.remaining = state.impact.all - promises / state.impact.price;
       state.impact.ended = (await impactFutures.hasEnded());
     }
