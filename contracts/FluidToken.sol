@@ -1,5 +1,8 @@
 /*
-Implements ERC20 Token Standard: https://github.com/ethereum/EIPs/issues/20
+This is a new token type that gives the holder right to funds that may not yet be available.
+It is based and compatible with the ERC20 token standard but has a double bottom line:
+funds that are available for a holder and funds that have been already redeemed.
+Both balances are automatically update when tokens are transferred making it fully tradable.
 */
 
 pragma solidity ^0.5.2;
@@ -18,14 +21,21 @@ contract FluidToken is ERC20 {
     */
     event Redeemed(address indexed to, uint256 value);
 
+    /**
+    * @dev A pot holding funds that may be gradually filled and released to token holders.
+    */
     Escrow public escrow;
 
+
+    /**
+    * @dev A core structure keeping an account of funds that have been already redeemed.
+    */
     mapping (address => uint256) private _redeemed;
+
 
     constructor(uint256 _initialSupply) public {
         escrow = Escrow(msg.sender);
         _mint(msg.sender, _initialSupply);
-
     }
 
     /**

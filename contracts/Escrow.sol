@@ -5,7 +5,7 @@ import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
 
 /**
  * @title Escrow
- * @dev Contract dedicated to hold funds until impact is validated.
+ * @dev Contract dedicated to holds funds that may be gradually unlocked to the recipient.
  *
  */
 contract Escrow {
@@ -24,7 +24,7 @@ contract Escrow {
 
 
     /**
-     * @dev Throws if called by any account other than the credit token contract.
+     * @dev Throws if called by any account other than the recipient.
      */
     modifier onlyRecipient() {
         require(msg.sender == recipient, "The caller is not the recipient");
@@ -58,7 +58,7 @@ contract Escrow {
 
 
     /**
-     * @dev Withdraw part of the escrow reserved for receiver
+     * @dev Withdraw part of the escrow reserved for recipient
      * @param _amount The amount of funds intended to be taken out
      */
     function withdraw(address _recipient, uint256 _amount) public onlyRecipient {
