@@ -3,7 +3,7 @@
   <md-app>
     <md-app-toolbar class="md-primary">
 
-      <span class="md-title">Impact Futures Protocol Demo</span>
+      <span class="md-title">Impact Delivery Agreement Demo</span>
       <div class="md-toolbar-section-end">
         <md-button style="color: white" @click="showSidepanel = true">Show logs</md-button>
       </div>
@@ -54,7 +54,7 @@
                 <div class="stats">
                   Balance: <span class="value">${{investor.balance}}</span> <br/>
                   <div v-if="impact.price">
-                  Impact Credits: <span class="value">{{investor.ic / impact.price}} x ${{impact.price}} (${{investor.available}})</span>
+                  Payment Rights: <span class="value">{{investor.ic / impact.price}} x ${{impact.price}} (${{investor.available}})</span>
                   </div>
                 </div>
               </md-card-content>
@@ -80,11 +80,11 @@
 
               <md-card-content v-if="escrow.address">
 
-                Creates impact futures.
+                Creates Impact Delivery Agreement
 
                 <div class="stats">
                   Working capital: <span class="value">${{main.balance}}</span> <br/>
-                  Impact Credits: <span class="value">{{main.ic / impact.price}} x ${{impact.price}} (${{main.available}})</span>
+                  Payment Rights: <span class="value">{{main.ic / impact.price}} x ${{impact.price}} (${{main.available}})</span>
 
 
                   <div>
@@ -122,7 +122,7 @@
                 <md-button @click="redeem(main.address)">Redeem</md-button>
               </md-card-actions>
               <div class="create-if-box" v-else>
-                <md-button class="md-primary create-if md-raised" @click="deployIF()">Create impact futures</md-button>
+                <md-button class="md-primary create-if md-raised" @click="deployIF()">Create IDA</md-button>
               </div>
 
             </md-ripple>
@@ -167,7 +167,7 @@
               <md-card-header style="background-color: #1cb8c4">
                 <div class="md-title">
                   <md-icon class="md-size-2x card-icon">all_inclusive</md-icon>
-                  Impact Futures {{impact.ended ? '[x]' : ''}}
+                  IDA {{impact.ended ? '[x]' : ''}}
                 </div>
                 <div class="md-subhead">{{ifu.address}}</div>
               </md-card-header>
@@ -391,7 +391,7 @@
         font-size: $size !important;
       }
 
-      span {/;'/k'
+      span {
         vertical-align: middle;
       }
     }
