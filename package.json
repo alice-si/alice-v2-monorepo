@@ -1,8 +1,8 @@
 {
-  "name": "truffle-vue",
-  "version": "0.2.0",
-  "description": "A vue.js truffle box",
-  "author": "osarrouy <olivier.sarrouy@gmail.com>",
+  "name": "IDA",
+  "version": "0.1.0",
+  "description": "Impact Delivery Agreement Protocol",
+  "author": "Jakub Wojciechowski <jakub@alice.si>",
   "private": true,
   "scripts": {
     "dev": "node scripts/dev-server.js",
