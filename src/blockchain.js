@@ -2,7 +2,7 @@
 import state from "@/state";
 import contract from 'truffle-contract'
 import GBP_JSON from '@contracts/DigitalGBPToken.json'
-import IF_JSON from '@contracts/ImpactFuturesMock.json'
+import IDA_JSON from '@contracts/IdaMock.json'
 import IP_JSON from '@contracts/ImpactPromise.json'
 import FT_JSON from '@contracts/FluidToken.json'
 import ESCROW_JSON from '@contracts/Escrow.json'
@@ -21,13 +21,13 @@ var setup = function(json) {
 };
 
 const GBP = setup(GBP_JSON)
-const ImpactFutures = setup(IF_JSON)
+const Ida = setup(IDA_JSON)
 const ImpactPromise = setup(IP_JSON)
 const FluidToken = setup(FT_JSON)
 const Escrow = setup(ESCROW_JSON)
 
 
-ImpactFutures.setProvider(ganacheProvider);
+Ida.setProvider(ganacheProvider);
 
 var main, investor, funder, validator;
 
@@ -50,7 +50,7 @@ var init = function(accounts) {
   state.accounts.investor.address = investor;
 };
 
-var gbp, impactFutures, impactPromises, impactCredits, escrow;
+var gbp, ida, impactPromises, impactCredits, escrow;
 
 const Blockchain = {
 
@@ -61,20 +61,20 @@ const Blockchain = {
     await this.a.updateBalances()
   },
   deployIF: async(number, price) => {
-    console.log("Deploying Impact Futures for: " + number + " of outcomes with price: " + price);
-    impactFutures = await ImpactFutures.new(gbp.address, number, price, validator, main, 1, {from: main, gas: 6700000});
-    impactPromises = await ImpactPromise.at(await impactFutures.impactPromise());
-    impactCredits = await FluidToken.at(await impactFutures.impactCredit());
-    escrow = await Escrow.at(await impactFutures.escrow());
+    console.log("Deploying Ida for: " + number + " of outcomes with price: " + price);
+    ida = await Ida.new(gbp.address, number, price, validator, main, 1, {from: main, gas: 6700000});
+    impactPromises = await ImpactPromise.at(await ida.impactPromise());
+    impactCredits = await FluidToken.at(await ida.impactCredit());
+    escrow = await Escrow.at(await ida.escrow());
     state.accounts.escrow.address = escrow.address;
-    state.accounts.ifu.address = impactFutures.address;
+    state.accounts.ifu.address = ida.address;
     console.log("ESCROW: " + escrow.address);
 
     state.logs.push({
-      message: 'Deployed impact futures contract to address: ' + impactFutures.address,
+      message: 'Deployed Ida contract to address: ' + ida.address,
       icon: 'all_inclusive',
-      code: 'ImpactFutures.new(' + gbp.address + ', 10, 100, ' + validator + ', ' + main  +')',
-      tx: impactFutures.transactionHash,
+      code: 'Ida.new(' + gbp.address + ', 10, 100, ' + validator + ', ' + main  +')',
+      tx: ida.transactionHash,
       gas: 2077540
     });
 
@@ -88,13 +88,13 @@ const Blockchain = {
   },
   fund: async(amount) => {
     console.log("Funding: " + amount + " from: " + funder);
-    await gbp.approve(impactFutures.address, amount, {from: funder});
-    let tx = await impactFutures.fund(amount, {from: funder, gas: 5000000});
+    await gbp.approve(ida.address, amount, {from: funder});
+    let tx = await ida.fund(amount, {from: funder, gas: 5000000});
 
     state.logs.push({
-      message: 'Impact Futures funded with $' + amount + ' donation',
+      message: 'IDA funded with $' + amount + ' donation',
       icon: 'people_outline',
-      code: 'impactFutures.fund(' + amount +')',
+      code: 'ida.fund(' + amount +')',
       tx: tx.tx,
       gas: tx.receipt.cumulativeGasUsed
     });
@@ -104,12 +104,12 @@ const Blockchain = {
   },
   refund: async(amount) => {
     console.log("Refunding...");
-    let tx = await impactFutures.refund({from: funder, gas: 5000000});
+    let tx = await ida.refund({from: funder, gas: 5000000});
 
     state.logs.push({
-      message: 'Impact Futures refunded',
+      message: 'IDA refunded',
       icon: 'people_outline',
-      code: 'impactFutures.refund()',
+      code: 'ida.refund()',
       tx: tx.tx,
       gas: tx.receipt.cumulativeGasUsed
     });
@@ -162,12 +162,12 @@ const Blockchain = {
   },
   validate: async () => {
     console.log("Validating...");
-    let tx = await impactFutures.validateOutcome({from: validator});
+    let tx = await ida.validateOutcome({from: validator});
 
     state.logs.push({
       message: 'Validated outcome',
       icon: 'check_circle_outline',
-      code: 'impactFutures.validateOutcome()',
+      code: 'ida.validateOutcome()',
       tx: tx.tx,
       gas: tx.receipt.cumulativeGasUsed
     });
@@ -177,12 +177,12 @@ const Blockchain = {
   },
   finalize: async () => {
     console.log("Finalizing...");
-    let tx = await impactFutures.setEnd({from: main});
+    let tx = await ida.setEnd({from: main});
 
     state.logs.push({
-      message: 'Finalizing impact futures',
+      message: 'Finalizing IDA',
       icon: 'cancel_presentation',
-      code: 'impactFutures.setEnd()',
+      code: 'ida.setEnd()',
       tx: tx.tx,
       gas: tx.receipt.cumulativeGasUsed
     });
@@ -214,14 +214,14 @@ const Blockchain = {
   },
 
   updateImpact: async () => {
-    if (impactFutures) {
-      state.impact.price = (await impactFutures.outcomePrice()).toString();
-      state.impact.all = (await impactFutures.outcomesNumber()).toString();
-      state.impact.validated = (await impactFutures.validatedNumber()).toString();
+    if (ida) {
+      state.impact.price = (await ida.outcomePrice()).toString();
+      state.impact.all = (await ida.outcomesNumber()).toString();
+      state.impact.validated = (await ida.validatedNumber()).toString();
       console.log("Validated: " + state.impact.validated);
       let promises = (await impactPromises.totalSupply()).toString();
       state.impact.remaining = state.impact.all - promises / state.impact.price;
-      state.impact.ended = (await impactFutures.hasEnded());
+      state.impact.ended = (await ida.hasEnded());
     }
   }
 }

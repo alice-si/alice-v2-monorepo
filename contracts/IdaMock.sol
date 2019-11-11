@@ -1,18 +1,18 @@
 pragma solidity ^0.5.2;
 
-import './ImpactFutures.sol';
+import './Ida.sol';
 
 /**
- * @title Impact Futures Mock
+ * @title Impact Delivery Agreement Mock
  * @dev Allows testing the end refunds
  *
  */
-contract ImpactFuturesMock is ImpactFutures {
+contract IdaMock is Ida {
 
   bool mockEnded;
 
   constructor(ERC20 _paymentToken, uint256 _outcomesNumber, uint256 _outcomesPrice, address _validator, address _manager, uint256 _end) public
-    ImpactFutures(_paymentToken, _outcomesNumber, _outcomesPrice, _validator, _manager, _end) {
+    Ida(_paymentToken, _outcomesNumber, _outcomesPrice, _validator, _manager, _end) {
   }
 
   function setEnd() public {

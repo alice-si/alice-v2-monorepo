@@ -8,11 +8,11 @@ import './FluidToken.sol';
 import './ImpactPromise.sol';
 
 /**
- * @title Impact Futures
+ * @title Impact Delivery Agreement
  * @dev Contract to manage social impact projects in a flexible way.
  *
  */
-contract ImpactFutures {
+contract Ida {
     using SafeMath for uint256;
 
     event Funded(address indexed funder, uint256 amount);
