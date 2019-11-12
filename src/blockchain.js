@@ -50,7 +50,7 @@ var init = function(accounts) {
   state.accounts.investor.address = investor;
 };
 
-var gbp, ida, impactPromises, impactCredits, escrow;
+var gbp, ida, impactPromises, paymentRights, escrow;
 
 const Blockchain = {
 
@@ -64,7 +64,7 @@ const Blockchain = {
     console.log("Deploying Ida for: " + number + " of outcomes with price: " + price);
     ida = await Ida.new(gbp.address, number, price, validator, main, 1, {from: main, gas: 6700000});
     impactPromises = await ImpactPromise.at(await ida.impactPromise());
-    impactCredits = await FluidToken.at(await ida.impactCredit());
+    paymentRights = await FluidToken.at(await ida.paymentRights());
     escrow = await Escrow.at(await ida.escrow());
     state.accounts.escrow.address = escrow.address;
     state.accounts.ifu.address = ida.address;
@@ -132,12 +132,12 @@ const Blockchain = {
     console.log("Investing: " + amount);
     let invested = amount * (1-discount/100);
     await gbp.transfer(main, invested, {from: investor});
-    let tx = await impactCredits.transfer(investor, amount, {from: main});
+    let tx = await paymentRights.transfer(investor, amount, {from: main});
 
     state.logs.push({
-      message: 'Invested $' + invested + ' to buy ' + amount + ' of impact credits',
+      message: 'Invested $' + invested + ' to buy ' + amount + ' of payment rights',
       icon: 'input',
-      code: 'impactCredits.transfer(' + investor + ', ' + amount + ')',
+      code: 'paymentRights.transfer(' + investor + ', ' + amount + ')',
       tx: tx.tx,
       gas: tx.receipt.cumulativeGasUsed
     });
@@ -146,14 +146,14 @@ const Blockchain = {
   },
   redeem: async (account) => {
     console.log("Redeeming from: " + account);
-    let available = await impactCredits.getAvailableToRedeem({from: account});
+    let available = await paymentRights.getAvailableToRedeem({from: account});
     console.log("Available: " + available);
-    let tx = await impactCredits.redeem(available, {from: account, gas: 1000000});
+    let tx = await paymentRights.redeem(available, {from: account, gas: 1000000});
 
     state.logs.push({
-      message: 'Redeemed ' + available + ' impact credits',
+      message: 'Redeemed ' + available + ' payment rights.',
       icon: 'attach_money',
-      code: 'impactCredits.redeem(' + available + ')',
+      code: 'paymentRights.redeem(' + available + ')',
       tx: tx.tx,
       gas: tx.receipt.cumulativeGasUsed
     });
@@ -195,17 +195,17 @@ const Blockchain = {
       if (account.address) {
         console.log("Checking balance for: " + account.address);
         account.balance = (await gbp.balanceOf(account.address)).toString();
-        if (impactPromises && impactCredits) {
+        if (impactPromises && paymentRights) {
           account.ip = (await impactPromises.balanceOf(account.address)).toString();
-          account.ic = (await impactCredits.balanceOf(account.address)).toString();
+          account.ic = (await paymentRights.balanceOf(account.address)).toString();
         }
       }
     };
     if (state.accounts.escrow.address) {
       state.accounts.escrow.unlocked = (await escrow.unlocked()).toString();
       console.log("Unlocked: " + state.accounts.escrow.unlocked);
-      state.accounts.investor.available = (await impactCredits.getAvailableToRedeem({from: investor})).toString();
-      state.accounts.main.available = (await impactCredits.getAvailableToRedeem({from: main})).toString();
+      state.accounts.investor.available = (await paymentRights.getAvailableToRedeem({from: investor})).toString();
+      state.accounts.main.available = (await paymentRights.getAvailableToRedeem({from: main})).toString();
     }
     // if (state.accounts.ifu.escrow) {
     //   state.accounts.ifu.escrow.balance =   (await gbp.balanceOf(state.accounts.ifu.escrow.address)).valueOf();

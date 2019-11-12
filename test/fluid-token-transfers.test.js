@@ -12,7 +12,7 @@ contract('Full tokens transfer', function ([owner, operator, sender, recipient])
   before("deploy and fund fluid escrow and token contracts", async function () {
     gbp = await GBP.new();
     escrow = await FluidEscrow.new(gbp.address, 1000, operator);
-    fluidToken = await FluidToken.at(await escrow.creditToken());
+    fluidToken = await FluidToken.at(await escrow.paymentRights());
     gbp.mint(escrow.address, 1000);
 
     (await escrow.capacity()).should.be.bignumber.equal('1000');
@@ -21,7 +21,7 @@ contract('Full tokens transfer', function ([owner, operator, sender, recipient])
   });
 
 
-  it("should distribute impact credit tokens", async function () {
+  it("should distribute paymentRights", async function () {
     await fluidToken.transfer(sender, 100, {from: owner});
 
     (await fluidToken.balanceOf(owner)).should.be.bignumber.equal('900');
@@ -67,7 +67,7 @@ contract('Part tokens transfer', function ([owner, operator, sender, recipient])
   before("deploy and fund fluid escrow and token contracts", async function () {
     gbp = await GBP.new();
     escrow = await FluidEscrow.new(gbp.address, 1000, operator);
-    fluidToken = await FluidToken.at(await escrow.creditToken());
+    fluidToken = await FluidToken.at(await escrow.paymentRights());
     gbp.mint(escrow.address, 1000);
 
     (await escrow.capacity()).should.be.bignumber.equal('1000');
@@ -76,7 +76,7 @@ contract('Part tokens transfer', function ([owner, operator, sender, recipient])
   });
 
 
-  it("should distribute impact credit tokens", async function () {
+  it("should distribute paymentRights", async function () {
     await fluidToken.transfer(sender, 100, {from: owner});
 
     (await fluidToken.balanceOf(owner)).should.be.bignumber.equal('900');
@@ -131,7 +131,7 @@ contract('Mixed token transfer', function ([owner, operator, sender, recipient, 
   before("deploy and fund fluid escrow and token contracts", async function () {
     gbp = await GBP.new();
     escrow = await FluidEscrow.new(gbp.address, 1000, operator);
-    fluidToken = await FluidToken.at(await escrow.creditToken());
+    fluidToken = await FluidToken.at(await escrow.paymentRights());
     gbp.mint(escrow.address, 1000);
 
     (await escrow.capacity()).should.be.bignumber.equal('1000');
@@ -140,7 +140,7 @@ contract('Mixed token transfer', function ([owner, operator, sender, recipient, 
   });
 
 
-  it("should distribute impact credit tokens", async function () {
+  it("should distribute paymentRights", async function () {
     await fluidToken.transfer(sender, 100, {from: owner});
     await fluidToken.transfer(recipient, 100, {from: owner});
 

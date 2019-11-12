@@ -7,11 +7,11 @@ var GBP = artifacts.require("DigitalGBPToken");
 require("./test-setup");
 const { time } = require('openzeppelin-test-helpers');
 
-contract('Impact Futures', function ([owner, validator, funder, investor, unauthorised]) {
+contract('Impact Delivery Agreement', function ([owner, validator, funder, investor, unauthorised]) {
   var escrow;
   var gbp;
   var ida;
-  var impactCredit;
+  var paymentRights;
   var impactPromise;
 
   before("deploy escrow and token contracts", async function () {
@@ -19,9 +19,9 @@ contract('Impact Futures', function ([owner, validator, funder, investor, unauth
     let end = await time.latest() + time.duration.years(1);
     ida = await Ida.new(gbp.address, 10, 100, validator, owner, end);
 
-    impactCredit = await FluidToken.at(await ida.impactCredit());
-    (await impactCredit.balanceOf(owner)).should.be.bignumber.equal('1000');
-    (await impactCredit.totalSupply()).should.be.bignumber.equal('1000');
+    paymentRights = await FluidToken.at(await ida.paymentRights());
+    (await paymentRights.balanceOf(owner)).should.be.bignumber.equal('1000');
+    (await paymentRights.totalSupply()).should.be.bignumber.equal('1000');
 
     impactPromise = await ImpactPromise.at(await ida.impactPromise());
     (await impactPromise.balanceOf(owner)).should.be.bignumber.equal('0');
@@ -32,9 +32,9 @@ contract('Impact Futures', function ([owner, validator, funder, investor, unauth
     (await gbp.balanceOf(escrow.address)).should.be.bignumber.equal('0');
   });
 
-  it("should get impact credits", async function () {
-    await impactCredit.transfer(investor, 100);
-    (await impactCredit.balanceOf(investor)).should.be.bignumber.equal('100');
+  it("should get impact payment rights", async function () {
+    await paymentRights.transfer(investor, 100);
+    (await paymentRights.balanceOf(investor)).should.be.bignumber.equal('100');
   });
 
   it("should fund", async function () {
@@ -51,15 +51,15 @@ contract('Impact Futures', function ([owner, validator, funder, investor, unauth
     await ida.validateOutcome({from: validator});
 
     (await escrow.unlocked()).should.be.bignumber.equal('100');
-    (await impactCredit.getAvailableToRedeem({from: investor})).should.be.bignumber.equal('10');
+    (await paymentRights.getAvailableToRedeem({from: investor})).should.be.bignumber.equal('10');
   });
 
 
   it("should withdraw from escrow", async function () {
-    await impactCredit.redeem(10, {from: investor});
+    await paymentRights.redeem(10, {from: investor});
 
     (await gbp.balanceOf(investor)).should.be.bignumber.equal('10');
-    (await impactCredit.getAvailableToRedeem({from: investor})).should.be.bignumber.equal('0');
+    (await paymentRights.getAvailableToRedeem({from: investor})).should.be.bignumber.equal('0');
     (await gbp.balanceOf(escrow.address)).should.be.bignumber.equal('190');
   });
 

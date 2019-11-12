@@ -12,7 +12,7 @@ contract('Fluid Token', function ([owner, operator, receiver, unauthorised]) {
   before("deploy fluid escrow and token contracts", async function () {
     gbp = await GBP.new();
     escrow = await FluidEscrow.new(gbp.address, 1000, operator);
-    fluidToken = await FluidToken.at(await escrow.creditToken());
+    fluidToken = await FluidToken.at(await escrow.paymentRights());
 
     (await escrow.capacity()).should.be.bignumber.equal('1000');
     (await fluidToken.balanceOf(owner)).should.be.bignumber.equal('1000');
@@ -26,7 +26,7 @@ contract('Fluid Token', function ([owner, operator, receiver, unauthorised]) {
   });
 
 
-  it("should distribute impact credit tokens", async function () {
+  it("should distribute payment rights", async function () {
     await fluidToken.transfer(receiver, 100, {from: owner});
 
     (await fluidToken.balanceOf(owner)).should.be.bignumber.equal('900');

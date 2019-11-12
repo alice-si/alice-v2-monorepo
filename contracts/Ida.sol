@@ -37,7 +37,7 @@ contract Ida {
 
     ERC20 public paymentToken;
     ImpactPromise public impactPromise;
-    FluidToken public impactCredit;
+    FluidToken public paymentRights;
 
     Escrow public escrow;
 
@@ -61,8 +61,8 @@ contract Ida {
 
         escrow = new FluidEscrow(_paymentToken, budget, address(this));
         impactPromise = new ImpactPromise();
-        impactCredit = FluidToken(escrow.recipient());
-        impactCredit.transfer(manager, budget);
+        paymentRights = FluidToken(escrow.recipient());
+        paymentRights.transfer(manager, budget);
     }
 
 
