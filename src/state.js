@@ -13,9 +13,11 @@ let state = {
     ended: false
   },
   claims: [],
-  logs: [
-
-  ]
+  logs: {
+    show: false,
+    list: []
+  },
+  paymentTokens: []
 
 };
 

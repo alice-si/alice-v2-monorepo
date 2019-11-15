@@ -17,7 +17,7 @@ contract('Impact Delivery Agreement', function ([owner, validator, funder, inves
   before("deploy escrow and token contracts", async function () {
     gbp = await GBP.new();
     let end = await time.latest() + time.duration.years(1);
-    ida = await Ida.new(gbp.address, 10, 100, validator, owner, end);
+    ida = await Ida.new(gbp.address, 10, 100, validator, end);
 
     paymentRights = await FluidToken.at(await ida.paymentRights());
     (await paymentRights.balanceOf(owner)).should.be.bignumber.equal('1000');

@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "truffle-contract": "^4.0.31",
-    "vue": "^2.4.2",
+    "vue": "^2.5.2",
     "vue-material": "^1.0.0-beta-11",
     "vue-router": "^2.7.0"
   },
@@ -45,6 +45,7 @@
     "cross-spawn": "^5.0.1",
     "css-loader": "^0.28.0",
     "cssnano": "^3.10.0",
+    "es6-promisify": "6.0.2",
     "eslint": "^3.19.0",
     "eslint-config-standard": "^6.2.1",
     "eslint-friendly-formatter": "^3.0.0",
@@ -87,9 +88,9 @@
     "sinon": "^2.1.0",
     "sinon-chai": "^2.8.0",
     "url-loader": "^0.5.8",
-    "vue-loader": "^13.0.4",
+    "vue-loader": "^13.3.0",
     "vue-style-loader": "^3.0.1",
-    "vue-template-compiler": "^2.4.2",
+    "vue-template-compiler": "^2.5.2",
     "web3": "^1.2.2",
     "webpack": "^2.6.1",
     "webpack-bundle-analyzer": "^2.2.1",

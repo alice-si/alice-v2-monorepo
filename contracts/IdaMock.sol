@@ -11,8 +11,8 @@ contract IdaMock is Ida {
 
   bool mockEnded;
 
-  constructor(ERC20 _paymentToken, uint256 _outcomesNumber, uint256 _outcomesPrice, address _validator, address _manager, uint256 _end) public
-    Ida(_paymentToken, _outcomesNumber, _outcomesPrice, _validator, _manager, _end) {
+  constructor(ERC20 _paymentToken, uint256 _outcomesNumber, uint256 _outcomesPrice, address _validator, uint256 _endTime) public
+    Ida(_paymentToken, _outcomesNumber, _outcomesPrice, _validator, _endTime) {
   }
 
   function setEnd() public {

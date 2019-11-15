@@ -26,15 +26,6 @@ contract Ida {
         _;
     }
 
-    /**
-     * @dev Throws if called by any account other than the Manger.
-     */
-    modifier onlyManager() {
-        require(msg.sender == manager, "The caller is not the manager");
-        _;
-    }
-
-
     ERC20 public paymentToken;
     ImpactPromise public impactPromise;
     FluidToken public paymentRights;
@@ -42,27 +33,25 @@ contract Ida {
     Escrow public escrow;
 
     address public validator;
-    address public manager;
 
     uint256 public outcomesNumber;
     uint256 public validatedNumber;
     uint256 public outcomePrice;
     uint256 public budget;
-    uint256 public end;
+    uint256 public endTime;
 
-    constructor(ERC20 _paymentToken, uint256 _outcomesNumber, uint256 _outcomesPrice, address _validator, address _manager, uint256 _end) public {
+    constructor(ERC20 _paymentToken, uint256 _outcomesNumber, uint256 _outcomesPrice, address _validator, uint256 _endTime) public {
         paymentToken = _paymentToken;
         outcomesNumber = _outcomesNumber;
         outcomePrice = _outcomesPrice;
         budget = outcomePrice.mul(outcomesNumber);
         validator = _validator;
-        manager = _manager;
-        end = _end;
+        endTime = _endTime;
 
         escrow = new FluidEscrow(_paymentToken, budget, address(this));
         impactPromise = new ImpactPromise();
         paymentRights = FluidToken(escrow.recipient());
-        paymentRights.transfer(manager, budget);
+        paymentRights.transfer(msg.sender, budget);
     }
 
 
@@ -84,7 +73,7 @@ contract Ida {
 
 
     function hasEnded() public view returns(bool) {
-      return now > end;
+      return now > endTime;
     }
 
 

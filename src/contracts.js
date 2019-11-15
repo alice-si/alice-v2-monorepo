@@ -1,91 +1,93 @@
 /* eslint-disable */
+const {promisify} = require("es6-promisify");
+
 import state from "@/state";
 import contract from 'truffle-contract'
-import GBP_JSON from '@contracts/AliceUSD.json'
+import AUSD_JSON from '@contracts/AliceUSD.json'
 import IDA_JSON from '@contracts/IdaMock.json'
 import IP_JSON from '@contracts/ImpactPromise.json'
 import FT_JSON from '@contracts/FluidToken.json'
 import ESCROW_JSON from '@contracts/Escrow.json'
 
-import {default as Web3} from 'web3'
+let ethereum = window.ethereum;
+let web3 = window.web3;
 
-const WEB3_PROVIDER = 'http://ganache.demo.alice.si:80';
+const AUSD_ADDRESS = "0xe10212440bf8e8d2bc753Cda7FD82C2bd6c2DF44";
 
-const ganacheProvider = new Web3.providers.HttpProvider(WEB3_PROVIDER);
-const web3 = new Web3(ganacheProvider);
+
+var connectWeb3 = async function() {
+  if (typeof ethereum !== 'undefined') {
+    await ethereum.enable();
+    web3 = new Web3(ethereum);
+  } else if (typeof web3 !== 'undefined') {
+    web3 = new Web3(web3.currentProvider);
+  } else {
+    web3 = new Web3(new Web3.providers.HttpProvider(process.env.WEB3_PROVIDER));
+  }
+};
+
 
 var setup = function(json) {
   let c = contract(json);
-  c.setProvider(ganacheProvider);
+  c.setProvider(web3.currentProvider);
   return c;
 };
 
-const GBP = setup(GBP_JSON)
-const Ida = setup(IDA_JSON)
+const AUSD = setup(AUSD_JSON)
+const IDA = setup(IDA_JSON)
 const ImpactPromise = setup(IP_JSON)
 const FluidToken = setup(FT_JSON)
 const Escrow = setup(ESCROW_JSON)
 
 
-Ida.setProvider(ganacheProvider);
+var main, ausd;
 
-var main, investor, funder, validator;
-
-state.accounts.main = {address: null, balance: 0, ic: 0, ip: 0, available: 0};
-state.accounts.funder = {address: null, balance: 0, ic: 0, ip: 0};
-state.accounts.ifu = {address: null, balance: 0, ic: 0, ip: 0};
-state.accounts.investor = {address: null, balance: 0, ic: 0, ip: 0, available: 0};
-state.accounts.escrow = {address: null, balance: 0, unlocked: 0, ic: 0, ip: 0};
-state.accounts.validator = {address: null};
-
-var init = function(accounts) {
-
-  main = accounts[0];
-  investor = accounts[1];
-  funder = accounts[2];
-  validator = accounts[3];
-
-  state.accounts.main.address = main;
-  state.accounts.funder.address = funder;
-  state.accounts.investor.address = investor;
+var initAccounts = function(accounts) {
+  //main = accounts[0];
+  //console.log("Main: " + main);
 };
 
 var gbp, ida, impactPromises, paymentRights, escrow;
 
-const Blockchain = {
+const Contracts = {
 
-  deploy: async () => {
-    let accounts = await web3.eth.getAccounts();
-    init(accounts);
-    gbp = await GBP.new({from: main, gas: 5000000});
-    await this.a.updateBalances()
+
+  deployAUSD: async() => {
+    let ausd = await AUSD.new({from: main, gas: 2000000});
+    console.log(ausd.address);
   },
-  deployIF: async(number, price) => {
-    console.log("Deploying Ida for: " + number + " of outcomes with price: " + price);
-    ida = await Ida.new(gbp.address, number, price, validator, 1, {from: main, gas: 6700000});
-    impactPromises = await ImpactPromise.at(await ida.impactPromise());
-    paymentRights = await FluidToken.at(await ida.paymentRights());
-    escrow = await Escrow.at(await ida.escrow());
-    state.accounts.escrow.address = escrow.address;
-    state.accounts.ifu.address = ida.address;
-    console.log("ESCROW: " + escrow.address);
 
-    state.logs.list.push({
-      message: 'Deployed Ida contract to address: ' + ida.address,
-      icon: 'all_inclusive',
-      code: 'Ida.new(' + gbp.address + ', 10, 100, ' + validator + ', ' + main  +')',
-      tx: ida.transactionHash,
-      gas: 2077540
-    });
 
-    await this.a.updateBalances()
-    await this.a.updateImpact()
+  deployIda: async(newIda) => {
+    console.log(newIda);
+    console.log("Deploying IDA for: " + newIda.outcomesNumber + " of outcomes with price: " + newIda.outcomesPrice);
+    ida = await IDA.new(
+      newIda.paymentToken,
+      newIda.outcomesNumber,
+      newIda.outcomesPrice,
+      newIda.validator,
+      newIda.endTime.getTime()/1000,
+      {from: main, gas: 6500000}
+    );
+    // impactPromises = await ImpactPromise.at(await ida.impactPromise());
+    // paymentRights = await FluidToken.at(await ida.paymentRights());
+    // escrow = await Escrow.at(await ida.escrow());
+    // state.accounts.escrow.address = escrow.address;
+    // state.accounts.ifu.address = ida.address;
+    // console.log("ESCROW: " + escrow.address);
+    //
+    // state.logs.list.push({
+    //   message: 'Deployed IDA contract to address: ' + ida.address,
+    //   icon: 'all_inclusive',
+    //   code: 'IDA.new(' + gbp.address + ', 10, 100, ' + validator + ', ' + main  +')',
+    //   tx: ida.transactionHash,
+    //   gas: 2077540
+    // });
+    //
+    // await this.a.updateBalances()
+    // await this.a.updateImpact()
   },
-  test: () => {
-    console.log('Test')
-    state.balance.investor = 15
 
-  },
   fund: async(amount) => {
     console.log("Funding: " + amount + " from: " + funder);
     await gbp.approve(ida.address, amount, {from: funder});
@@ -102,6 +104,7 @@ const Blockchain = {
     await this.a.updateBalances()
     await this.a.updateImpact()
   },
+
   refund: async(amount) => {
     console.log("Refunding...");
     let tx = await ida.refund({from: funder, gas: 5000000});
@@ -116,6 +119,7 @@ const Blockchain = {
 
     await this.a.updateBalances()
   },
+
   deposit: async (account, label) => {
     let tx = await gbp.mint(account.address, 100, {from: main});
     console.log(tx);
@@ -128,6 +132,7 @@ const Blockchain = {
     });
     await this.a.updateBalances()
   },
+
   invest: async (amount, discount) => {
     console.log("Investing: " + amount);
     let invested = amount * (1-discount/100);
@@ -144,6 +149,7 @@ const Blockchain = {
 
     await this.a.updateBalances()
   },
+
   redeem: async (account) => {
     console.log("Redeeming from: " + account);
     let available = await paymentRights.getAvailableToRedeem({from: account});
@@ -160,6 +166,7 @@ const Blockchain = {
 
     await this.a.updateBalances()
   },
+
   validate: async () => {
     console.log("Validating...");
     let tx = await ida.validateOutcome({from: validator});
@@ -175,6 +182,7 @@ const Blockchain = {
     await this.a.updateBalances()
     await this.a.updateImpact()
   },
+
   finalize: async () => {
     console.log("Finalizing...");
     let tx = await ida.setEnd({from: main});
@@ -189,6 +197,7 @@ const Blockchain = {
 
     await this.a.updateImpact();
   },
+
   updateBalances: async () => {
     console.log('Updating balances...');
     for(const account of Object.values(state.accounts)) {
@@ -223,7 +232,29 @@ const Blockchain = {
       state.impact.remaining = state.impact.all - promises / state.impact.price;
       state.impact.ended = (await ida.hasEnded());
     }
-  }
-}
+  },
 
-export default Blockchain
+  init: async () => {
+    await connectWeb3();
+    let getAccounts = promisify(web3.eth.getAccounts);
+    let accounts = await getAccounts();
+    if (accounts.length > 0) {
+      main = accounts[0];
+      console.log("Connected to metamask: " + main);
+    }
+    let ausd = await AUSD.at(AUSD_ADDRESS);
+    if (state.paymentTokens.length == 0) {
+      state.paymentTokens.push({
+        name: "Alice USD",
+        address: ausd.address
+      });
+    }
+    console.log("Linked AUSD token: " + ausd.address);
+    web3.eth.getBlock(5440737, function(e,r) {
+      console.log(r);
+    });
+
+  }
+};
+
+export default Contracts
