@@ -11,10 +11,10 @@ import 'openzeppelin-solidity/contracts/token/ERC20/ERC20Burnable.sol';
 
 contract AliceUSD is ERC20Mintable, ERC20Burnable {
 
-  string public name = "DigitalGBPToken";
+  string public name = "Alice Demo USD";
   uint8 public decimals = 2;
-  string public symbol = "DGBP";
-  string public version = 'DGBP 1.0';
+  string public symbol = "AliceUSD";
+  string public version = 'AUSD 1.0';
 
   uint256 constant public MINT_DEFAULT = 100 ether;
 

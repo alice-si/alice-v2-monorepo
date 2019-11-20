@@ -5,12 +5,14 @@ import App from './App'
 import Web3 from 'web3'
 import router from './router'
 import VueMaterial from 'vue-material'
+import VueGoogleCharts from 'vue-google-charts'
+
 import 'vue-material/dist/vue-material.css'
 import 'vue-material/dist/theme/default.css'
 
 Vue.config.productionTip = false
 Vue.use(VueMaterial)
-
+Vue.use(VueGoogleCharts)
 
 
 window.addEventListener('load', function () {

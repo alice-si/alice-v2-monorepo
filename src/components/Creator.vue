@@ -33,6 +33,11 @@
           <div class="form">
 
             <md-field>
+              <label>Project name</label>
+              <md-input v-model="newIda.name"></md-input>
+            </md-field>
+
+            <md-field>
               <label>Number of promises</label>
               <md-input v-model="newIda.outcomesNumber"></md-input>
             </md-field>
@@ -97,42 +102,10 @@
     methods: {
       deployIda: async function () {
         this.deploying = true;
-        await Contracts.deployIda(this.newIda);
+        let idaAddress = await Contracts.deployIda(this.newIda);
         this.deploying = false;
-      },
-      // deposit: async function (account, label) {
-      //   await Blockchain.deposit(account, label)
-      // },
-      // fund: async function () {
-      //   await Blockchain.fund(100);
-      // },
-      // refund: async function () {
-      //   await Blockchain.refund();
-      // },
-      // invest: async function () {
-      //   await Blockchain.invest(100, this.discount);
-      // },
-      // redeem: async function (account) {
-      //   await Blockchain.redeem(account);
-      // },
-      // validate: async function (claim) {
-      //   console.log("Validating: " + claim);
-      //   await Blockchain.validate(100);
-      //   State.claims.splice(State.claims.indexOf(claim), 1);
-      // },
-      // claimOutcome: async function () {
-      //   console.log("Claiming outcome");
-      //   State.claims.push("Impact promise " + this.impact.claimsCounter++);
-      // },
-      // finalize: async function () {
-      //   await Blockchain.finalize();
-      // },
-      // deployIF: async function () {
-      //   await Blockchain.deployIF(this.outcomesNumber, this.outcomesPrice);
-      // },
-      // changeDiscount: async function (change) {
-      //   this.discount += change;
-      // }
+        this.$router.push({path: '/dashboard/'+idaAddress});
+      }
     }
   }
 </script>
@@ -146,13 +119,13 @@
     text-align: center;
   }
 
-  .md-card {
+  .md-card.creator {
     width: 33% !important;
     display: inline-block;
     vertical-align: top;
   }
 
-  .md-card.card-center {
+  .md-card.creator.card-center {
     margin: 0 auto;
   }
 
@@ -160,7 +133,7 @@
     margin: 15px 0 15px 0;
   }
 
-  .md-card-actions {
+  .creator .md-card-actions {
     padding: 0 6px 6px 6px;
   }
 
@@ -181,7 +154,7 @@
     color: #616161;
   }
 
-  .md-card .md-subhead {
+  .md-card.creator .md-subhead {
     font-size: 12px;
   }
 
@@ -189,15 +162,15 @@
     color: white;
   }
 
-  .md-card-content {
+  .creator .md-card-content {
     padding: 10px 10px 0 10px !important;
   }
 
-  .md-card-header {
+  .creator .md-card-header {
     padding: 6px 16px 6px 16px;
   }
 
-  .md-subhead {
+  .creator.md-subhead {
     font-size: 11px;
     height: 15px;
   }
@@ -205,11 +178,6 @@
   .create-if {
     background-color: #1cb8c4 !important;
     color: white;
-  }
-
-  .md-drawer {
-    background-color: white;
-    width: 700px;
   }
 
   .md-field {

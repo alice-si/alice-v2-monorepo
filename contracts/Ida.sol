@@ -15,6 +15,7 @@ import './ImpactPromise.sol';
 contract Ida {
     using SafeMath for uint256;
 
+    event Created(address indexed creator, uint256 indexed outcomesNumber, uint256 outcomePrice, string name);
     event Funded(address indexed funder, uint256 amount);
     event Validated(uint256 amount);
 
@@ -32,15 +33,18 @@ contract Ida {
 
     Escrow public escrow;
 
-    address public validator;
 
+    string public name;
     uint256 public outcomesNumber;
     uint256 public validatedNumber;
     uint256 public outcomePrice;
+    //Avoid storing budget to save gas
     uint256 public budget;
+    address public validator;
     uint256 public endTime;
 
-    constructor(ERC20 _paymentToken, uint256 _outcomesNumber, uint256 _outcomesPrice, address _validator, uint256 _endTime) public {
+    constructor(ERC20 _paymentToken, string memory _name, uint256 _outcomesNumber, uint256 _outcomesPrice, address _validator, uint256 _endTime) public {
+        name = _name;
         paymentToken = _paymentToken;
         outcomesNumber = _outcomesNumber;
         outcomePrice = _outcomesPrice;
@@ -52,6 +56,8 @@ contract Ida {
         impactPromise = new ImpactPromise();
         paymentRights = FluidToken(escrow.recipient());
         paymentRights.transfer(msg.sender, budget);
+
+        emit Created(msg.sender, outcomesNumber, outcomePrice, name);
     }
 
 

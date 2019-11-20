@@ -2,7 +2,8 @@
 let state = {
   accounts: {},
   balance: {
-    investor: 10
+    tokens: 0,
+    funded: 0
   },
   impact: {
     claimsCounter: 1,
@@ -17,7 +18,16 @@ let state = {
     show: false,
     list: []
   },
-  paymentTokens: []
+  paymentTokens: [],
+  ida: {
+    name: '',
+    promisesNumber: 0,
+    promisePrice: 0,
+    validator: '',
+    endTime: '',
+    fundingUnlocked: false
+  },
+  allIdas: []
 
 };
 

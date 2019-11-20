@@ -1,24 +1,43 @@
 <template>
   <md-app id="app">
     <md-app-toolbar class="md-primary">
-      <span class="md-title">Impact Delivery Agreement</span>
+      <span class="md-title">{{$router.currentRoute.name == 'creator' ? 'Create a new IDA' : ida.name}}</span>
       <div class="md-toolbar-section-end">
-        <md-button style="color: white" @click="showLogs()">Show logs</md-button>
+        <!--<md-button style="color: white" @click="showLogs()">Show logs</md-button>-->
+
+
+        <md-tabs class="md-primary" md-sync-route>
+          <!--<md-tab v-for="route in $router.options.routes"-->
+          <!--:key="route.path"-->
+          <!--v-if="route.path != '*'"-->
+          <!--:to="route.path"-->
+
+          <!--:md-label="route.name"-->
+          <!--exact>-->
+
+          <!--</md-tab>-->
+          <md-tab
+            key="list"
+            to="/list"
+            md-label="Browse IDAs"
+            exact>
+
+          </md-tab>
+
+          <md-tab
+            key="creator"
+            to="/creator"
+            md-label="Create another IDA"
+            exact>
+
+          </md-tab>
+        </md-tabs>
+
       </div>
 
       <div class="md-toolbar-row">
 
-        <md-tabs class="md-primary" md-sync-route>
-          <md-tab v-for="route in $router.options.routes"
-                  :key="route.path"
-                  v-if="route.path != '*'"
-                  :to="route.path"
 
-                  :md-label="route.name"
-                  exact>
-
-          </md-tab>
-        </md-tabs>
 
       </div>
     </md-app-toolbar>
@@ -37,8 +56,7 @@
   export default {
     data() {
       return {
-        // logs: State.logs,
-        // showSidepanel: false
+        ida: State.ida
       }
     },
     methods: {
@@ -63,6 +81,14 @@
 
   .md-toolbar-row {
     width: auto;
+  }
+
+  .md-toolbar.md-theme-default.md-primary {
+    background-color: #8A48DB;
+  }
+
+  .md-tabs.md-theme-default.md-primary .md-tabs-navigation {
+    background-color: #8A48DB;
   }
 
 
