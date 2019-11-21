@@ -43,12 +43,51 @@
 
     </md-drawer>
 
+    <md-drawer class="md-drawer md-right" :md-active.sync="showDistributePanel" md-swipeable>
+      <md-toolbar class="md-primary">
+        <span class="md-title">Distribute payment rights</span>
+      </md-toolbar>
+
+      <div class="form" >
+
+        <div class="md-layout-item md-small-size-100">
+          <md-field>
+            <label for="fundingAmount">Discount (%)</label>
+            <md-input name="fundingAmount" id="discount" v-model="distributeDiscount" :disabled="processing" />
+          </md-field>
+        </div>
+
+
+        <div class="md-layout-item md-small-size-100">
+          <md-field>
+            <label for="fundingAmount">Amount</label>
+            <md-input name="distributeAmount" id="distributeAmount" v-model="distributeAmount" :disabled="processing" />
+          </md-field>
+        </div>
+
+        <md-button class="md-primary md-raised" @click="updateConditions()">Update conditions</md-button>
+      </div>
+
+    </md-drawer>
+
 
     <div class="md-layout md-gutter">
 
       <div class="md-layout-item md-size-100">
 
-        <md-card class="md-primary md-accent tokens-notification">
+        <md-card class="md-primary md-accent tokens-notification" v-if="ida.isOwner">
+          <md-card-header>
+            <md-card-header-text>
+              <div class="md-title">
+                You are the cretor of this IDA
+                <md-button class="funds-button" @click="distribute()">Distribute payment rights</md-button>
+              </div>
+
+            </md-card-header-text>
+          </md-card-header>
+        </md-card>
+
+        <md-card class="md-primary md-accent tokens-notification" v-else>
           <md-card-header>
             <md-card-header-text>
               <div class="md-title" v-if="balance.tokens == 0">
@@ -240,6 +279,9 @@
         processing: false,
         showFundPanel: false,
         fundingAmount: null,
+        showDistributePanel: false,
+        distributeAmount: State.ida.distributeAmount,
+        distributeDiscount: State.ida.distributeDiscount,
         chartOptions: {
           pieHole: 0.3,
           legend: {position: 'none'},
@@ -276,6 +318,16 @@
         await Contracts.fund(this.fundingAmount);
         this.processing = false;
         this.showFundPanel = false;
+      },
+      distribute: async function() {
+        this.showDistributePanel = true;
+      },
+      updateConditions: async function() {
+        this.processing = true;
+        await Contracts.updateConditions(this.distributeAmount, this.distributeDiscount);
+        this.processing = false;
+        this.showDistributePanel = false;
+
       },
       onChartReady: function(chart) {
         setTimeout(() => {

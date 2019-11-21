@@ -1,5 +1,5 @@
 var Escrow = artifacts.require("RefundableEscrow");
-var GBP = artifacts.require("DigitalGBPToken");
+var GBP = artifacts.require("AliceUSD");
 
 require("./test-setup");
 

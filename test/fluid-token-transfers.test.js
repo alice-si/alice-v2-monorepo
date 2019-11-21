@@ -1,6 +1,6 @@
 var FluidEscrow = artifacts.require("FluidEscrow");
 var FluidToken = artifacts.require("FluidToken");
-var GBP = artifacts.require("DigitalGBPToken");
+var GBP = artifacts.require("AliceUSD");
 
 require("./test-setup");
 

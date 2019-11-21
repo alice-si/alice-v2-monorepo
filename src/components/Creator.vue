@@ -17,7 +17,7 @@
       </md-dialog-content>
     </md-dialog>
 
-    <md-card class="card-center">
+    <md-card class="card-center creator">
       <md-ripple>
 
         <md-card-header>
@@ -68,6 +68,7 @@
 
         <div class="button-box">
           <md-button class="md-primary create-if md-raised" @click="deployIda()">Deploy</md-button>
+          <md-button class="md-primary create-if md-raised" @click="deployIdaFactory()">Deploy Factory</md-button>
         </div>
 
       </md-ripple>
@@ -92,7 +93,9 @@
         impact: State.impact,
         paymentTokens: State.paymentTokens,
         showSidepanel: false,
-        newIda: {},
+        newIda: {
+          validator: "0xBC773Ca86D9071e163168a8A5aD25e235907F9e7"
+        },
         deploying: false
       }
     },
@@ -105,6 +108,11 @@
         let idaAddress = await Contracts.deployIda(this.newIda);
         this.deploying = false;
         this.$router.push({path: '/dashboard/'+idaAddress});
+      },
+      deployIdaFactory: async function () {
+
+        await Contracts.deployIdaFactory();
+
       }
     }
   }

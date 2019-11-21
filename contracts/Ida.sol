@@ -43,9 +43,13 @@ contract Ida {
     address public validator;
     uint256 public endTime;
 
-    constructor(ERC20 _paymentToken, string memory _name, uint256 _outcomesNumber, uint256 _outcomesPrice, address _validator, uint256 _endTime) public {
+    constructor(ERC20 _paymentToken, ImpactPromise _impactPromise, string memory _name, uint256 _outcomesNumber, uint256 _outcomesPrice, address _validator, uint256 _endTime) public {
+        require(address(_paymentToken) != address(0x0));
+        require(address(_impactPromise) != address(0x0));
+
         name = _name;
         paymentToken = _paymentToken;
+        impactPromise = _impactPromise;
         outcomesNumber = _outcomesNumber;
         outcomePrice = _outcomesPrice;
         budget = outcomePrice.mul(outcomesNumber);
@@ -53,7 +57,6 @@ contract Ida {
         endTime = _endTime;
 
         escrow = new FluidEscrow(_paymentToken, budget, address(this));
-        impactPromise = new ImpactPromise();
         paymentRights = FluidToken(escrow.recipient());
         paymentRights.transfer(msg.sender, budget);
 

@@ -25,7 +25,10 @@ let state = {
     promisePrice: 0,
     validator: '',
     endTime: '',
-    fundingUnlocked: false
+    fundingUnlocked: false,
+    isOwner: false,
+    distributeAmount: null,
+    distributeDiscount: null
   },
   allIdas: []
 

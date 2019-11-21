@@ -9,6 +9,7 @@ import 'openzeppelin-solidity/contracts/token/ERC20/ERC20Burnable.sol';
 
 contract ImpactPromise is ERC20Mintable, ERC20Burnable {
 
+    //TODO: Add unique parameters per IDA
     string public name = "Impact Promise";
     uint8 public decimals = 18;
     string public symbol = "IP";
