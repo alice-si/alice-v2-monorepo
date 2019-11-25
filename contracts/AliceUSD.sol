@@ -18,7 +18,7 @@ contract AliceUSD is ERC20Mintable, ERC20Burnable {
 
   uint256 constant public MINT_DEFAULT = 100 ether;
 
-  function publicMint() public onlyMinter returns (bool) {
+  function publicMint() public returns (bool) {
     _mint(msg.sender, MINT_DEFAULT);
     return true;
   }

@@ -70,6 +70,40 @@
 
     </md-drawer>
 
+    <md-drawer class="md-drawer md-right" :md-active.sync="showInvestPanel" md-swipeable>
+      <md-toolbar class="md-primary">
+        <span class="md-title">Invest</span>
+      </md-toolbar>
+
+      <div class="form" v-if="ida.investingUnlocked">
+
+        <div class="md-layout-item md-small-size-100">
+          You can invest with <b>{{ida.distributeDiscount}}%</b> discount
+        </div>
+
+
+
+        <div class="md-layout-item md-small-size-100">
+          <md-field>
+            <label for="fundingAmount">Amount to invest</label>
+            <md-input name="investmentAmount" id="investmentAmount" v-model="investmentAmount" :disabled="processing" />
+          </md-field>
+          This will get you {{investmentAmount * (100/(100-distributeDiscount))}} payment rights
+        </div>
+
+        <md-button class="md-primary md-raised" @click="invest()">Invest</md-button>
+      </div>
+
+      <div v-else>
+        <div class="unlock-info">Please enable investing by making a token allowance</div>
+        <md-button @click="unlockInvesting()" class="md-icon-button md-raised md-accent">
+          <md-icon>vpn_key</md-icon>
+          <md-tooltip md-direction="right">Unlock access</md-tooltip>
+        </md-button>
+      </div>
+
+    </md-drawer>
+
 
     <div class="md-layout md-gutter">
 
@@ -79,7 +113,7 @@
           <md-card-header>
             <md-card-header-text>
               <div class="md-title">
-                You are the cretor of this IDA
+                You are the creator of this IDA
                 <md-button class="funds-button" @click="distribute()">Distribute payment rights</md-button>
               </div>
 
@@ -189,7 +223,7 @@
                 </div>
 
                 <div class="md-layout-item md-size-33">
-                  <div class="value-big">${{balance.funded}}</div>
+                  <div class="value-big">${{balance.totalFunded}}</div>
                   <div class="value-subtitle">total funding</div>
                 </div>
 
@@ -230,12 +264,12 @@
               <div class="md-layout md-gutter">
 
                 <div class="md-layout-item md-size-33">
-                  <div class="value-big">${{balance.funded}}</div>
+                  <div class="value-big">${{balance.invested}}</div>
                   <div class="value-subtitle">invested by You</div>
                 </div>
 
                 <div class="md-layout-item md-size-33">
-                  <div class="value-big">${{balance.funded}}</div>
+                  <div class="value-big">${{balance.totalInvested}}</div>
                   <div class="value-subtitle">total invested</div>
                 </div>
 
@@ -256,7 +290,7 @@
             </md-card-content>
 
             <div class="button-box">
-              <md-button class="md-primary create-if md-raised action-button" @click="deployIda()">Invest</md-button>
+              <md-button class="md-primary create-if md-raised action-button" @click="showInvestPanel = true">Invest</md-button>
             </div>
 
           </md-ripple>
@@ -282,6 +316,8 @@
         showDistributePanel: false,
         distributeAmount: State.ida.distributeAmount,
         distributeDiscount: State.ida.distributeDiscount,
+        showInvestPanel: false,
+        investmentAmount: null,
         chartOptions: {
           pieHole: 0.3,
           legend: {position: 'none'},
@@ -313,6 +349,11 @@
         await Contracts.unlockFunding();
         this.processing = false;
       },
+      unlockInvesting: async function() {
+        this.processing = true;
+        await Contracts.unlockInvesting();
+        this.processing = false;
+      },
       fund: async function() {
         this.processing = true;
         await Contracts.fund(this.fundingAmount);
@@ -327,12 +368,17 @@
         await Contracts.updateConditions(this.distributeAmount, this.distributeDiscount);
         this.processing = false;
         this.showDistributePanel = false;
-
+      },
+      invest: async function() {
+        this.processing = true;
+        await Contracts.invest(this.investmentAmount);
+        this.processing = false;
+        this.showDistributePanel = false;
       },
       onChartReady: function(chart) {
         setTimeout(() => {
           console.log("Updating chart... ");
-          let data = [['Who',     'How much'], ['You',      this.balance.funded], ['Other', 70]];
+          let data = [['Who',     'How much'], ['You',      this.balance.funded], ['Other', this.balance.totalFunded - this.balance.funded]];
           chart.draw(google.visualization.arrayToDataTable(data), this.chartOptions);
         }, 5000);
 

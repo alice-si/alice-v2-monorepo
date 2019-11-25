@@ -16,8 +16,8 @@ import STS_JSON from '@contracts/SimpleTokenSeller.json'
 let ethereum = window.ethereum;
 let web3 = window.web3;
 
-const AUSD_ADDRESS = "0xe10212440bf8e8d2bc753Cda7FD82C2bd6c2DF44";
-const IDA_FACTORY_ADDRESS = "0xb0cCAf343cF1A247b978a565Ae49E4Ad6ddf0d69";
+const AUSD_ADDRESS = "0xee2416114a5C02df5DFfadA3d0E2308c532cbd65";
+const IDA_FACTORY_ADDRESS = "0x0f4117e86de326ea8B5f8Fd86785dF45A6225E09";
 
 
 var connectWeb3 = async function() {
@@ -41,7 +41,7 @@ var setup = function(json) {
 const AUSD = setup(AUSD_JSON);
 const IDA = setup(IDA_JSON);
 const ImpactPromise = setup(IP_JSON);
-const FluidToken = setup(FT_JSON);
+const FLUID_TOKEN = setup(FT_JSON);
 const Escrow = setup(ESCROW_JSON);
 const IDA_FACTORY = setup(IDA_FACTORY_JSON);
 const STS_FACTORY = setup(STS_FACTORY_JSON);
@@ -51,10 +51,19 @@ const STS = setup(STS_JSON);
 
 var main, ausd, idaFactory, ida, impactPromise, paymentRights, sts;
 
+async function updateInvestments() {
+  let investingAllowance = await ausd.allowance(main, sts.address);
+  state.ida.investingUnlocked = investingAllowance > 0;
+  console.log("Is investing unlocked: " + state.ida.investingUnlocked);
+
+  console.log(paymentRights);
+  state.balance.invested = web3.fromWei((await paymentRights.balanceOf(main)), 'ether');
+  console.log("Invested: " + state.balance.invested);
+}
+
 const Contracts = {
 
-
-  deployAUSD: async() => {
+  deployAliceUSD: async() => {
     let ausd = await AUSD.new({from: main, gas: 2000000});
     console.log(ausd.address);
   },
@@ -101,6 +110,14 @@ const Contracts = {
     state.ida.fundingUnlocked = true;
   },
 
+  unlockInvesting: async() => {
+    let amount = await ausd.balanceOf(main);
+    console.log("Unlocking investing: " + amount);
+    await ausd.approve(sts.address, amount, {from: main});
+
+    state.ida.investingUnlocked = true;
+  },
+
   fund: async(amount) => {
     console.log("Funding: " + amount);
     let wei = web3.toWei(amount, 'ether');
@@ -116,6 +133,12 @@ const Contracts = {
     await this.a.updateIda();
   },
 
+  invest: async (amount) => {
+    console.log("Investing: " + amount);
+    await sts.buy(web3.toWei(amount, 'ether'), {from: main, gas: 2000000});
+    await this.a.updateBalances();
+  },
+
   refund: async(amount) => {
     console.log("Refunding...");
     let tx = await ida.refund({from: funder, gas: 5000000});
@@ -124,25 +147,6 @@ const Contracts = {
       message: 'IDA refunded',
       icon: 'people_outline',
       code: 'ida.refund()',
-      tx: tx.tx,
-      gas: tx.receipt.cumulativeGasUsed
-    });
-
-    await this.a.updateBalances()
-  },
-
-
-
-  invest: async (amount, discount) => {
-    console.log("Investing: " + amount);
-    let invested = amount * (1-discount/100);
-    await gbp.transfer(main, invested, {from: investor});
-    let tx = await paymentRights.transfer(investor, amount, {from: main});
-
-    state.logs.list.push({
-      message: 'Invested $' + invested + ' to buy ' + amount + ' of payment rights',
-      icon: 'input',
-      code: 'paymentRights.transfer(' + investor + ', ' + amount + ')',
       tx: tx.tx,
       gas: tx.receipt.cumulativeGasUsed
     });
@@ -202,10 +206,10 @@ const Contracts = {
     console.log('Updating balances...');
 
     state.balance.tokens = parseInt(web3.fromWei(await ausd.balanceOf(main), 'ether'));
+
     state.balance.funded = parseInt(web3.fromWei(await impactPromise.balanceOf(main), 'ether'));
 
-    console.log('Promises: ' + state.balance.funded);
-
+    state.balance.totalFunded = parseInt(web3.fromWei(await impactPromise.totalSupply()), 'ether');
 
     // for(const account of Object.values(state.accounts)) {
     //   if (account.address) {
@@ -231,8 +235,8 @@ const Contracts = {
 
   updateIda: async () => {
     if (ida) {
-      let allowance = await ausd.allowance(main, ida.address);
-      state.ida.fundingUnlocked = allowance > 0;
+      let fundingAllowance = await ausd.allowance(main, ida.address);
+      state.ida.fundingUnlocked = fundingAllowance > 0;
       console.log("Is funding unlocked: " + state.ida.fundingUnlocked);
     }
   },
@@ -241,7 +245,7 @@ const Contracts = {
     console.log("Loading all idas...");
     state.allIdas = [];
     let filter = web3.eth.filter({
-      fromBlock: 5469483,
+      fromBlock: 5481000,
       topics: ["0x1480d181f6c9d1c5d69ff67235bd28f2d0de1345ad64d32803e8696b40d64549"]
     });
 
@@ -285,6 +289,7 @@ const Contracts = {
 
       let paymentRightsAddress = await ida.paymentRights();
       console.log("Payment rights: " + paymentRightsAddress);
+      paymentRights = await FLUID_TOKEN.at(paymentRightsAddress);
 
       let impactPromiseAddress = await ida.impactPromise();
       console.log("Impact promise address: " + impactPromiseAddress);
@@ -312,14 +317,16 @@ const Contracts = {
         state.ida.isOwner = (main.toLocaleLowerCase() == owner.toLocaleLowerCase());
         state.ida.distributeAmount = web3.fromWei((await sts.currentSupply()), 'ether');
         state.ida.distributeDiscount = (await sts.currentDiscount()).toString();
+
+        await updateInvestments();
       });
 
       await this.a.updateBalances();
       await this.a.updateIda();
+
     }
-
-
   }
 };
+
 
 export default Contracts

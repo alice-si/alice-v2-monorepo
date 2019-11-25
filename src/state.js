@@ -3,7 +3,10 @@ let state = {
   accounts: {},
   balance: {
     tokens: 0,
-    funded: 0
+    funded: 0,
+    totalFunded: 0,
+    invested: 0,
+    totalInvested: 0
   },
   impact: {
     claimsCounter: 1,
@@ -26,6 +29,7 @@ let state = {
     validator: '',
     endTime: '',
     fundingUnlocked: false,
+    investingUnlocked: false,
     isOwner: false,
     distributeAmount: null,
     distributeDiscount: null

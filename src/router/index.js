@@ -4,6 +4,7 @@ import Demo from '@/components/Demo'
 import Creator from '@/components/Creator'
 import Dashboard from '@/components/Dashboard'
 import List from '@/components/List'
+import Admin from '@/components/Admin'
 
 Vue.use(Router)
 
@@ -29,6 +30,11 @@ export default new Router({
       name: 'List',
       component: List
     },
+    {
+      path: '/admin',
+      name: 'Admin',
+      component: Admin
+    }
 
   ]
 })

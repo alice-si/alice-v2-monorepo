@@ -68,7 +68,6 @@
 
         <div class="button-box">
           <md-button class="md-primary create-if md-raised" @click="deployIda()">Deploy</md-button>
-          <md-button class="md-primary create-if md-raised" @click="deployIdaFactory()">Deploy Factory</md-button>
         </div>
 
       </md-ripple>
@@ -108,11 +107,6 @@
         let idaAddress = await Contracts.deployIda(this.newIda);
         this.deploying = false;
         this.$router.push({path: '/dashboard/'+idaAddress});
-      },
-      deployIdaFactory: async function () {
-
-        await Contracts.deployIdaFactory();
-
       }
     }
   }
