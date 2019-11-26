@@ -7,9 +7,6 @@ import router from './router'
 import VueMaterial from 'vue-material'
 import VueGoogleCharts from 'vue-google-charts'
 
-import 'vue-material/dist/vue-material.css'
-import 'vue-material/dist/theme/default.css'
-
 Vue.config.productionTip = false
 Vue.use(VueMaterial)
 Vue.use(VueGoogleCharts)
