@@ -18,8 +18,8 @@ let ethereum = window.ethereum;
 let web3 = window.web3;
 
 const START_BLOCK = 5481000;
-const AUSD_ADDRESS = "0xee2416114a5C02df5DFfadA3d0E2308c532cbd65";
-const IDA_FACTORY_ADDRESS = "0x796F0052cB3c95564d9caedE415C4079f2893d7D";
+const AUSD_ADDRESS = "0x22d64d4A9DD6e3531BE6A93a532084f3093B388f";
+const IDA_FACTORY_ADDRESS = "0x567ef0f528A7576f02E9F4e0c7A46C2C42Aa4FD4";
 
 
 var connectWeb3 = async function() {
@@ -59,9 +59,10 @@ async function updateInvestments() {
   state.ida.investingUnlocked = investingAllowance > 0;
   console.log("Is investing unlocked: " + state.ida.investingUnlocked);
 
-  console.log(paymentRights);
   state.balance.invested = web3.fromWei((await paymentRights.balanceOf(main)), 'ether');
   console.log("Invested: " + state.balance.invested);
+  state.balance.redeemable = web3.fromWei((await paymentRights.getAvailableToRedeem({from: main})), 'ether');
+  console.log("Reedemable: " + state.balance.redeemable);
 }
 
 async function getAllClaims() {
@@ -111,8 +112,8 @@ async function getAllClaims() {
 const Contracts = {
 
   deployAliceUSD: async() => {
-    let ausd = await AUSD.new({from: main, gas: 2000000});
-    console.log(ausd.address);
+    let ausd = await AUSD.new({from: main, gas: 5000000});
+    console.log("Alice USD address: " + ausd.address);
   },
 
   deployIdaFactory: async() => {
@@ -205,36 +206,13 @@ const Contracts = {
     await getAllClaims();
   },
 
-  refund: async(amount) => {
-    console.log("Refunding...");
-    let tx = await ida.refund({from: funder, gas: 5000000});
+  redeem: async () => {
+    let available = await paymentRights.getAvailableToRedeem({from: main});
+    console.log("Redeeming: " + available);
+    await paymentRights.redeem(available, {from: main, gas: 1000000});
 
-    state.logs.list.push({
-      message: 'IDA refunded',
-      icon: 'people_outline',
-      code: 'ida.refund()',
-      tx: tx.tx,
-      gas: tx.receipt.cumulativeGasUsed
-    });
-
-    await this.a.updateBalances()
-  },
-
-  redeem: async (account) => {
-    console.log("Redeeming from: " + account);
-    let available = await paymentRights.getAvailableToRedeem({from: account});
-    console.log("Available: " + available);
-    let tx = await paymentRights.redeem(available, {from: account, gas: 1000000});
-
-    state.logs.list.push({
-      message: 'Redeemed ' + available + ' payment rights.',
-      icon: 'attach_money',
-      code: 'paymentRights.redeem(' + available + ')',
-      tx: tx.tx,
-      gas: tx.receipt.cumulativeGasUsed
-    });
-
-    await this.a.updateBalances()
+    state.balance.redeemable = web3.fromWei((await paymentRights.getAvailableToRedeem({from: main})), 'ether');
+    state.balance.tokens = parseInt(web3.fromWei(await ausd.balanceOf(main), 'ether'));
   },
 
   updateBalances: async () => {

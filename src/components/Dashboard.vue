@@ -98,14 +98,12 @@
           You can invest with <b>{{ida.distributeDiscount}}%</b> discount
         </div>
 
-
-
         <div class="md-layout-item md-small-size-100">
           <md-field>
-            <label for="fundingAmount">Amount to invest</label>
+            <label for="fundingAmount">Number of payment rights to buy</label>
             <md-input name="investmentAmount" id="investmentAmount" v-model="investmentAmount" :disabled="processing" />
           </md-field>
-          This will get you {{investmentAmount * (100/(100-distributeDiscount))}} payment rights
+          This will cost you ${{investmentAmount * (ida.distributeDiscount/100)}}
         </div>
 
         <md-button class="md-primary md-raised" @click="invest()">Invest</md-button>
@@ -363,6 +361,7 @@
 
             <div class="button-box">
               <md-button class="md-primary md-raised action-button" @click="showInvestPanel = true">Invest</md-button>
+              <md-button class="md-primary md-raised action-button" v-if="balance.redeemable > 0" @click="redeem()">Redeem ${{balance.redeemable}}</md-button>
             </div>
 
           </md-ripple>
@@ -458,6 +457,11 @@
       validateClaim: async function(claimKey) {
         this.processing = true;
         await Contracts.validateClaim(claimKey);
+        this.processing = false;
+      },
+      redeem: async function() {
+        this.processing = true;
+        await Contracts.redeem();
         this.processing = false;
       },
       onChartReady: function(chart) {

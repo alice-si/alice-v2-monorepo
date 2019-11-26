@@ -6,6 +6,7 @@ let state = {
     funded: 0,
     totalFunded: 0,
     invested: 0,
+    redeemable: 0,
     totalInvested: 0
   },
   impact: {
