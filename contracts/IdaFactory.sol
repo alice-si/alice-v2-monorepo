@@ -16,11 +16,13 @@ contract IdaFactory {
 
   SimpleTokenSellerFactory simpleTokenSellerFactory;
   ImpactPromiseFactory impactPromiseFactory;
+  ClaimsRegistry public claimsRegistry;
 
 
-  constructor(SimpleTokenSellerFactory _simpleTokenSellerFactory, ImpactPromiseFactory _impactPromiseFactory) public {
+  constructor(SimpleTokenSellerFactory _simpleTokenSellerFactory, ImpactPromiseFactory _impactPromiseFactory, ClaimsRegistry _claimsRegistry) public {
     simpleTokenSellerFactory = _simpleTokenSellerFactory;
     impactPromiseFactory = _impactPromiseFactory;
+    claimsRegistry = _claimsRegistry;
   }
 
 
@@ -34,7 +36,7 @@ contract IdaFactory {
   ) public returns (Ida) {
 
     ImpactPromise promiseToken = impactPromiseFactory.createImpactPromise();
-    Ida ida = new Ida(_paymentToken, promiseToken, _name, _outcomesNumber, _outcomesPrice, _validator, _endTime);
+    Ida ida = new Ida(_paymentToken, promiseToken, claimsRegistry, _name, _outcomesNumber, _outcomesPrice, _validator, _endTime, msg.sender);
     promiseToken.addMinter(address(ida));
     SimpleTokenSeller sts = simpleTokenSellerFactory.createSimpleTokenSeller(ida.paymentToken(), ida.paymentRights(), msg.sender);
     ERC20 paymentRights = ida.paymentRights();

@@ -93,7 +93,7 @@
         paymentTokens: State.paymentTokens,
         showSidepanel: false,
         newIda: {
-          validator: "0xBC773Ca86D9071e163168a8A5aD25e235907F9e7"
+          validator: "0xcC554f8c7C2b49151AE0A81524c3434307dE33cC"
         },
         deploying: false
       }

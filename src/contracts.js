@@ -12,12 +12,14 @@ import IDA_FACTORY_JSON from '@contracts/IdaFactory.json'
 import IP_FACTORY_JSON from '@contracts/ImpactPromiseFactory.json'
 import STS_FACTORY_JSON from '@contracts/SimpleTokenSellerFactory.json'
 import STS_JSON from '@contracts/SimpleTokenSeller.json'
+import CLAIMS_REGISTRY_JSON from '@contracts/ClaimsRegistry.json'
 
 let ethereum = window.ethereum;
 let web3 = window.web3;
 
+const START_BLOCK = 5481000;
 const AUSD_ADDRESS = "0xee2416114a5C02df5DFfadA3d0E2308c532cbd65";
-const IDA_FACTORY_ADDRESS = "0x0f4117e86de326ea8B5f8Fd86785dF45A6225E09";
+const IDA_FACTORY_ADDRESS = "0x796F0052cB3c95564d9caedE415C4079f2893d7D";
 
 
 var connectWeb3 = async function() {
@@ -47,9 +49,10 @@ const IDA_FACTORY = setup(IDA_FACTORY_JSON);
 const STS_FACTORY = setup(STS_FACTORY_JSON);
 const IP_FACTORY = setup(IP_FACTORY_JSON);
 const STS = setup(STS_JSON);
+const CLAIMS_REGISTRY = setup(CLAIMS_REGISTRY_JSON);
 
 
-var main, ausd, idaFactory, ida, impactPromise, paymentRights, sts;
+var main, ausd, idaFactory, ida, impactPromise, paymentRights, sts, claimsRegistry, owner;
 
 async function updateInvestments() {
   let investingAllowance = await ausd.allowance(main, sts.address);
@@ -60,6 +63,50 @@ async function updateInvestments() {
   state.balance.invested = web3.fromWei((await paymentRights.balanceOf(main)), 'ether');
   console.log("Invested: " + state.balance.invested);
 }
+
+async function getAllClaims() {
+  state.ida.claims = [];
+  let idaTopic = '0x' + web3.padLeft(ida.address.substring(2).toLocaleLowerCase(), 64);
+  let ownerTopic = '0x' + web3.padLeft(owner.substring(2).toLocaleLowerCase(), 64);
+  console.log(idaTopic);
+  let filter = web3.eth.filter({
+    fromBlock: START_BLOCK,
+    topics: [
+      "0x8c9f893548e8429f9352aba6698e6f4dca2e390604f6e8c5881a7a505d94ae50", //setClaim
+      ownerTopic,
+      idaTopic
+    ]
+  });
+  let filterValidated = web3.eth.filter({
+    fromBlock: START_BLOCK,
+    topics: [
+      "0xcc1d5cc2da95ba3e4e62fd4fc753229e033b0a3c7700e8f6d084029ad74fe769", //approveClaim
+      ownerTopic,
+      idaTopic
+    ]
+  });
+
+  filterValidated.get(async function (err, validatedEvents) {
+
+    let validated = validatedEvents.reduce(function (map, obj) {
+      map[web3.toAscii(obj.topics[3])] = true;
+      return map;
+    }, {});
+
+    filter.get(async function (err, results) {
+      console.log("Claims size: " + results.length);
+      for (var i = 0; i < results.length; i++) {
+        let code = web3.toAscii(results[i].topics[3]);
+        state.ida.claims.push({
+          code: code,
+          isValidated: validated[code]
+        })
+      }
+    })
+  });
+}
+
+
 
 const Contracts = {
 
@@ -74,7 +121,10 @@ const Contracts = {
     console.log("STS deplyed: " + stsFactory.address);
     let impactPromiseFactory = await IP_FACTORY.new({from: main, gas: 6000000});
     console.log("IP factory deplyed: " + impactPromiseFactory.address);
-    idaFactory = await IDA_FACTORY.new(stsFactory.address, impactPromiseFactory.address, {from: main, gas: 6000000});
+    let claimsRegistry = await CLAIMS_REGISTRY.new({from: main, gas: 6000000});
+    console.log("Claims registry deplyed: " + impactPromiseFactory.address);
+
+    idaFactory = await IDA_FACTORY.new(stsFactory.address, impactPromiseFactory.address, claimsRegistry.address, {from: main, gas: 6000000});
     console.log("Ida factory address: " + idaFactory.address);
   },
 
@@ -135,8 +185,24 @@ const Contracts = {
 
   invest: async (amount) => {
     console.log("Investing: " + amount);
-    await sts.buy(web3.toWei(amount, 'ether'), {from: main, gas: 2000000});
+    await sts.buy(web3.toWei(amount, 'ether'), {from: main, gas: 1000000});
     await this.a.updateBalances();
+  },
+
+  submitClaim: async (claimKey) => {
+    let key = web3.fromAscii(claimKey);
+    let val = '0x'+web3.padLeft(web3.toHex(web3.toWei(state.ida.promisePrice, 'ether')).substring(2), 64);
+    console.log("Submitting claim: " + claimKey + " key: " + key + " value: " + val);
+
+    await claimsRegistry.setClaim(ida.address, key, val, {from: main, gas: 1000000});
+    await getAllClaims();
+  },
+
+  validateClaim: async (claimKey) => {
+    console.log("Validating claim: " + claimKey);
+    let key = web3.fromAscii(claimKey);
+    await ida.validateOutcome(key, {from: main, gas: 1000000});
+    await getAllClaims();
   },
 
   refund: async(amount) => {
@@ -169,37 +235,6 @@ const Contracts = {
     });
 
     await this.a.updateBalances()
-  },
-
-  validate: async () => {
-    console.log("Validating...");
-    let tx = await ida.validateOutcome({from: validator});
-
-    state.logs.list.push({
-      message: 'Validated outcome',
-      icon: 'check_circle_outline',
-      code: 'ida.validateOutcome()',
-      tx: tx.tx,
-      gas: tx.receipt.cumulativeGasUsed
-    });
-
-    await this.a.updateBalances()
-    await this.a.updateImpact()
-  },
-
-  finalize: async () => {
-    console.log("Finalizing...");
-    let tx = await ida.setEnd({from: main});
-
-    state.logs.list.push({
-      message: 'Finalizing IDA',
-      icon: 'cancel_presentation',
-      code: 'ida.setEnd()',
-      tx: tx.tx,
-      gas: tx.receipt.cumulativeGasUsed
-    });
-
-    await this.a.updateImpact();
   },
 
   updateBalances: async () => {
@@ -245,7 +280,7 @@ const Contracts = {
     console.log("Loading all idas...");
     state.allIdas = [];
     let filter = web3.eth.filter({
-      fromBlock: 5481000,
+      fromBlock: START_BLOCK,
       topics: ["0x1480d181f6c9d1c5d69ff67235bd28f2d0de1345ad64d32803e8696b40d64549"]
     });
 
@@ -295,15 +330,20 @@ const Contracts = {
       console.log("Impact promise address: " + impactPromiseAddress);
       impactPromise = await ImpactPromise.at(impactPromiseAddress);
 
+      let claimsRegistryAddress = await ida.claimsRegistry();
+      console.log("Claims Registry: " + claimsRegistryAddress);
+      claimsRegistry = await CLAIMS_REGISTRY.at(claimsRegistryAddress);
+
       state.ida.name = (await ida.name());
       state.ida.promisesNumber = (await ida.outcomesNumber()).toString();
       state.ida.promisePrice = web3.fromWei((await ida.outcomePrice()), 'ether');
       state.ida.validator = await ida.validator();
       state.ida.endTime = new Date(await ida.endTime()*1000).toLocaleDateString("en-GB");
 
+
       //Get sts
       let stsFilter = web3.eth.filter({
-        fromBlock: 5469483,
+        fromBlock: START_BLOCK,
         topics: [
           "0x3aedc386eb06c3badc9815fdc61ff1ac848d8263144b24a174804ca1cd30e742",
           "0x000000000000000000000000" + ida.address.substring(2)
@@ -312,13 +352,15 @@ const Contracts = {
       stsFilter.get(async function(err, results) {
         sts = await STS.at('0x'+results[0].topics[2].substring(26));
         console.log("STS linked: " + sts.address);
-        let owner = await sts.owner();
+        owner = await sts.owner();
         console.log("Ida owner: " + owner);
         state.ida.isOwner = (main.toLocaleLowerCase() == owner.toLocaleLowerCase());
+        state.ida.isValidator = (main.toLocaleLowerCase() == state.ida.validator.toLocaleLowerCase());
         state.ida.distributeAmount = web3.fromWei((await sts.currentSupply()), 'ether');
         state.ida.distributeDiscount = (await sts.currentDiscount()).toString();
 
         await updateInvestments();
+        await getAllClaims();
       });
 
       await this.a.updateBalances();

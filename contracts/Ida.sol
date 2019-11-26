@@ -6,6 +6,7 @@ import './Escrow.sol';
 import './FluidEscrow.sol';
 import './FluidToken.sol';
 import './ImpactPromise.sol';
+import './ClaimsRegistry.sol';
 
 /**
  * @title Impact Delivery Agreement
@@ -32,33 +33,44 @@ contract Ida {
     FluidToken public paymentRights;
 
     Escrow public escrow;
+    ClaimsRegistry public claimsRegistry;
 
 
     string public name;
     uint256 public outcomesNumber;
     uint256 public validatedNumber;
     uint256 public outcomePrice;
-    //Avoid storing budget to save gas
-    uint256 public budget;
     address public validator;
     uint256 public endTime;
+    address public serviceProvider;
 
-    constructor(ERC20 _paymentToken, ImpactPromise _impactPromise, string memory _name, uint256 _outcomesNumber, uint256 _outcomesPrice, address _validator, uint256 _endTime) public {
+    constructor(
+      ERC20 _paymentToken,
+      ImpactPromise _impactPromise,
+      ClaimsRegistry _claimsRegistry,
+      string memory _name,
+      uint256 _outcomesNumber,
+      uint256 _outcomesPrice,
+      address _validator,
+      uint256 _endTime,
+      address _serviceProvider
+    ) public {
         require(address(_paymentToken) != address(0x0));
         require(address(_impactPromise) != address(0x0));
 
         name = _name;
         paymentToken = _paymentToken;
         impactPromise = _impactPromise;
+        claimsRegistry = _claimsRegistry;
         outcomesNumber = _outcomesNumber;
         outcomePrice = _outcomesPrice;
-        budget = outcomePrice.mul(outcomesNumber);
         validator = _validator;
         endTime = _endTime;
+        serviceProvider = _serviceProvider;
 
-        escrow = new FluidEscrow(_paymentToken, budget, address(this));
+        escrow = new FluidEscrow(_paymentToken, outcomePrice.mul(outcomesNumber), address(this));
         paymentRights = FluidToken(escrow.recipient());
-        paymentRights.transfer(msg.sender, budget);
+        paymentRights.transfer(msg.sender, outcomePrice.mul(outcomesNumber));
 
         emit Created(msg.sender, outcomesNumber, outcomePrice, name);
     }
@@ -66,7 +78,7 @@ contract Ida {
 
     function fund(uint256 _amount) public {
         require(!hasEnded());
-        require(paymentToken.balanceOf(address(escrow)).add(_amount) <= budget, "The funding amount exceed allowed impact budget");
+        require(paymentToken.balanceOf(address(escrow)).add(_amount) <= outcomePrice.mul(outcomesNumber), "The funding amount exceed allowed impact budget");
         paymentToken.transferFrom(msg.sender, address(escrow), _amount);
         impactPromise.mint(msg.sender, _amount);
 
@@ -74,10 +86,19 @@ contract Ida {
     }
 
 
-    function validateOutcome() public onlyValidator {
+    function validateOutcome(bytes32 key) public onlyValidator {
+        require(validatedNumber < outcomesNumber, "All of the outcomes have been already validated");
+        require(claimsRegistry.getClaim(serviceProvider, address(this), key) == bytes32(outcomePrice), "The claim must be registered before validation");
+        require(!claimsRegistry.isApproved(validator, serviceProvider, address(this), key), "The claim has already been approved");
+
+        claimsRegistry.approveClaim(serviceProvider, address(this), key);
         escrow.unlock(outcomePrice);
         validatedNumber = validatedNumber.add(1);
         emit Validated(outcomePrice);
+    }
+
+    function check(bytes32 val) public view returns(bool) {
+      return val == bytes32(outcomePrice);
     }
 
 

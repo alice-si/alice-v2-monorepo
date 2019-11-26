@@ -33,7 +33,7 @@ contract SimpleTokenSeller is Ownable {
   }
 
   function buy(uint256 amount) public {
-    require(amount < currentSupply);
+    require(amount <= currentSupply);
     uint256 price = 100;
     price = price.sub(currentDiscount).mul(amount).div(100);
     currentSupply = currentSupply.sub(amount);

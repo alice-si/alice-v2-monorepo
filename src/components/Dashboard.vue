@@ -17,6 +17,23 @@
       </md-dialog-content>
     </md-dialog>
 
+    <md-drawer class="md-drawer md-right" :md-active.sync="showClaimPanel" md-swipeable>
+      <md-toolbar class="md-primary">
+        <span class="md-title">Submit Claim</span>
+      </md-toolbar>
+
+      <div class="form">
+        <div class="md-layout-item md-small-size-100">
+          <md-field>
+            <label for="fundingAmount">Code</label>
+            <md-input name="fundingAmount" id="claimKey" v-model="claimKey" :disabled="processing" />
+          </md-field>
+        </div>
+
+        <md-button class="md-primary md-raised" @click="submitClaim()">Submit</md-button>
+      </div>
+    </md-drawer>
+
     <md-drawer class="md-drawer md-right" :md-active.sync="showFundPanel" md-swipeable>
       <md-toolbar class="md-primary">
         <span class="md-title">Fund IDA</span>
@@ -121,7 +138,18 @@
           </md-card-header>
         </md-card>
 
-        <md-card class="md-primary md-accent tokens-notification" v-else>
+        <md-card class="md-primary md-accent tokens-notification" v-if="ida.isValidator">
+          <md-card-header>
+            <md-card-header-text>
+              <div class="md-title">
+                You are the validator of this IDA
+              </div>
+
+            </md-card-header-text>
+          </md-card-header>
+        </md-card>
+
+        <md-card class="md-primary md-accent tokens-notification" v-if="!ida.isValidator && !ida.isOwner">
           <md-card-header>
             <md-card-header-text>
               <div class="md-title" v-if="balance.tokens == 0">
@@ -203,6 +231,50 @@
       </div>
 
       <div class="md-layout-item md-size-66">
+        <md-card class="impact">
+          <md-ripple>
+
+            <md-card-header >
+              <md-card-header-text>
+                <div class="md-title">Impact</div>
+              </md-card-header-text>
+
+            </md-card-header>
+
+
+            <md-card-content style="text-align: left">
+
+
+                <md-table>
+                  <md-table-row>
+                    <md-table-head md-numeric>ID</md-table-head>
+                    <md-table-head>Code</md-table-head>
+                    <md-table-head v-if="ida.isValidator">Validate</md-table-head>
+                    <md-table-head v-else>Validated</md-table-head>
+                  </md-table-row>
+
+                  <md-table-row v-for="(claim, index) in ida.claims" :key="claim.code">
+                    <md-table-cell md-numeric>{{index + 1}}</md-table-cell>
+                    <md-table-cell>{{claim.code}}</md-table-cell>
+                    <md-table-cell>
+                      <md-button @click="validateClaim(claim.code)" class="md-icon-button md-raised md-dense md-accent" :disabled="!ida.isValidator || claim.isValidated">
+                        <md-icon v-if="claim.isValidated || ida.isValidator">done</md-icon>
+                        <md-icon v-if="!claim.isValidated && !ida.isValidator">hourglass_empty</md-icon>
+                        <md-tooltip md-direction="right">Validate claim</md-tooltip>
+                      </md-button>
+                    </md-table-cell>
+                  </md-table-row>
+                </md-table>
+
+            </md-card-content>
+
+            <div class="button-box" v-if="ida.isOwner">
+              <md-button class="md-primary action-button md-raised" @click="showClaimPanel = true">Submit Claim</md-button>
+            </div>
+
+          </md-ripple>
+        </md-card>
+
         <md-card class="funding">
           <md-ripple>
 
@@ -290,7 +362,7 @@
             </md-card-content>
 
             <div class="button-box">
-              <md-button class="md-primary create-if md-raised action-button" @click="showInvestPanel = true">Invest</md-button>
+              <md-button class="md-primary md-raised action-button" @click="showInvestPanel = true">Invest</md-button>
             </div>
 
           </md-ripple>
@@ -318,6 +390,8 @@
         distributeDiscount: State.ida.distributeDiscount,
         showInvestPanel: false,
         investmentAmount: null,
+        showClaimPanel: false,
+        claimKey: null,
         chartOptions: {
           pieHole: 0.3,
           legend: {position: 'none'},
@@ -374,6 +448,17 @@
         await Contracts.invest(this.investmentAmount);
         this.processing = false;
         this.showDistributePanel = false;
+      },
+      submitClaim: async function() {
+        this.processing = true;
+        await Contracts.submitClaim(this.claimKey);
+        this.processing = false;
+        this.showClaimPanel = false;
+      },
+      validateClaim: async function(claimKey) {
+        this.processing = true;
+        await Contracts.validateClaim(claimKey);
+        this.processing = false;
       },
       onChartReady: function(chart) {
         setTimeout(() => {
@@ -462,11 +547,13 @@
     font-color: grey;
   }
 
-  .funding .md-title, .investing .md-title {
+  .funding .md-title, .investing .md-title, .impact .md-title {
     color: white;
   }
 
-
+  .impact .md-card-header-flex {
+    background-color: #8A48DB;
+  }
 
   .funding .md-card-header-flex {
     background-color: #21B7C5;
@@ -498,6 +585,10 @@
     margin-bottom: 20px;
   }
 
+  .impact .md-button.action-button.md-primary.md-theme-default {
+    background-color: #8A48DB;
+  }
+
   .funding .md-button.action-button.md-primary.md-theme-default {
     background-color: #21B7C5;
   }
@@ -506,7 +597,7 @@
     background-color: #01C0EF;
   }
 
-  .investing {
+  .investing, .funding {
     margin-top: 20px;
   }
 

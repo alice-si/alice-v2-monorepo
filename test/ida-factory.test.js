@@ -7,6 +7,7 @@ var Sts = artifacts.require("SimpleTokenSeller");
 var StsFactory = artifacts.require("SimpleTokenSellerFactory");
 var ImpactPromiseFactory = artifacts.require("ImpactPromiseFactory");
 var IdaFactory = artifacts.require("IdaFactory");
+var ClaimsRegistry = artifacts.require("ClaimsRegistry");
 
 
 require("./test-setup");
@@ -19,8 +20,7 @@ contract('Ida Factory', function ([owner, validator, investor, unauthorised]) {
   var paymentRights;
   var impactPromise;
 
-  var factory;
-  var sts;
+  var factory, sts, claimsRegistry;
   var end;
 
   before("deploy Ida factory & gbp", async function () {
@@ -28,7 +28,8 @@ contract('Ida Factory', function ([owner, validator, investor, unauthorised]) {
     gbp = await AUSD.new();
     let impactPromiseFactory = await ImpactPromiseFactory.new();
     let stsFactory = await StsFactory.new();
-    factory = await IdaFactory.new(stsFactory.address, impactPromiseFactory.address, {gas: 6000000});
+    claimsRegistry = await ClaimsRegistry.new();
+    factory = await IdaFactory.new(stsFactory.address, impactPromiseFactory.address, claimsRegistry.address, {gas: 6000000});
   });
 
   it("should create a new Ida", async function () {

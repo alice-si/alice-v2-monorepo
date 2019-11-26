@@ -31,8 +31,10 @@ let state = {
     fundingUnlocked: false,
     investingUnlocked: false,
     isOwner: false,
+    isValidator: false,
     distributeAmount: null,
-    distributeDiscount: null
+    distributeDiscount: null,
+    claims: []
   },
   allIdas: []
 
