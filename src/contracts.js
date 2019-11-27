@@ -255,14 +255,14 @@ const Contracts = {
     });
 
     filter.get(async function(err, results) {
+      console.log(results[0]);
+      window.d = results[0].data;
       for (var i = 0; i < results.length; i++) {
-        let ida = await
-        IDA.at(results[i].address);
         state.allIdas.push({
-          name: await ida.name(),
+          name: web3.toAscii('0x'+results[i].data.substring(194)),
           address: results[i].address,
-          promisesNumber: (await ida.outcomesNumber()).toString(),
-          promisePrice: web3.fromWei((await ida.outcomePrice()), 'ether')
+          promisesNumber: web3.toDecimal(results[i].topics[2]),
+          promisePrice: web3.fromWei((web3.toDecimal(results[i].data.substring(0,66))), 'ether')
         });
       }
     });

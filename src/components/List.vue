@@ -102,6 +102,10 @@
     width: 100%;
   }
 
+  .md-table-cell-container {
+    text-align: left;
+  }
+
 
 
 </style>
