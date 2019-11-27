@@ -229,51 +229,10 @@
       </div>
 
       <div class="md-layout-item md-size-66">
-        <md-card class="impact">
-          <md-ripple>
+        <md-tabs class="md-transparent" md-alignment="fixed">
 
-            <md-card-header >
-              <md-card-header-text>
-                <div class="md-title">Impact</div>
-              </md-card-header-text>
-
-            </md-card-header>
-
-
-            <md-card-content style="text-align: left">
-
-
-                <md-table>
-                  <md-table-row>
-                    <md-table-head md-numeric>ID</md-table-head>
-                    <md-table-head>Code</md-table-head>
-                    <md-table-head v-if="ida.isValidator">Validate</md-table-head>
-                    <md-table-head v-else>Validated</md-table-head>
-                  </md-table-row>
-
-                  <md-table-row v-for="(claim, index) in ida.claims" :key="claim.code">
-                    <md-table-cell md-numeric>{{index + 1}}</md-table-cell>
-                    <md-table-cell>{{claim.code}}</md-table-cell>
-                    <md-table-cell>
-                      <md-button @click="validateClaim(claim.code)" class="md-icon-button md-raised md-dense md-accent" :disabled="!ida.isValidator || claim.isValidated">
-                        <md-icon v-if="claim.isValidated || ida.isValidator">done</md-icon>
-                        <md-icon v-if="!claim.isValidated && !ida.isValidator">hourglass_empty</md-icon>
-                        <md-tooltip md-direction="right">Validate claim</md-tooltip>
-                      </md-button>
-                    </md-table-cell>
-                  </md-table-row>
-                </md-table>
-
-            </md-card-content>
-
-            <div class="button-box" v-if="ida.isOwner">
-              <md-button class="md-primary action-button md-raised" @click="showClaimPanel = true">Submit Claim</md-button>
-            </div>
-
-          </md-ripple>
-        </md-card>
-
-        <md-card class="funding">
+          <md-tab id="tab-funding" md-label="Funding" >
+            <md-card class="funding">
           <md-ripple>
 
             <md-card-header >
@@ -310,8 +269,9 @@
 
           </md-ripple>
         </md-card>
-
-        <md-card class="investing">
+          </md-tab>
+          <md-tab id="tab-investing" md-label="Investing" >
+            <md-card class="investing">
           <md-ripple>
 
             <md-card-header>
@@ -350,6 +310,55 @@
 
           </md-ripple>
         </md-card>
+          </md-tab>
+          <md-tab id="tab-impact" md-label="Impact" >
+            <md-card class="impact">
+              <md-ripple>
+
+                <md-card-header >
+                  <md-card-header-text>
+                    <div class="md-title">Impact</div>
+                  </md-card-header-text>
+
+                </md-card-header>
+
+
+                <md-card-content style="text-align: left">
+
+
+                  <md-table>
+                    <md-table-row>
+                      <md-table-head md-numeric>ID</md-table-head>
+                      <md-table-head>Code</md-table-head>
+                      <md-table-head v-if="ida.isValidator">Validate</md-table-head>
+                      <md-table-head v-else>Validated</md-table-head>
+                    </md-table-row>
+
+                    <md-table-row v-for="(claim, index) in ida.claims" :key="claim.code">
+                      <md-table-cell md-numeric>{{index + 1}}</md-table-cell>
+                      <md-table-cell>{{claim.code}}</md-table-cell>
+                      <md-table-cell>
+                        <md-button @click="validateClaim(claim.code)" class="md-icon-button md-raised md-dense md-accent" :disabled="!ida.isValidator || claim.isValidated">
+                          <md-icon v-if="claim.isValidated || ida.isValidator">done</md-icon>
+                          <md-icon v-if="!claim.isValidated && !ida.isValidator">hourglass_empty</md-icon>
+                          <md-tooltip md-direction="right">Validate claim</md-tooltip>
+                        </md-button>
+                      </md-table-cell>
+                    </md-table-row>
+                  </md-table>
+
+                </md-card-content>
+
+                <div class="button-box" v-if="ida.isOwner" >
+                  <md-button class="md-primary action-button md-raised" @click="showClaimPanel = true">Submit Claim</md-button>
+                </div>
+
+                <div style="height: 20px" v-else></div>
+
+              </md-ripple>
+            </md-card>
+          </md-tab>
+        </md-tabs>
       </div>
     </div>
   </div>
@@ -450,6 +459,10 @@
     padding: 0 20px 0 20px;
     width: 100%;
     text-align: center;
+  }
+
+  div.page .md-card.impact {
+    min-height: 350px;
   }
 
   .md-card.card-center {
@@ -568,9 +581,20 @@
     background-color: #01C0EF;
   }
 
-  .investing, .funding {
-    margin-top: 20px;
+  .md-app-content .md-card.investing, .md-app-content .md-card.funding, .md-app-content .md-card.impact {
+    margin: 20px 10px 0 10px;
+    height: 408px;
   }
+
+  .md-tab {
+    padding: 0;
+  }
+
+  .md-tabs-content {
+    height: 450px !important;
+  }
+
+
 
 
 
