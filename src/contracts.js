@@ -60,9 +60,30 @@ async function updateInvestments() {
   console.log("Is investing unlocked: " + state.ida.investingUnlocked);
 
   state.balance.invested = web3.fromWei((await paymentRights.balanceOf(main)), 'ether');
-  console.log("Invested: " + state.balance.invested);
+  console.log("Invested by You: " + state.balance.invested);
+  let left = web3.fromWei((await paymentRights.balanceOf(sts.address)), 'ether');
+  state.balance.totalInvested = state.ida.budget - left;
+  console.log("Invested by others");
   state.balance.redeemable = web3.fromWei((await paymentRights.getAvailableToRedeem({from: main})), 'ether');
   console.log("Reedemable: " + state.balance.redeemable);
+
+  state.investingChartData.You = state.balance.invested;
+  state.investingChartData.Others = state.balance.totalInvested - state.balance.invested;
+}
+
+async function updateFunding() {
+  console.log('Updating funding...');
+
+  state.balance.funded = parseInt(web3.fromWei(await impactPromise.balanceOf(main), 'ether'));
+
+  state.balance.totalFunded = parseInt(web3.fromWei(await impactPromise.totalSupply()), 'ether');
+
+  state.fundingChartData.You = state.balance.funded;
+  state.fundingChartData.Others = state.balance.totalFunded - state.balance.funded;
+}
+
+async function updateHoldings() {
+  state.balance.tokens = parseInt(web3.fromWei(await ausd.balanceOf(main), 'ether'));
 }
 
 async function getAllClaims() {
@@ -154,7 +175,7 @@ const Contracts = {
   },
 
   unlockFunding: async() => {
-    let amount = await ausd.balanceOf(main);
+    let amount = await impactPromise.totalSupply();
     console.log("Unlocking funding: " + amount);
     await ausd.approve(ida.address, amount, {from: main});
 
@@ -162,7 +183,7 @@ const Contracts = {
   },
 
   unlockInvesting: async() => {
-    let amount = await ausd.balanceOf(main);
+    let amount = await paymentRights.totalSupply();
     console.log("Unlocking investing: " + amount);
     await ausd.approve(sts.address, amount, {from: main});
 
@@ -174,8 +195,8 @@ const Contracts = {
     let wei = web3.toWei(amount, 'ether');
     await ida.fund(wei, {from: main, gas: 5000000});
 
-    await this.a.updateBalances();
-    await this.a.updateIda();
+    await updateFunding();
+    await updateHoldings();
   },
 
   updateConditions: async(distributeAmount, distributeDiscount) => {
@@ -187,7 +208,9 @@ const Contracts = {
   invest: async (amount) => {
     console.log("Investing: " + amount);
     await sts.buy(web3.toWei(amount, 'ether'), {from: main, gas: 1000000});
-    await this.a.updateBalances();
+
+    await updateInvestments();
+    await updateHoldings();
   },
 
   submitClaim: async (claimKey) => {
@@ -213,37 +236,6 @@ const Contracts = {
 
     state.balance.redeemable = web3.fromWei((await paymentRights.getAvailableToRedeem({from: main})), 'ether');
     state.balance.tokens = parseInt(web3.fromWei(await ausd.balanceOf(main), 'ether'));
-  },
-
-  updateBalances: async () => {
-    console.log('Updating balances...');
-
-    state.balance.tokens = parseInt(web3.fromWei(await ausd.balanceOf(main), 'ether'));
-
-    state.balance.funded = parseInt(web3.fromWei(await impactPromise.balanceOf(main), 'ether'));
-
-    state.balance.totalFunded = parseInt(web3.fromWei(await impactPromise.totalSupply()), 'ether');
-
-    // for(const account of Object.values(state.accounts)) {
-    //   if (account.address) {
-    //     console.log("Checking balance for: " + account.address);
-    //     account.balance = (await gbp.balanceOf(account.address)).toString();
-    //     if (impactPromises && paymentRights) {
-    //       account.ip = (await impactPromises.balanceOf(account.address)).toString();
-    //       account.ic = (await paymentRights.balanceOf(account.address)).toString();
-    //     }
-    //   }
-    // };
-    // if (state.accounts.escrow.address) {
-    //   state.accounts.escrow.unlocked = (await escrow.unlocked()).toString();
-    //   console.log("Unlocked: " + state.accounts.escrow.unlocked);
-    //   state.accounts.investor.available = (await paymentRights.getAvailableToRedeem({from: investor})).toString();
-    //   state.accounts.main.available = (await paymentRights.getAvailableToRedeem({from: main})).toString();
-    // }
-    // if (state.accounts.ifu.escrow) {
-    //   state.accounts.ifu.escrow.balance =   (await gbp.balanceOf(state.accounts.ifu.escrow.address)).valueOf();
-    //   console.log("Escrow: " + state.accounts.ifu.escrow.balance);
-    // }
   },
 
   updateIda: async () => {
@@ -317,6 +309,7 @@ const Contracts = {
       state.ida.promisePrice = web3.fromWei((await ida.outcomePrice()), 'ether');
       state.ida.validator = await ida.validator();
       state.ida.endTime = new Date(await ida.endTime()*1000).toLocaleDateString("en-GB");
+      state.ida.budget = state.ida.promisesNumber * state.ida.promisePrice;
 
 
       //Get sts
@@ -337,11 +330,13 @@ const Contracts = {
         state.ida.distributeAmount = web3.fromWei((await sts.currentSupply()), 'ether');
         state.ida.distributeDiscount = (await sts.currentDiscount()).toString();
 
-        await updateInvestments();
+        updateInvestments();
+
         await getAllClaims();
       });
 
-      await this.a.updateBalances();
+      updateFunding();
+      updateHoldings();
       await this.a.updateIda();
 
     }

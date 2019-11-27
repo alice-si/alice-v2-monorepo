@@ -298,15 +298,7 @@
                 </div>
 
                 <div class="md-layout-item md-size-33">
-                  <div class="value-big" style="padding-top:0; height:80px; margin-top: -5px">
-                    <GChart
-                      type="PieChart"
-                      :data="fundingChart"
-                      :options="chartOptions"
-                      @ready="onChartReady"
-                    />
-                  </div>
-
+                  <ratio-chart second-color="#21B7C5" :values="fundingChartData"></ratio-chart>
                 </div>
 
               </div>
@@ -344,15 +336,7 @@
                 </div>
 
                 <div class="md-layout-item md-size-33">
-                  <div class="value-big" style="padding-top:0; height:80px; margin-top: -5px">
-                    <GChart
-                      type="PieChart"
-                      :data="fundingChart"
-                      :options="investingChartOptions"
-                      @ready="onChartReady"
-                    />
-                  </div>
-
+                  <ratio-chart second-color="#01C0EF" :values="investingChartData"></ratio-chart>
                 </div>
 
               </div>
@@ -374,9 +358,11 @@
 <script>
   import Contracts from '@/contracts'
   import State from '@/state'
+  import RatioChart from './RatioChart'
 
   export default {
-    name: 'Creator',
+    name: 'Dashboard',
+    components: {RatioChart},
     data() {
       return {
         ida: State.ida,
@@ -391,19 +377,8 @@
         investmentAmount: null,
         showClaimPanel: false,
         claimKey: null,
-        chartOptions: {
-          pieHole: 0.3,
-          legend: {position: 'none'},
-          colors: ['#8A48DB', '#21B7C5']
-
-        },
-        investingChartOptions: {
-          pieHole: 0.3,
-          legend: {position: 'none'},
-          colors: ['#8A48DB', '#01C0EF']
-
-        },
-        fundingChart: [['Who',     'How much'], ['You',      0], ['Other', 70]]
+        investingChartData: State.investingChartData,
+        fundingChartData: State.fundingChartData
       }
     },
     beforeCreate: function () {
@@ -446,7 +421,7 @@
         this.processing = true;
         await Contracts.invest(this.investmentAmount);
         this.processing = false;
-        this.showDistributePanel = false;
+        this.showInvestPanel = false;
       },
       submitClaim: async function() {
         this.processing = true;
@@ -463,14 +438,6 @@
         this.processing = true;
         await Contracts.redeem();
         this.processing = false;
-      },
-      onChartReady: function(chart) {
-        setTimeout(() => {
-          console.log("Updating chart... ");
-          let data = [['Who',     'How much'], ['You',      this.balance.funded], ['Other', this.balance.totalFunded - this.balance.funded]];
-          chart.draw(google.visualization.arrayToDataTable(data), this.chartOptions);
-        }, 5000);
-
       }
     }
   }

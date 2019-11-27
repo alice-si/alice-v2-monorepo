@@ -27,6 +27,7 @@ let state = {
     name: '',
     promisesNumber: 0,
     promisePrice: 0,
+    budget: 0,
     validator: '',
     endTime: '',
     fundingUnlocked: false,
@@ -37,7 +38,9 @@ let state = {
     distributeDiscount: null,
     claims: []
   },
-  allIdas: []
+  allIdas: [],
+  investingChartData: {You: 0, Others: 0},
+  fundingChartData: {You: 0, Others: 0}
 
 };
 
