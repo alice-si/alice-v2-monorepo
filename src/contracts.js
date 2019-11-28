@@ -175,7 +175,7 @@ const Contracts = {
   },
 
   unlockFunding: async() => {
-    let amount = await impactPromise.totalSupply();
+    let amount = await paymentRights.totalSupply();
     console.log("Unlocking funding: " + amount);
     await ausd.approve(ida.address, amount, {from: main});
 
