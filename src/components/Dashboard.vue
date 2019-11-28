@@ -26,7 +26,7 @@
         <div class="md-layout-item md-small-size-100">
           <md-field>
             <label for="fundingAmount">Code</label>
-            <md-input name="fundingAmount" id="claimKey" v-model="claimKey" :disabled="processing" />
+            <md-input name="fundingAmount" id="claimKey" v-model="claimKey" :disabled="processing"/>
           </md-field>
         </div>
 
@@ -39,16 +39,21 @@
         <span class="md-title">Fund IDA</span>
       </md-toolbar>
 
-      <div class="form" v-if="ida.fundingUnlocked">
-        <div class="md-layout-item md-small-size-100">
-          <md-field>
-            <label for="fundingAmount">Amount</label>
-            <md-input name="fundingAmount" id="fundingAmount" v-model="fundingAmount" :disabled="processing" />
+      <form novalidate v-if="ida.fundingUnlocked">
+        <div class="form-container">
+          <md-field :class="getValidationClass('fundingForm', 'fundingAmount')">
+            <label for="fundingAmount">Amount (up to ${{ida.maxFunding}})</label>
+            <md-input name="fundingAmount" id="fundingAmount" v-model="fundingForm.fundingAmount"
+                      :disabled="processing"/>
+            <span class="md-error" v-if="!$v.fundingForm.fundingAmount.required">Please provide the amount to fund</span>
+            <span class="md-error" v-else-if="!$v.fundingForm.fundingAmount.maxValue">Can fund up to ${{ida.maxFunding}}</span>
+            <span class="md-error" v-else-if="!$v.fundingForm.fundingAmount.maxAvailable">You only have ${{balance.tokens}} tokens to spend</span>
           </md-field>
         </div>
 
         <md-button class="md-primary md-raised" @click="fund()">Fund</md-button>
-      </div>
+
+      </form>
 
       <div v-else>
         <div class="unlock-info">Please enable funding by making a token allowance</div>
@@ -65,12 +70,12 @@
         <span class="md-title">Distribute payment rights</span>
       </md-toolbar>
 
-      <div class="form" >
+      <div class="form">
 
         <div class="md-layout-item md-small-size-100">
           <md-field>
             <label for="fundingAmount">Discount (%)</label>
-            <md-input name="fundingAmount" id="discount" v-model="distributeDiscount" :disabled="processing" />
+            <md-input name="fundingAmount" id="discount" v-model="distributeDiscount" :disabled="processing"/>
           </md-field>
         </div>
 
@@ -78,7 +83,7 @@
         <div class="md-layout-item md-small-size-100">
           <md-field>
             <label for="fundingAmount">Amount</label>
-            <md-input name="distributeAmount" id="distributeAmount" v-model="distributeAmount" :disabled="processing" />
+            <md-input name="distributeAmount" id="distributeAmount" v-model="distributeAmount" :disabled="processing"/>
           </md-field>
         </div>
 
@@ -95,16 +100,21 @@
       <div class="form" v-if="ida.investingUnlocked">
 
         <div class="md-layout-item md-small-size-100">
-          You can invest with <b>{{ida.distributeDiscount}}%</b> discount
+          You buy up to <b>${{ida.maxInvestment}}</b> rights with <b>{{ida.distributeDiscount}}%</b> discount
         </div>
 
-        <div class="md-layout-item md-small-size-100">
-          <md-field>
-            <label for="fundingAmount">Number of payment rights to buy</label>
-            <md-input name="investmentAmount" id="investmentAmount" v-model="investmentAmount" :disabled="processing" />
-          </md-field>
-          This will cost you ${{investmentAmount * (ida.distributeDiscount/100)}}
-        </div>
+        <form novalidate v-if="ida.investingUnlocked">
+          <div class="form-container">
+            <md-field :class="getValidationClass('investmentForm', 'investmentAmount')">
+              <label for="fundingAmount">Number of payment rights to buy</label>
+              <md-input name="investmentAmount" id="investmentAmount" v-model="investmentForm.investmentAmount" :disabled="processing"/>
+              <span class="md-error" v-if="!$v.investmentForm.investmentAmount.required">Please provide the amount to invest</span>
+              <span class="md-error" v-else-if="!$v.investmentForm.investmentAmount.maxValue">You can invest up to ${{ida.maxInvestment}}</span>
+              <span class="md-error" v-else-if="!$v.investmentForm.investmentAmount.maxAvailable">You only have ${{balance.tokens}} tokens to invest</span>
+            </md-field>
+            This will cost you ${{investmentForm.investmentAmount * (ida.distributeDiscount/100)}}
+          </div>
+        </form>
 
         <md-button class="md-primary md-raised" @click="invest()">Invest</md-button>
       </div>
@@ -231,91 +241,94 @@
       <div class="md-layout-item md-size-66">
         <md-tabs class="md-transparent" md-alignment="fixed">
 
-          <md-tab id="tab-funding" md-label="Funding" >
+          <md-tab id="tab-funding" md-label="Funding">
             <md-card class="funding">
-          <md-ripple>
+              <md-ripple>
 
-            <md-card-header >
-              <md-card-header-text>
-                <div class="md-title">Funding</div>
-              </md-card-header-text>
+                <md-card-header>
+                  <md-card-header-text>
+                    <div class="md-title">Funding</div>
+                  </md-card-header-text>
 
-            </md-card-header>
+                </md-card-header>
 
 
-            <md-card-content style="text-align: left">
-              <div class="md-layout md-gutter">
+                <md-card-content style="text-align: left">
+                  <div class="md-layout md-gutter">
 
-                <div class="md-layout-item md-size-33">
-                  <div class="value-big">${{balance.funded}}</div>
-                  <div class="value-subtitle">funded by You</div>
+                    <div class="md-layout-item md-size-33">
+                      <div class="value-big">${{balance.funded}}</div>
+                      <div class="value-subtitle">funded by You</div>
+                    </div>
+
+                    <div class="md-layout-item md-size-33">
+                      <div class="value-big">${{balance.totalFunded}}</div>
+                      <div class="value-subtitle">total funding</div>
+                    </div>
+
+                    <div class="md-layout-item md-size-33">
+                      <ratio-chart second-color="#21B7C5" :values="fundingChartData"></ratio-chart>
+                    </div>
+
+                  </div>
+                </md-card-content>
+
+                <div class="button-box">
+                  <md-button class="md-primary action-button md-raised" @click="showFundPanel = true">Fund</md-button>
                 </div>
 
-                <div class="md-layout-item md-size-33">
-                  <div class="value-big">${{balance.totalFunded}}</div>
-                  <div class="value-subtitle">total funding</div>
-                </div>
-
-                <div class="md-layout-item md-size-33">
-                  <ratio-chart second-color="#21B7C5" :values="fundingChartData"></ratio-chart>
-                </div>
-
-              </div>
-            </md-card-content>
-
-            <div class="button-box">
-              <md-button class="md-primary action-button md-raised" @click="showFundPanel = true">Fund</md-button>
-            </div>
-
-          </md-ripple>
-        </md-card>
+              </md-ripple>
+            </md-card>
           </md-tab>
-          <md-tab id="tab-investing" md-label="Investing" >
+          <md-tab id="tab-investing" md-label="Investing">
             <md-card class="investing">
-          <md-ripple>
+              <md-ripple>
 
-            <md-card-header>
-              <md-card-header-text>
-                <div class="md-title">Investing</div>
-              </md-card-header-text>
+                <md-card-header>
+                  <md-card-header-text>
+                    <div class="md-title">Investing</div>
+                  </md-card-header-text>
 
-            </md-card-header>
+                </md-card-header>
 
 
-            <md-card-content style="text-align: left">
-              <div class="md-layout md-gutter">
+                <md-card-content style="text-align: left">
+                  <div class="md-layout md-gutter">
 
-                <div class="md-layout-item md-size-33">
-                  <div class="value-big">${{balance.invested}}</div>
-                  <div class="value-subtitle">invested by You</div>
+                    <div class="md-layout-item md-size-33">
+                      <div class="value-big">${{balance.invested}}</div>
+                      <div class="value-subtitle">invested by You</div>
+                    </div>
+
+                    <div class="md-layout-item md-size-33">
+                      <div class="value-big">${{balance.totalInvested}}</div>
+                      <div class="value-subtitle">total invested</div>
+                    </div>
+
+                    <div class="md-layout-item md-size-33">
+                      <ratio-chart second-color="#01C0EF" :values="investingChartData"></ratio-chart>
+                    </div>
+
+                  </div>
+
+                </md-card-content>
+
+                <div class="button-box">
+                  <md-button class="md-primary md-raised action-button" @click="showInvestPanel = true">Invest
+                  </md-button>
+                  <md-button class="md-primary md-raised action-button" v-if="balance.redeemable > 0" @click="redeem()">
+                    Redeem ${{balance.redeemable}}
+                  </md-button>
                 </div>
 
-                <div class="md-layout-item md-size-33">
-                  <div class="value-big">${{balance.totalInvested}}</div>
-                  <div class="value-subtitle">total invested</div>
-                </div>
-
-                <div class="md-layout-item md-size-33">
-                  <ratio-chart second-color="#01C0EF" :values="investingChartData"></ratio-chart>
-                </div>
-
-              </div>
-
-            </md-card-content>
-
-            <div class="button-box">
-              <md-button class="md-primary md-raised action-button" @click="showInvestPanel = true">Invest</md-button>
-              <md-button class="md-primary md-raised action-button" v-if="balance.redeemable > 0" @click="redeem()">Redeem ${{balance.redeemable}}</md-button>
-            </div>
-
-          </md-ripple>
-        </md-card>
+              </md-ripple>
+            </md-card>
           </md-tab>
-          <md-tab id="tab-impact" md-label="Impact" >
+          <md-tab id="tab-impact" md-label="Impact">
             <md-card class="impact">
               <md-ripple>
 
-                <md-card-header >
+                <md-card-header>
                   <md-card-header-text>
                     <div class="md-title">Impact</div>
                   </md-card-header-text>
@@ -338,7 +351,9 @@
                       <md-table-cell md-numeric>{{index + 1}}</md-table-cell>
                       <md-table-cell>{{claim.code}}</md-table-cell>
                       <md-table-cell>
-                        <md-button @click="validateClaim(claim.code)" class="md-icon-button md-raised md-dense md-accent" :disabled="!ida.isValidator || claim.isValidated">
+                        <md-button @click="validateClaim(claim.code)"
+                                   class="md-icon-button md-raised md-dense md-accent"
+                                   :disabled="!ida.isValidator || claim.isValidated">
                           <md-icon v-if="claim.isValidated || ida.isValidator">done</md-icon>
                           <md-icon v-if="!claim.isValidated && !ida.isValidator">hourglass_empty</md-icon>
                           <md-tooltip md-direction="right">Validate claim</md-tooltip>
@@ -349,8 +364,9 @@
 
                 </md-card-content>
 
-                <div class="button-box" v-if="ida.isOwner" >
-                  <md-button class="md-primary action-button md-raised" @click="showClaimPanel = true">Submit Claim</md-button>
+                <div class="button-box" v-if="ida.isOwner">
+                  <md-button class="md-primary action-button md-raised" @click="showClaimPanel = true">Submit Claim
+                  </md-button>
                 </div>
 
                 <div style="height: 20px" v-else></div>
@@ -368,9 +384,15 @@
   import Contracts from '@/contracts'
   import State from '@/state'
   import RatioChart from './RatioChart'
+  import {validationMixin} from 'vuelidate'
+  import {
+    required,
+    maxValue
+  } from 'vuelidate/lib/validators'
 
   export default {
     name: 'Dashboard',
+    mixins: [validationMixin],
     components: {RatioChart},
     data() {
       return {
@@ -378,16 +400,36 @@
         balance: State.balance,
         processing: false,
         showFundPanel: false,
-        fundingAmount: null,
+        fundingForm: {
+          fundingAmount: null
+        },
         showDistributePanel: false,
         distributeAmount: State.ida.distributeAmount,
         distributeDiscount: State.ida.distributeDiscount,
         showInvestPanel: false,
-        investmentAmount: null,
+        investmentForm: {
+          investmentAmount: null
+        },
         showClaimPanel: false,
         claimKey: null,
         investingChartData: State.investingChartData,
         fundingChartData: State.fundingChartData
+      }
+    },
+    validations: {
+      fundingForm: {
+        fundingAmount: {
+          required,
+          maxValue: (value, model) => value <= State.ida.maxFunding,
+          maxAvailable: (value, model) => value <= State.balance.tokens
+        }
+      },
+      investmentForm: {
+        investmentAmount: {
+          required,
+          maxValue: (value, model) => value <= State.ida.maxInvestment,
+          maxAvailable: (value, model) => value <= State.balance.tokens
+        }
       }
     },
     beforeCreate: function () {
@@ -395,65 +437,80 @@
       Contracts.init(idaAddress);
     },
     methods: {
-      getDemoTokens: async function() {
+      getDemoTokens: async function () {
         this.processing = true;
         await Contracts.getDemoTokens();
         this.processing = false;
 
       },
-      unlockFunding: async function() {
+      unlockFunding: async function () {
         this.processing = true;
         await Contracts.unlockFunding();
         this.processing = false;
       },
-      unlockInvesting: async function() {
+      unlockInvesting: async function () {
         this.processing = true;
         await Contracts.unlockInvesting();
         this.processing = false;
       },
-      fund: async function() {
-        this.processing = true;
-        await Contracts.fund(this.fundingAmount);
-        this.processing = false;
-        this.showFundPanel = false;
+      fund: async function () {
+        this.$v.fundingForm.$touch()
+        if (!this.$v.fundingForm.$invalid) {
+          this.processing = true;
+          await Contracts.fund(this.fundingForm.fundingAmount);
+          this.processing = false;
+          this.showFundPanel = false;
+        }
       },
-      distribute: async function() {
+      distribute: async function () {
         this.showDistributePanel = true;
       },
-      updateConditions: async function() {
+      updateConditions: async function () {
         this.processing = true;
         await Contracts.updateConditions(this.distributeAmount, this.distributeDiscount);
         this.processing = false;
         this.showDistributePanel = false;
       },
-      invest: async function() {
-        this.processing = true;
-        await Contracts.invest(this.investmentAmount);
-        this.processing = false;
-        this.showInvestPanel = false;
+      invest: async function () {
+        this.$v.investmentForm.$touch();
+        if (!this.$v.investmentForm.$invalid) {
+          this.processing = true;
+          await Contracts.invest(this.investmentForm.investmentAmount);
+          this.processing = false;
+          this.showInvestPanel = false;
+        }
       },
-      submitClaim: async function() {
+      submitClaim: async function () {
         this.processing = true;
         await Contracts.submitClaim(this.claimKey);
         this.processing = false;
         this.showClaimPanel = false;
       },
-      validateClaim: async function(claimKey) {
+      validateClaim: async function (claimKey) {
         this.processing = true;
         await Contracts.validateClaim(claimKey);
         this.processing = false;
       },
-      redeem: async function() {
+      redeem: async function () {
         this.processing = true;
         await Contracts.redeem();
         this.processing = false;
+      },
+      getValidationClass(formName, fieldName) {
+        const field = this.$v[formName][fieldName]
+
+        if (field) {
+          return {
+            'md-invalid': field.$invalid && field.$dirty
+          }
+        }
       }
     }
   }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style lang="scss" >
+<style lang="scss">
 
   div.page {
     padding: 0 20px 0 20px;
@@ -549,7 +606,7 @@
 
   .value-big {
     height: 100px;
-    font-family:Avenir;
+    font-family: Avenir;
     font-size: 36px;
     text-align: center;
     padding-top: 50px;
@@ -559,7 +616,7 @@
 
   .value-subtitle {
     text-align: center;
-    font-family:Avenir;
+    font-family: Avenir;
     font-size: 14px;
     color: gray;
   }
@@ -592,6 +649,10 @@
 
   .md-tabs-content {
     height: 450px !important;
+  }
+
+  .form-container {
+    padding: 20px 20px 0 20px;
   }
 
 </style>

@@ -63,6 +63,7 @@ async function updateInvestments() {
   console.log("Invested by You: " + state.balance.invested);
   let left = web3.fromWei((await paymentRights.balanceOf(sts.address)), 'ether');
   state.balance.totalInvested = state.ida.budget - left;
+  state.ida.maxInvestment = state.ida.budget - state.balance.totalInvested;
   console.log("Invested by others");
   state.balance.redeemable = web3.fromWei((await paymentRights.getAvailableToRedeem({from: main})), 'ether');
   console.log("Reedemable: " + state.balance.redeemable);
@@ -77,6 +78,7 @@ async function updateFunding() {
   state.balance.funded = parseInt(web3.fromWei(await impactPromise.balanceOf(main), 'ether'));
 
   state.balance.totalFunded = parseInt(web3.fromWei(await impactPromise.totalSupply()), 'ether');
+  state.ida.maxFunding = state.ida.budget - state.balance.totalFunded;
 
   state.fundingChartData.You = state.balance.funded;
   state.fundingChartData.Others = state.balance.totalFunded - state.balance.funded;
@@ -193,7 +195,7 @@ const Contracts = {
   fund: async(amount) => {
     console.log("Funding: " + amount);
     let wei = web3.toWei(amount, 'ether');
-    await ida.fund(wei, {from: main, gas: 5000000});
+    await ida.fund(wei, {from: main, gas: 1000000});
 
     await updateFunding();
     await updateHoldings();
