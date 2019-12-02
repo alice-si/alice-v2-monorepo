@@ -22,7 +22,7 @@
         <md-card-header class="md-layout-item md-size-100">
           <md-card-header-text>
             <div class="md-title">Create IDA</div>
-            <div class="md-subhead">to automatically deploy a smart-contract</div>
+            <div class="md-subhead">Create a new Impact Delivery Agreement by filling out this form. Be specific about the Promises you want people to fund. Make sure you nominate a validator who will verify that you have fulfilled your promises.</div>
           </md-card-header-text>
 
         </md-card-header>
