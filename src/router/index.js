@@ -11,6 +11,11 @@ Vue.use(Router)
 export default new Router({
   routes: [
     {
+      path: '/',
+      name: 'List',
+      component: List
+    },
+    {
       path: '/creator',
       name: 'creator',
       component: Creator
@@ -24,11 +29,6 @@ export default new Router({
       path: '/dashboard/:ida',
       name: 'Dashboard',
       component: Dashboard
-    },
-    {
-      path: '/list',
-      name: 'List',
-      component: List
     },
     {
       path: '/admin',
