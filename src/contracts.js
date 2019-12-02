@@ -322,6 +322,7 @@ const Contracts = {
       claimsRegistry = await CLAIMS_REGISTRY.at(claimsRegistryAddress);
 
       state.ida.name = (await ida.name());
+      state.ida.address = idaAddress;
       state.ida.promisesNumber = (await ida.outcomesNumber()).toString();
       state.ida.promisePrice = web3.fromWei((await ida.outcomePrice()), 'ether');
       state.ida.validator = await ida.validator();

@@ -2,8 +2,13 @@
   <md-app id="app">
     <md-app-toolbar class="md-primary">
       <span class="md-title">{{$router.currentRoute.name == 'creator' ? 'Create a new IDA' : ida.name}}</span>
+      <md-button :href="'https://rinkeby.etherscan.io/address/'+ ida.address" target="_blank" style="padding-top: 5px;" v-if="ida.address">
+        {{ida.address}}
+        <md-icon style="font-size: 14px !important; padding-bottom: 4px;">open_in_new</md-icon>
+      </md-button>
       <div class="md-toolbar-section-end">
         <!--<md-button style="color: white" @click="showLogs()">Show logs</md-button>-->
+
 
 
         <md-tabs class="md-primary" md-sync-route>

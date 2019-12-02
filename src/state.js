@@ -24,6 +24,7 @@ let state = {
   },
   paymentTokens: [],
   ida: {
+    address: null,
     name: '',
     promisesNumber: 0,
     promisePrice: 0,
