@@ -45,8 +45,10 @@
             <label for="fundingAmount">Amount (up to ${{ida.maxFunding}})</label>
             <md-input name="fundingAmount" id="fundingAmount" v-model="fundingForm.fundingAmount"
                       :disabled="processing"/>
-            <span class="md-error" v-if="!$v.fundingForm.fundingAmount.required">Please provide the amount to fund</span>
-            <span class="md-error" v-else-if="!$v.fundingForm.fundingAmount.maxValue">Can fund up to ${{ida.maxFunding}}</span>
+            <span class="md-error"
+                  v-if="!$v.fundingForm.fundingAmount.required">Please provide the amount to fund</span>
+            <span class="md-error"
+                  v-else-if="!$v.fundingForm.fundingAmount.maxValue">Can fund up to ${{ida.maxFunding}}</span>
             <span class="md-error" v-else-if="!$v.fundingForm.fundingAmount.maxAvailable">You only have ${{balance.tokens}} tokens to spend</span>
           </md-field>
         </div>
@@ -107,7 +109,8 @@
           <div class="form-container">
             <md-field :class="getValidationClass('investmentForm', 'investmentAmount')">
               <label for="fundingAmount">Number of payment rights to buy</label>
-              <md-input name="investmentAmount" id="investmentAmount" v-model="investmentForm.investmentAmount" :disabled="processing"/>
+              <md-input name="investmentAmount" id="investmentAmount" v-model="investmentForm.investmentAmount"
+                        :disabled="processing"/>
               <span class="md-error" v-if="!$v.investmentForm.investmentAmount.required">Please provide the amount to invest</span>
               <span class="md-error" v-else-if="!$v.investmentForm.investmentAmount.maxValue">You can invest up to ${{ida.maxInvestment}}</span>
               <span class="md-error" v-else-if="!$v.investmentForm.investmentAmount.maxAvailable">You only have ${{balance.tokens}} tokens to invest</span>
@@ -175,64 +178,48 @@
       </div>
 
       <div class="md-layout-item md-size-33">
-        <md-card>
+        <md-card class="description" v-if="ida.data">
           <md-ripple>
-
-            <md-card-header>
-              <md-card-header-text>
-                <div class="md-title">Agreement details</div>
-                <div class="md-subhead">a list of parameters specified by the creator</div>
-              </md-card-header-text>
-
-            </md-card-header>
-
-
             <md-card-content style="text-align: left">
-              <div>
-                <md-list>
 
-                  <md-divider></md-divider>
-                  <md-subheader>Number of promises</md-subheader>
-
-                  <md-list-item>
-                    <div>
-                      <b>{{ida.promisesNumber}}</b>
-                    </div>
-                  </md-list-item>
-
-                  <md-divider></md-divider>
-                  <md-subheader>Price per promise</md-subheader>
-
-                  <md-list-item>
-                    <div>
-                      <b>${{ida.promisePrice}}</b>
-                    </div>
-                  </md-list-item>
-
-                  <md-divider></md-divider>
-
-                  <md-subheader>Validator</md-subheader>
-
-                  <md-list-item class="md-list-item-text">
-                    <div class="md-list-item-text">
-                      <b>{{ida.validator}}</b>
-                    </div>
-                  </md-list-item>
-
-                  <md-divider></md-divider>
-
-                  <md-subheader>Project deadline</md-subheader>
-
-                  <md-list-item class="md-list-item-text">
-                    <div class="md-list-item-text">
-                      <b>{{ida.endTime}}</b>
-                    </div>
-                  </md-list-item>
-
-
-                </md-list>
+              <div style="padding-top: 10px;">
+                <div class="text">
+                  {{ida.data['project-description']}}
+                </div>
               </div>
 
+              <div>
+                <md-divider></md-divider>
+                <md-subheader>{{ida.data['organisation-name']}}</md-subheader>
+                <div class="text">
+                  {{ida.data['organisation-description']}}
+                </div>
+              </div>
+
+              <div>
+                <md-divider></md-divider>
+                <md-subheader>{{ida.promisesNumber}} x ${{ida.promisePrice}}</md-subheader>
+                <div class="text">
+                  {{ida.data['promise-description']}}
+                </div>
+              </div>
+
+              <div>
+                <md-divider></md-divider>
+                <md-subheader>Validator</md-subheader>
+                <div class="text">
+                  {{ida.data['validator-name']}} <br/>
+                  <span class="address-text"> {{ida.validator}}</span>
+                </div>
+              </div>
+
+              <div>
+                <md-divider></md-divider>
+                <md-subheader>Project deadline</md-subheader>
+                <div class="text">
+                  <b>{{ida.endTime}}</b>
+                </div>
+              </div>
             </md-card-content>
           </md-ripple>
         </md-card>
@@ -534,10 +521,6 @@
     color: whtie;
   }
 
-  .md-card .md-subhead {
-    font-size: 12px;
-  }
-
   .card-icon {
     color: white;
   }
@@ -653,6 +636,25 @@
 
   .form-container {
     padding: 20px 20px 0 20px;
+  }
+
+  .description.md-card .text {
+    font-size: 14px;
+    height: auto;
+    font-style: italic;
+    color: gray;
+    padding: 0 16px 16px 16px;
+  }
+
+  .description.md-card .md-subheader.md-theme-default {
+    color: black;
+    font-size: 14px;
+    font-weight: bolder;
+  }
+
+  span.address-text {
+    font-size: 11px;
+    font-weight: bolder;
   }
 
 </style>

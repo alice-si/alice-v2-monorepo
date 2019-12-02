@@ -10,7 +10,7 @@
 
         <md-progress-spinner md-mode="indeterminate"></md-progress-spinner>
 
-        <div >
+        <div>
           Please wait....
         </div>
 
@@ -19,8 +19,7 @@
 
     <md-card class="card-center creator">
       <md-ripple>
-
-        <md-card-header>
+        <md-card-header class="md-layout-item md-size-100">
           <md-card-header-text>
             <div class="md-title">Create IDA</div>
             <div class="md-subhead">to automatically deploy a smart-contract</div>
@@ -32,39 +31,94 @@
         <md-card-content>
           <div class="form">
 
-            <md-field>
-              <label>Project name</label>
-              <md-input v-model="newIda.name"></md-input>
-            </md-field>
+            <div class="md-layout md-gutter">
 
-            <md-field>
-              <label>Number of promises</label>
-              <md-input v-model="newIda.outcomesNumber"></md-input>
-            </md-field>
+              <div class="md-layout-item md-size-50">
+                <md-field>
+                  <label>Project name</label>
+                  <md-input v-model="newIda.name"></md-input>
+                </md-field>
+              </div>
 
-            <md-field>
-              <label>Price per promise</label>
-              <md-input v-model="newIda.outcomesPrice"></md-input>
-            </md-field>
+              <div class="md-layout-item md-size-50">
+                <md-field>
+                  <label>Project description</label>
+                  <md-input v-model="newIda.projectDescription"></md-input>
+                </md-field>
+              </div>
 
-            <md-field>
-              <label for="paymentToken">Payment Token</label>
-              <md-select v-model="newIda.paymentToken" name="paymentToken" id="paymentToken">
-                <md-option v-for="(p, index) in paymentTokens" :value="p.address" :key="p.address">{{p.name}}</md-option>
-              </md-select>
-            </md-field>
+              <div class="md-layout-item md-size-50">
+                <md-field>
+                  <label>Your name or organization name</label>
+                  <md-input v-model="newIda.organisationName"></md-input>
+                </md-field>
+              </div>
 
-            <md-datepicker v-model="newIda.endTime">
-              <label>Project deadline</label>
-            </md-datepicker>
+              <div class="md-layout-item md-size-50">
+                <md-field>
+                  <label>Describe who you are</label>
+                  <md-input v-model="newIda.organisationDescription"></md-input>
+                </md-field>
+              </div>
 
-            <md-field>
-              <label>Validator</label>
-              <md-input v-model="newIda.validator"></md-input>
-            </md-field>
+              <div class="md-layout-item md-size-50">
+                <md-field>
+                  <label>Number of promises</label>
+                  <md-input v-model="newIda.outcomesNumber"></md-input>
+                </md-field>
+              </div>
+
+              <div class="md-layout-item md-size-50">
+                <md-field>
+                  <label>Promise description</label>
+                  <md-input v-model="newIda.promiseDescription"></md-input>
+                </md-field>
+              </div>
+
+
+              <div class="md-layout-item md-size-50">
+                <md-field>
+                  <label>Price per promise</label>
+                  <md-input v-model="newIda.outcomesPrice"></md-input>
+                </md-field>
+              </div>
+
+              <div class="md-layout-item md-size-50">
+                <md-field>
+                  <label for="paymentToken">Payment Token</label>
+                  <md-select v-model="newIda.paymentToken" name="paymentToken" id="paymentToken">
+                    <md-option v-for="(p, index) in paymentTokens" :value="p.address" :key="p.address">{{p.name}}
+                    </md-option>
+                  </md-select>
+                </md-field>
+              </div>
+
+              <div class="md-layout-item md-size-50">
+                <md-field>
+                  <label>Validator Name and Description</label>
+                  <md-input v-model="newIda.validatorName"></md-input>
+                </md-field>
+              </div>
+
+              <div class="md-layout-item md-size-50">
+                <md-field>
+                  <label>Validator Ethereum Address</label>
+                  <md-input v-model="newIda.validator"></md-input>
+                </md-field>
+              </div>
+
+              <div class="md-layout-item md-size-50">
+              <md-datepicker v-model="newIda.endTime">
+                <label>Project deadline</label>
+              </md-datepicker>
+              </div>
+
+
+            </div>
 
           </div>
         </md-card-content>
+
 
         <div class="button-box">
           <md-button class="md-primary create-if md-raised" @click="deployIda()">Deploy</md-button>
@@ -78,6 +132,7 @@
 <script>
   import Contracts from '@/contracts'
   import State from '@/state'
+
 
   export default {
     name: 'Creator',
@@ -99,21 +154,24 @@
       }
     },
     beforeCreate: function () {
-      Contracts.init()
+      Contracts.init(null, true);
     },
     methods: {
       deployIda: async function () {
         this.deploying = true;
         let idaAddress = await Contracts.deployIda(this.newIda);
         this.deploying = false;
-        this.$router.push({path: '/dashboard/'+idaAddress});
+        this.$router.push({path: '/dashboard/' + idaAddress});
+      },
+      test: async function () {
+        await Contracts.box3();
       }
     }
   }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style lang="scss" >
+<style lang="scss">
 
   div.page {
     padding: 0 20px 0 20px;
@@ -122,7 +180,7 @@
   }
 
   .md-card.creator {
-    width: 33% !important;
+    width: 66% !important;
     display: inline-block;
     vertical-align: top;
   }
@@ -165,7 +223,12 @@
   }
 
   .creator .md-card-content {
-    padding: 10px 10px 0 10px !important;
+    width: 100%;
+    padding: 0;
+  }
+
+  .creator .md-card-header+.md-card-content {
+
   }
 
   .creator .md-card-header {
@@ -195,6 +258,7 @@
 
   .md-field .md-input {
     height: 28px !important;
+    width: 100%;
   }
 
   .md-field.md-has-value .md-input {
@@ -236,10 +300,9 @@
   .md-date-icon {
     display: none;
   }
-  .md-field>.md-icon~.md-file, .md-field>.md-icon~.md-input, .md-field>.md-icon~.md-textarea {
+
+  .md-field > .md-icon ~ .md-file, .md-field > .md-icon ~ .md-input, .md-field > .md-icon ~ .md-textarea {
     margin-left: 0;
   }
-
-
 
 </style>

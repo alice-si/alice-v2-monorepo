@@ -52,7 +52,16 @@ const STS = setup(STS_JSON);
 const CLAIMS_REGISTRY = setup(CLAIMS_REGISTRY_JSON);
 
 
-var main, ausd, idaFactory, ida, impactPromise, paymentRights, sts, claimsRegistry, owner;
+var main, ausd, idaFactory, ida, impactPromise, paymentRights, sts, claimsRegistry, owner, box;
+
+async function saveDetailsIn3Box(newIda) {
+  const space = await box.openSpace(newIda.name);
+  await space.public.set('project-description', newIda.projectDescription);
+  await space.public.set('organisation-name', newIda.organisationName);
+  await space.public.set('organisation-description', newIda.organisationDescription);
+  await space.public.set('promise-description', newIda.promiseDescription);
+  await space.public.set('validator-name', newIda.validatorName);
+}
 
 async function updateInvestments() {
   let investingAllowance = await ausd.allowance(main, sts.address);
@@ -155,6 +164,8 @@ const Contracts = {
   deployIda: async(newIda) => {
     console.log(newIda);
     console.log("Deploying IDA for: " + newIda.outcomesNumber + " of outcomes with price: " + newIda.outcomesPrice);
+
+    await saveDetailsIn3Box(newIda);
 
     let tx = await idaFactory.createIda(
       newIda.paymentToken,
@@ -270,7 +281,7 @@ const Contracts = {
     });
   },
 
-  init: async (idaAddress) => {
+  init: async (idaAddress, open3Box) => {
     await connectWeb3();
     let getAccounts = promisify(web3.eth.getAccounts);
     let accounts = await getAccounts();
@@ -289,6 +300,10 @@ const Contracts = {
 
     idaFactory = await IDA_FACTORY.at(IDA_FACTORY_ADDRESS);
     console.log("Linked Ida factory: " + idaFactory.address);
+
+    if (open3Box) {
+      box = await Box.openBox(main, web3.currentProvider)
+    }
 
     if (idaAddress) {
       console.log("Fetching IDA: " + idaAddress);
@@ -312,7 +327,10 @@ const Contracts = {
       state.ida.validator = await ida.validator();
       state.ida.endTime = new Date(await ida.endTime()*1000).toLocaleDateString("en-GB");
       state.ida.budget = state.ida.promisesNumber * state.ida.promisePrice;
+      state.ida.serviceProvider = (await ida.serviceProvider());
 
+      //Get description from 3Box
+      state.ida.data = await Box.getSpace(state.ida.serviceProvider, state.ida.name);
 
       //Get sts
       let stsFilter = web3.eth.filter({

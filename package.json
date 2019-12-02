@@ -16,6 +16,7 @@
     "lint": "eslint --ext .js,.vue src test/unit/specs test/e2e/specs"
   },
   "dependencies": {
+    "3box": "^1.13.2",
     "chart.js": "^2.9.3",
     "truffle-contract": "^4.0.31",
     "vue": "^2.5.2",
