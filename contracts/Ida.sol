@@ -72,7 +72,7 @@ contract Ida {
         paymentRights = FluidToken(escrow.recipient());
         paymentRights.transfer(msg.sender, outcomePrice.mul(outcomesNumber));
 
-        emit Created(msg.sender, outcomesNumber, outcomePrice, name);
+        emit Created(serviceProvider, outcomesNumber, outcomePrice, name);
     }
 
 

@@ -41,7 +41,8 @@ let state = {
   },
   allIdas: [],
   investingChartData: {You: 0, Others: 0},
-  fundingChartData: {You: 0, Others: 0}
+  fundingChartData: {You: 0, Others: 0},
+  investingTotalChartData: {Invested: 0, Cap: 0}
 
 };
 

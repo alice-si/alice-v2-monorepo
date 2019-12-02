@@ -36,7 +36,7 @@
 
     <md-drawer class="md-drawer md-right" :md-active.sync="showFundPanel" md-swipeable>
       <md-toolbar class="md-primary">
-        <span class="md-title">Fund IDA</span>
+        <span class="md-title">Fund Promises</span>
       </md-toolbar>
 
       <form novalidate v-if="ida.fundingUnlocked">
@@ -69,8 +69,13 @@
 
     <md-drawer class="md-drawer md-right" :md-active.sync="showDistributePanel" md-swipeable>
       <md-toolbar class="md-primary">
-        <span class="md-title">Distribute payment rights</span>
+        <span class="md-title">Create IDA investment market</span>
       </md-toolbar>
+
+      <div class="text">
+        Allow investors to buy a portion of your payment rights at a certain discount.
+        This will allow you to get working capital upfront instead of waiting to be paid each time a promise is achieved.
+      </div>
 
       <div class="form">
 
@@ -142,7 +147,7 @@
             <md-card-header-text>
               <div class="md-title">
                 You are the creator of this IDA
-                <md-button class="funds-button" @click="distribute()">Distribute payment rights</md-button>
+                <md-button class="funds-button" @click="distribute()">Create IDA investment market</md-button>
               </div>
 
             </md-card-header-text>
@@ -228,13 +233,13 @@
       <div class="md-layout-item md-size-66">
         <md-tabs class="md-transparent" md-alignment="fixed">
 
-          <md-tab id="tab-funding" md-label="Funding">
+          <md-tab id="tab-funding" md-label="Fund Promises">
             <md-card class="funding">
               <md-ripple>
 
                 <md-card-header>
                   <md-card-header-text>
-                    <div class="md-title">Funding</div>
+                    <div class="md-title">Fund Promises</div>
                   </md-card-header-text>
 
                 </md-card-header>
@@ -288,12 +293,12 @@
                     </div>
 
                     <div class="md-layout-item md-size-33">
-                      <div class="value-big">${{balance.totalInvested}}</div>
-                      <div class="value-subtitle">total invested</div>
+                      <div class="value-big">${{balance.totalInvested}} / ${{ida.budget}}</div>
+                      <div class="value-subtitle">total invested / market cap</div>
                     </div>
 
                     <div class="md-layout-item md-size-33">
-                      <ratio-chart second-color="#01C0EF" :values="investingChartData"></ratio-chart>
+                      <ratio-chart second-color="#01C0EF" :values="investingTotalChartData"></ratio-chart>
                     </div>
 
                   </div>
@@ -400,7 +405,8 @@
         showClaimPanel: false,
         claimKey: null,
         investingChartData: State.investingChartData,
-        fundingChartData: State.fundingChartData
+        fundingChartData: State.fundingChartData,
+        investingTotalChartData: State.investingTotalChartData
       }
     },
     validations: {
@@ -638,12 +644,16 @@
     padding: 20px 20px 0 20px;
   }
 
-  .description.md-card .text {
+  .description.md-card .text, .text {
     font-size: 14px;
     height: auto;
     font-style: italic;
     color: gray;
     padding: 0 16px 16px 16px;
+  }
+
+  .md-drawer .text {
+    padding-top: 16px;
   }
 
   .description.md-card .md-subheader.md-theme-default {

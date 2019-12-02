@@ -21,28 +21,20 @@
     <div class="md-layout md-gutter">
       <md-table class="idas-table">
         <md-table-row>
-          <md-table-head md-numeric>ID</md-table-head>
           <md-table-head>Name</md-table-head>
-          <md-table-head>Address</md-table-head>
-          <md-table-head>Promises number</md-table-head>
+          <md-table-head>Creator</md-table-head>
+          <md-table-head>Promises</md-table-head>
           <md-table-head>Promise price</md-table-head>
-          <md-table-head>Details</md-table-head>
         </md-table-row>
 
-        <md-table-row v-for="(ida, index) in allIdas" :key="ida.address">
-          <md-table-cell md-numeric>{{index + 1}}</md-table-cell>
+
+        <md-table-row v-for="(ida, index) in allIdas" :key="ida.address" @click="navigate(ida)">
           <md-table-cell>{{ida.name}}</md-table-cell>
-          <md-table-cell>{{ida.address}}</md-table-cell>
-          <md-table-cell>{{ida.promisesNumber}}</md-table-cell>
+          <md-table-cell>{{ida.creator}}</md-table-cell>
+          <md-table-cell>{{ida.promise}}</md-table-cell>
           <md-table-cell>${{ida.promisePrice}}</md-table-cell>
-          <md-table-cell>
-            <router-link :to="'/dashboard/'+ida.address">
-              <md-button class="md-icon-button">
-                <md-icon>double_arrow</md-icon>
-              </md-button>
-            </router-link>
-          </md-table-cell>
         </md-table-row>
+
       </md-table>
 
     </div>
@@ -69,21 +61,9 @@
       Contracts.getAllIdas();
     },
     methods: {
-      getDemoTokens: async function() {
-        this.processing = true;
-        await Contracts.getDemoTokens();
-        this.processing = false;
-      },
-      unlockFunding: async function() {
-        this.processing = true;
-        await Contracts.unlockFunding();
-        this.processing = false;
-      },
-      fund: async function() {
-        this.processing = true;
-        await Contracts.fund(this.fundingAmount);
-        this.processing = false;
-        this.showFundPanel = false;
+      navigate: function(ida) {
+        this.$router.push({name: 'Dashboard', params: {ida: ida.address}});
+        console.log("GO");
       }
     }
   }
@@ -100,6 +80,10 @@
 
   .idas-table {
     width: 100%;
+  }
+
+  .md-table-row {
+    cursor: pointer;
   }
 
   .md-table-cell-container {
