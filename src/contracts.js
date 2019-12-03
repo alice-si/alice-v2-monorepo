@@ -70,7 +70,7 @@ async function updateInvestments() {
 
   state.balance.invested = web3.fromWei((await paymentRights.balanceOf(main)), 'ether');
   console.log("Invested by You: " + state.balance.invested);
-  let left = web3.fromWei((await paymentRights.balanceOf(sts.address)), 'ether');
+  let left = web3.fromWei((await paymentRights.balanceOf(owner)), 'ether');
   state.balance.totalInvested = state.ida.budget - left;
   state.ida.maxInvestment = state.ida.budget - state.balance.totalInvested;
   console.log("Invested by others");
@@ -208,6 +208,14 @@ const Contracts = {
     await ausd.approve(sts.address, amount, {from: main});
 
     state.ida.investingUnlocked = true;
+  },
+
+  unlockDistribution: async() => {
+    let amount = await paymentRights.totalSupply();
+    console.log("Unlocking distribution: " + amount);
+    await paymentRights.approve(sts.address, amount, {from: main});
+
+    state.ida.distributionUnlocked = true;
   },
 
   fund: async(amount) => {
@@ -374,6 +382,12 @@ const Contracts = {
         state.ida.isValidator = (main.toLocaleLowerCase() == state.ida.validator.toLocaleLowerCase());
         state.ida.distributeAmount = web3.fromWei((await sts.currentSupply()), 'ether');
         state.ida.distributeDiscount = (await sts.currentDiscount()).toString();
+
+        if (state.ida.isOwner) {
+          let ownerAllowance = await paymentRights.allowance(main, sts.address);
+          console.log("Owner allowance: " + ownerAllowance);
+          state.ida.distributionUnlocked = ownerAllowance > 0
+        }
 
         updateInvestments();
 

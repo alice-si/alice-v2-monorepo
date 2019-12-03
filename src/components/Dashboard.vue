@@ -83,7 +83,7 @@
         This will allow you to get working capital upfront instead of waiting to be paid each time a promise is achieved.
       </div>
 
-      <div class="form">
+      <div class="form" v-if="ida.distributionUnlocked">
 
         <div class="md-layout-item md-small-size-100">
           <md-field>
@@ -101,6 +101,14 @@
         </div>
 
         <md-button class="md-primary md-raised" @click="updateConditions()">Update conditions</md-button>
+      </div>
+
+      <div v-if="!ida.distributionUnlocked">
+        <div class="unlock-info">Please enable investing by making a token allowance</div>
+        <md-button @click="unlockDistribution()" class="md-icon-button md-raised md-accent">
+          <md-icon>vpn_key</md-icon>
+          <md-tooltip md-direction="right">Unlock access</md-tooltip>
+        </md-button>
       </div>
 
     </md-drawer>
@@ -247,15 +255,15 @@
       <div class="md-layout-item md-size-66">
         <md-tabs class="md-transparent" md-alignment="fixed">
 
-          <md-tab id="tab-funding" md-label="Fund Promises">
+          <md-tab id="tab-funding" :md-label="ida.isOwner? 'Collect Funds' : 'Fund Promises'">
             <md-card class="funding">
               <md-ripple>
 
                 <md-card-header>
                   <md-card-header-text>
-                    <div class="md-title">Fund Promises</div>
+                    <div class="md-title">{{ida.isOwner ? 'Collect Funds' : 'Fund Promises'}}</div>
                     <div class="md-subhead">
-                      by buying the Impact Promise Token
+                      by {{ida.isOwner ? 'selling' : 'buying'}} the Impact Promise Token
                       <md-button :href="'https://rinkeby.etherscan.io/token/'+ ida.promiseToken"
                                  target="_blank" class="token-button">
                         {{ida.promiseToken}}
@@ -277,9 +285,13 @@
                 <md-card-content style="text-align: left">
                   <div class="md-layout md-gutter">
 
-                    <div class="md-layout-item md-size-33">
+                    <div class="md-layout-item md-size-33" v-if="!ida.isOwner">
                       <div class="value-big">${{balance.funded}}</div>
                       <div class="value-subtitle">funded by You</div>
+                    </div>
+
+                    <div class="md-layout-item md-size-33" v-if="ida.isOwner">
+
                     </div>
 
                     <div class="md-layout-item md-size-33">
@@ -294,22 +306,23 @@
                   </div>
                 </md-card-content>
 
-                <div class="button-box">
-                  <md-button class="md-primary action-button md-raised" @click="showFundPanel = true">Fund</md-button>
+                <div class="button-box" >
+                  <md-button v-if="!ida.isOwner" class="md-primary action-button md-raised" @click="showFundPanel = true">Fund</md-button>
                 </div>
 
               </md-ripple>
             </md-card>
           </md-tab>
-          <md-tab id="tab-investing" md-label="Invest in this IDA">
+
+          <md-tab id="tab-investing" :md-label="ida.isOwner ? 'Raise investment' : 'Invest in this IDA'">
             <md-card class="investing">
               <md-ripple>
 
                 <md-card-header>
                   <md-card-header-text>
-                    <div class="md-title">Invest in this IDA</div>
+                    <div class="md-title">{{ida.isOwner ? 'Raise investment' : 'Invest in this IDA'}}</div>
                     <div class="md-subhead">
-                      by buying the Payment Rights Token
+                      by {{ida.isOwner ? 'selling' : 'buying'}} the Payment Rights Token
                       <md-button :href="'https://rinkeby.etherscan.io/token/'+ ida.paymentRightsToken"
                                  target="_blank" class="token-button">
                         {{ida.paymentRightsToken}}
@@ -331,7 +344,11 @@
                 <md-card-content style="text-align: left">
                   <div class="md-layout md-gutter">
 
-                    <div class="md-layout-item md-size-33">
+                    <div class="md-layout-item md-size-33" v-if="ida.isOwner">
+
+                    </div>
+
+                    <div class="md-layout-item md-size-33" v-else>
                       <div class="value-big">${{balance.invested}}</div>
                       <div class="value-subtitle">invested by You</div>
                     </div>
@@ -350,8 +367,16 @@
                 </md-card-content>
 
                 <div class="button-box">
-                  <md-button class="md-primary md-raised action-button" @click="showInvestPanel = true">Invest
+
+                  <md-button class="md-primary md-raised action-button" @click="showDistributePanel = true" v-if="ida.isOwner">
+                    Update market conditions
                   </md-button>
+
+                  <md-button class="md-primary md-raised action-button" @click="showInvestPanel = true" v-else>
+                    Invest
+                  </md-button>
+
+
                   <md-button class="md-primary md-raised action-button" v-if="balance.redeemable > 0" @click="redeem()">
                     Redeem ${{balance.redeemable}}
                   </md-button>
@@ -360,13 +385,13 @@
               </md-ripple>
             </md-card>
           </md-tab>
-          <md-tab id="tab-impact" md-label="Impact">
+          <md-tab id="tab-impact" :md-label="ida.isOwner ? 'Report Impact' : 'Track Impact'">
             <md-card class="impact">
               <md-ripple>
 
                 <md-card-header>
                   <md-card-header-text>
-                    <div class="md-title">Impact</div>
+                    <div class="md-title">{{ida.isOwner ? 'Report Impact' : 'Track Impact'}}</div>
                   </md-card-header-text>
 
                 </md-card-header>
@@ -375,7 +400,7 @@
                 <md-card-content style="text-align: left">
 
 
-                  <md-table>
+                  <md-table v-if="ida.claims && ida.claims.length > 0">
                     <md-table-row>
                       <md-table-head md-numeric>ID</md-table-head>
                       <md-table-head>Code</md-table-head>
@@ -489,6 +514,11 @@
       unlockInvesting: async function () {
         this.processing = true;
         await Contracts.unlockInvesting();
+        this.processing = false;
+      },
+      unlockDistribution: async function () {
+        this.processing = true;
+        await Contracts.unlockDistribution();
         this.processing = false;
       },
       fund: async function () {
