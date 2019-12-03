@@ -81,7 +81,8 @@ async function updateInvestments() {
   state.investingChartData.Others = state.balance.totalInvested - state.balance.invested;
 
   state.investingTotalChartData.Invested = state.balance.totalInvested;
-  state.investingTotalChartData.Cap = state.ida.budget;
+  state.investingTotalChartData.Remaining = state.ida.budget - state.balance.totalInvested;
+
 }
 
 async function updateFunding() {
@@ -94,6 +95,9 @@ async function updateFunding() {
 
   state.fundingChartData.You = state.balance.funded;
   state.fundingChartData.Others = state.balance.totalFunded - state.balance.funded;
+
+  state.fundingTotalChartData.Funded = state.balance.totalFunded;
+  state.fundingTotalChartData.Remaining = state.ida.budget - state.balance.totalFunded;
 }
 
 async function updateHoldings() {
@@ -348,6 +352,8 @@ const Contracts = {
       state.ida.endTime = new Date(await ida.endTime()*1000).toLocaleDateString("en-GB");
       state.ida.budget = state.ida.promisesNumber * state.ida.promisePrice;
       state.ida.serviceProvider = (await ida.serviceProvider());
+      state.ida.paymentRightsToken = paymentRightsAddress;
+      state.ida.promiseToken = impactPromiseAddress;
 
       //Get description from 3Box
       state.ida.data = await Box.getSpace(state.ida.serviceProvider, state.ida.name);

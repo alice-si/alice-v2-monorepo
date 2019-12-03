@@ -39,6 +39,12 @@
         <span class="md-title">Fund Promises</span>
       </md-toolbar>
 
+      <div class="text" v-if="ida.data">
+        Fund the delivery of this IDA's promises. Your money will only be paid out each time <b>{{ida.data['organisation-name']}}</b>
+        fulfils a promise, as validated by <b>{{ida.data['validator-name']}}</b>.
+        If any money is still locked after <b>{{ida.endTime}}</b>, you will be able to reclaim your funds.
+      </div>
+
       <form novalidate v-if="ida.fundingUnlocked">
         <div class="form-container">
           <md-field :class="getValidationClass('fundingForm', 'fundingAmount')">
@@ -101,16 +107,24 @@
 
     <md-drawer class="md-drawer md-right" :md-active.sync="showInvestPanel" md-swipeable>
       <md-toolbar class="md-primary">
-        <span class="md-title">Invest</span>
+        <span class="md-title">Invest in this IDA</span>
       </md-toolbar>
 
-      <div class="form" v-if="ida.investingUnlocked">
+      <div class="text" v-if="ida.data && ida.distributeAmount > 0">
+        <b>{{ida.data['organisation-name']}}</b> has made <b>{{ida.distributeAmount}}</b> payment rights investable
+        at a <b>{{ida.distributeDiscount}}%</b> discount.
+        Buying these will allow you to claim the funds that are unlocked each time a promise is fulfilled,
+        with a maximum return of <b>{{100 / (100-ida.distributeDiscount) * 100 - 100}}%</b> on your investment.
+        You risk losing your investment if promises are not delivered.
+      </div>
 
-        <div class="md-layout-item md-small-size-100">
-          You buy up to <b>${{ida.maxInvestment}}</b> rights with <b>{{ida.distributeDiscount}}%</b> discount
-        </div>
+      <div class="text" v-if="ida.data && ida.distributeAmount == 0">
+        Unfortunately, <b>{{ida.data['organisation-name']}}</b> is not selling payment rights at the moment.
+      </div>
 
-        <form novalidate v-if="ida.investingUnlocked">
+      <div class="form" v-if="ida.investingUnlocked && ida.data && ida.distributeAmount > 0">
+
+        <form novalidate>
           <div class="form-container">
             <md-field :class="getValidationClass('investmentForm', 'investmentAmount')">
               <label for="fundingAmount">Number of payment rights to buy</label>
@@ -120,14 +134,14 @@
               <span class="md-error" v-else-if="!$v.investmentForm.investmentAmount.maxValue">You can invest up to ${{ida.maxInvestment}}</span>
               <span class="md-error" v-else-if="!$v.investmentForm.investmentAmount.maxAvailable">You only have ${{balance.tokens}} tokens to invest</span>
             </md-field>
-            This will cost you ${{investmentForm.investmentAmount * (ida.distributeDiscount/100)}}
+            This will cost you ${{investmentForm.investmentAmount * ((100-ida.distributeDiscount)/100)}}
           </div>
         </form>
 
         <md-button class="md-primary md-raised" @click="invest()">Invest</md-button>
       </div>
 
-      <div v-else>
+      <div v-if="!ida.investingUnlocked">
         <div class="unlock-info">Please enable investing by making a token allowance</div>
         <md-button @click="unlockInvesting()" class="md-icon-button md-raised md-accent">
           <md-icon>vpn_key</md-icon>
@@ -240,6 +254,21 @@
                 <md-card-header>
                   <md-card-header-text>
                     <div class="md-title">Fund Promises</div>
+                    <div class="md-subhead">
+                      by buying the Impact Promise Token
+                      <md-button :href="'https://rinkeby.etherscan.io/token/'+ ida.promiseToken"
+                                 target="_blank" class="token-button">
+                        {{ida.promiseToken}}
+                        <md-icon style="font-size: 14px !important; padding-bottom: 4px;">open_in_new</md-icon>
+                        <md-tooltip md-direction="top">View on Etherscan</md-tooltip>
+                      </md-button>
+
+                      <md-button @click="watchToken(ida.promiseToken)" class="md-icon-button">
+                        <md-icon>visibility</md-icon>
+                        <md-tooltip md-direction="right">Watch on Metamask</md-tooltip>
+                      </md-button>
+
+                    </div>
                   </md-card-header-text>
 
                 </md-card-header>
@@ -254,12 +283,12 @@
                     </div>
 
                     <div class="md-layout-item md-size-33">
-                      <div class="value-big">${{balance.totalFunded}}</div>
-                      <div class="value-subtitle">total funding</div>
+                      <div class="value-big">${{balance.totalFunded}} / ${{ida.budget}}</div>
+                      <div class="value-subtitle">total funded / cap</div>
                     </div>
 
                     <div class="md-layout-item md-size-33">
-                      <ratio-chart second-color="#21B7C5" :values="fundingChartData"></ratio-chart>
+                      <ratio-chart second-color="#21B7C5" :values="fundingTotalChartData"></ratio-chart>
                     </div>
 
                   </div>
@@ -272,13 +301,28 @@
               </md-ripple>
             </md-card>
           </md-tab>
-          <md-tab id="tab-investing" md-label="Investing">
+          <md-tab id="tab-investing" md-label="Invest in this IDA">
             <md-card class="investing">
               <md-ripple>
 
                 <md-card-header>
                   <md-card-header-text>
-                    <div class="md-title">Investing</div>
+                    <div class="md-title">Invest in this IDA</div>
+                    <div class="md-subhead">
+                      by buying the Payment Rights Token
+                      <md-button :href="'https://rinkeby.etherscan.io/token/'+ ida.paymentRightsToken"
+                                 target="_blank" class="token-button">
+                        {{ida.paymentRightsToken}}
+                        <md-icon style="font-size: 14px !important; padding-bottom: 4px;">open_in_new</md-icon>
+                        <md-tooltip md-direction="top">View on Etherscan</md-tooltip>
+                      </md-button>
+
+                      <md-button @click="watchToken(ida.paymentRightsToken)" class="md-icon-button">
+                        <md-icon>visibility</md-icon>
+                        <md-tooltip md-direction="right">Watch on Metamask</md-tooltip>
+                      </md-button>
+
+                    </div>
                   </md-card-header-text>
 
                 </md-card-header>
@@ -406,7 +450,8 @@
         claimKey: null,
         investingChartData: State.investingChartData,
         fundingChartData: State.fundingChartData,
-        investingTotalChartData: State.investingTotalChartData
+        investingTotalChartData: State.investingTotalChartData,
+        fundingTotalChartData: State.fundingTotalChartData
       }
     },
     validations: {
@@ -496,6 +541,37 @@
           return {
             'md-invalid': field.$invalid && field.$dirty
           }
+        }
+      },
+      watchToken: function(token) {
+        console.log("Watching: " + token);
+        try {
+          web3.currentProvider.sendAsync({
+            method: 'wallet_watchAsset',
+            params: {
+              'type': 'ERC20',
+              'options': {
+                'address': token,
+                'symbol': 'IDA',
+                'decimals': 18,
+                'image': 'https://s3.eu-west-2.amazonaws.com/alice-res/favicon.ico',
+              },
+            },
+            id: Math.round(Math.random() * 100000),
+          }, (err, data) => {
+            if (!err) {
+              if (data.result) {
+                console.log('Token added');
+              } else {
+                console.log(data);
+                console.log('Some error');
+              }
+            } else {
+              console.log(err.message);
+            }
+          });
+        } catch (e) {
+          console.log(e);
         }
       }
     }
@@ -665,6 +741,32 @@
   span.address-text {
     font-size: 11px;
     font-weight: bolder;
+  }
+
+  .investing .md-subhead, .funding .md-subhead {
+    color: white;
+    margin-bottom: 5px;
+    opacity: 1;
+  }
+
+  .token-button {
+    font-size: 12px;
+    color: white !important;
+    height: 22px;
+  }
+
+  .token-button .md-icon.md-theme-default {
+    color: white !important;
+  }
+
+  .md-subhead .md-button.md-icon-button.md-theme-default {
+    font-size: 12px;
+    height: 20px;
+    margin-left: -16px;
+  }
+
+  .md-subhead .md-button .md-icon {
+    color: white !important;
   }
 
 </style>

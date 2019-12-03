@@ -35,14 +35,17 @@ let state = {
     investingUnlocked: false,
     isOwner: false,
     isValidator: false,
-    distributeAmount: null,
-    distributeDiscount: null,
-    claims: []
+    distributeAmount: 0,
+    distributeDiscount: 0,
+    claims: [],
+    paymentRightsToken: null,
+    promiseToken: null
   },
   allIdas: [],
   investingChartData: {You: 0, Others: 0},
   fundingChartData: {You: 0, Others: 0},
-  investingTotalChartData: {Invested: 0, Cap: 0}
+  investingTotalChartData: {Invested: 0, Remaining: 0},
+  fundingTotalChartData: {Funded: 0, Remaining: 0}
 
 };
 
