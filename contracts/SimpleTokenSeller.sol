@@ -13,6 +13,7 @@ contract SimpleTokenSeller is Ownable {
   using SafeMath for uint256;
 
   event TokensSold(ERC20 indexed soldToken, ERC20 indexed paymentToken, uint256 amountSold, uint256 discount);
+  event ConditionsChanged(ERC20 indexed paymentRightsToken, uint256 amountAvailable, uint256 discount);
 
   ERC20 public paymentToken;
   ERC20 public offeredToken;
@@ -26,10 +27,11 @@ contract SimpleTokenSeller is Ownable {
   }
 
   function updateConditions(uint256 supply, uint256 discount) public onlyOwner {
-    require(supply <= offeredToken.balanceOf(address(this)), "Cannot set supply greater than the amount of tokens available");
+    require(supply <= offeredToken.balanceOf(address(owner())), "Cannot set supply greater than the amount of tokens available");
     require(discount < 100, "Discount must be less than 100%");
     currentSupply = supply;
     currentDiscount = discount;
+    emit ConditionsChanged(offeredToken, currentSupply, discount);
   }
 
   function buy(uint256 amount) public {
@@ -38,10 +40,11 @@ contract SimpleTokenSeller is Ownable {
     price = price.sub(currentDiscount).mul(amount).div(100);
     currentSupply = currentSupply.sub(amount);
 
-    offeredToken.transfer(msg.sender, amount);
+    offeredToken.transferFrom(owner(), msg.sender, amount);
     paymentToken.transferFrom(msg.sender, owner(), price);
 
     emit TokensSold(offeredToken, paymentToken, amount, currentDiscount);
+    emit ConditionsChanged(offeredToken, currentSupply, currentDiscount);
   }
 
 }

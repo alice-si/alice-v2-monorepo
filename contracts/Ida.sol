@@ -17,7 +17,7 @@ contract Ida {
     using SafeMath for uint256;
 
     event Created(address indexed creator, uint256 indexed outcomesNumber, uint256 outcomePrice, string name);
-    event Funded(address indexed funder, uint256 amount);
+    event Funded(address indexed funder, uint256 amount, uint256 totalFunded);
     event Validated(uint256 amount);
 
     /**
@@ -30,6 +30,7 @@ contract Ida {
 
     ERC20 public paymentToken;
     ImpactPromise public impactPromise;
+    //FIXME: Replace with PaymentRights with decimals and name
     FluidToken public paymentRights;
 
     Escrow public escrow;
@@ -70,7 +71,7 @@ contract Ida {
 
         escrow = new FluidEscrow(_paymentToken, outcomePrice.mul(outcomesNumber), address(this));
         paymentRights = FluidToken(escrow.recipient());
-        paymentRights.transfer(msg.sender, outcomePrice.mul(outcomesNumber));
+        paymentRights.transfer(serviceProvider, outcomePrice.mul(outcomesNumber));
 
         emit Created(serviceProvider, outcomesNumber, outcomePrice, name);
     }
@@ -82,7 +83,7 @@ contract Ida {
         paymentToken.transferFrom(msg.sender, address(escrow), _amount);
         impactPromise.mint(msg.sender, _amount);
 
-        emit Funded(msg.sender, _amount);
+        emit Funded(msg.sender, _amount, impactPromise.totalSupply());
     }
 
 

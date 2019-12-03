@@ -42,7 +42,7 @@ contract('Ida Factory', function ([owner, validator, investor, unauthorised]) {
     sts = await Sts.at(stsAddress);
 
     paymentRights = await FluidToken.at(await ida.paymentRights());
-    (await paymentRights.balanceOf(sts.address)).should.be.bignumber.equal('1000');
+    (await paymentRights.balanceOf(owner)).should.be.bignumber.equal('1000');
     (await paymentRights.totalSupply()).should.be.bignumber.equal('1000');
 
     let impactPromiseAddress = await ida.impactPromise();
@@ -64,6 +64,7 @@ contract('Ida Factory', function ([owner, validator, investor, unauthorised]) {
 
 
   it("should not allow updating conditions by other than owner", async function () {
+    await paymentRights.approve(sts.address, 100, {from: owner});
     await sts.updateConditions(100, 50, {from: investor}).shouldBeReverted();
   });
 
@@ -84,7 +85,7 @@ contract('Ida Factory', function ([owner, validator, investor, unauthorised]) {
     (await gbp.balanceOf(owner)).should.be.bignumber.equal('25');
     (await gbp.balanceOf(investor)).should.be.bignumber.equal('75');
 
-    (await paymentRights.balanceOf(sts.address)).should.be.bignumber.equal('950');
+    (await paymentRights.balanceOf(owner)).should.be.bignumber.equal('950');
     (await paymentRights.balanceOf(investor)).should.be.bignumber.equal('50');
   });
 

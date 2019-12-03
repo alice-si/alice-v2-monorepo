@@ -39,8 +39,6 @@ contract IdaFactory {
     Ida ida = new Ida(_paymentToken, promiseToken, claimsRegistry, _name, _outcomesNumber, _outcomesPrice, _validator, _endTime, msg.sender);
     promiseToken.addMinter(address(ida));
     SimpleTokenSeller sts = simpleTokenSellerFactory.createSimpleTokenSeller(ida.paymentToken(), ida.paymentRights(), msg.sender);
-    ERC20 paymentRights = ida.paymentRights();
-    paymentRights.transfer(address(sts), paymentRights.balanceOf(address(this)));
 
     emit IdaCreated(address(ida), address(sts));
     return ida;

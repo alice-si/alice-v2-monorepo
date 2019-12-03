@@ -37,7 +37,7 @@ contract('Impact Delivery Agreement', function ([owner, validator, funder, inves
     sts = await Sts.at(stsAddress);
 
     paymentRights = await FluidToken.at(await ida.paymentRights());
-    //(await paymentRights.balanceOf(owner)).should.be.bignumber.equal('1000');
+    (await paymentRights.balanceOf(owner)).should.be.bignumber.equal('1000');
     (await paymentRights.totalSupply()).should.be.bignumber.equal('1000');
 
     impactPromise = await ImpactPromise.at(await ida.impactPromise());
@@ -50,7 +50,9 @@ contract('Impact Delivery Agreement', function ([owner, validator, funder, inves
   });
 
   it("should get impact payment rights", async function () {
+    await paymentRights.approve(sts.address, 100, {from: owner});
     await sts.updateConditions(100, 50);
+
     await gbp.mint(investor, 100);
     await gbp.approve(sts.address, 100, {from: investor});
 
