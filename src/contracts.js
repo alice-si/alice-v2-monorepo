@@ -17,9 +17,9 @@ import CLAIMS_REGISTRY_JSON from '@contracts/ClaimsRegistry.json'
 let ethereum = window.ethereum;
 let web3 = window.web3;
 
-const START_BLOCK = 5543601;
+const START_BLOCK = 5549491;
 const AUSD_ADDRESS = "0x22d64d4A9DD6e3531BE6A93a532084f3093B388f";
-const IDA_FACTORY_ADDRESS = "0x567ef0f528A7576f02E9F4e0c7A46C2C42Aa4FD4";
+const IDA_FACTORY_ADDRESS = "0x173aB8C479ba6c1b8a4C32142A353900389800Af";
 
 
 var connectWeb3 = async function() {
@@ -277,8 +277,7 @@ const Contracts = {
     filter.get(async function(err, results) {
       for (var i = 0; i < results.length; i++) {
 
-        //let serviceProvider = '0x' + results[i].topics[1].substring(26);
-        let serviceProvider = '0xBC773Ca86D9071e163168a8A5aD25e235907F9e7';
+        let serviceProvider = '0x' + results[i].topics[1].substring(26);
         let address = results[i].address;
         let promisesNumber = web3.toDecimal(results[i].topics[2]);
         let rawName = web3.toAscii('0x'+results[i].data.substring(194));

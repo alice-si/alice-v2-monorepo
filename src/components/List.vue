@@ -24,7 +24,7 @@
           <md-table-head>Name</md-table-head>
           <md-table-head>Creator</md-table-head>
           <md-table-head>Promises</md-table-head>
-          <md-table-head>Promise price</md-table-head>
+          <md-table-head>Project budget</md-table-head>
         </md-table-row>
 
 
@@ -32,7 +32,7 @@
           <md-table-cell>{{ida.name}}</md-table-cell>
           <md-table-cell>{{ida.creator}}</md-table-cell>
           <md-table-cell>{{ida.promise}}</md-table-cell>
-          <md-table-cell>${{ida.promisePrice}}</md-table-cell>
+          <md-table-cell>{{ida.promisesNumber}} x ${{ida.promisePrice}}</md-table-cell>
         </md-table-row>
 
       </md-table>
