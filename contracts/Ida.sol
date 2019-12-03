@@ -4,7 +4,7 @@ import 'openzeppelin-solidity/contracts/token/ERC20/ERC20.sol';
 import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
 import './Escrow.sol';
 import './FluidEscrow.sol';
-import './FluidToken.sol';
+import './PaymentRights.sol';
 import './ImpactPromise.sol';
 import './ClaimsRegistry.sol';
 
@@ -30,8 +30,7 @@ contract Ida {
 
     ERC20 public paymentToken;
     ImpactPromise public impactPromise;
-    //FIXME: Replace with PaymentRights with decimals and name
-    FluidToken public paymentRights;
+    PaymentRights public paymentRights;
 
     Escrow public escrow;
     ClaimsRegistry public claimsRegistry;
@@ -70,7 +69,7 @@ contract Ida {
         serviceProvider = _serviceProvider;
 
         escrow = new FluidEscrow(_paymentToken, outcomePrice.mul(outcomesNumber), address(this));
-        paymentRights = FluidToken(escrow.recipient());
+        paymentRights = PaymentRights(escrow.recipient());
         paymentRights.transfer(serviceProvider, outcomePrice.mul(outcomesNumber));
 
         emit Created(serviceProvider, outcomesNumber, outcomePrice, name);
