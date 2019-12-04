@@ -153,9 +153,6 @@
         deploying: false
       }
     },
-    beforeCreate: function () {
-      Contracts.init(null, true);
-    },
     methods: {
       deployIda: async function () {
         this.deploying = true;

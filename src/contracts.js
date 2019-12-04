@@ -29,7 +29,12 @@ var connectWeb3 = async function() {
   } else if (typeof web3 !== 'undefined') {
     web3 = new Web3(web3.currentProvider);
   } else {
-    web3 = new Web3(new Web3.providers.HttpProvider(process.env.WEB3_PROVIDER));
+    throw 'NO_WEB3'
+  }
+  let getNetwork = promisify(web3.version.getNetwork);
+  let netId = await getNetwork();
+  if (netId != 4) {
+    throw 'WRONG_NETWORK'
   }
 };
 
@@ -311,8 +316,11 @@ const Contracts = {
     });
   },
 
-  init: async (idaAddress, open3Box) => {
+  setupNetwork: async function () {
     await connectWeb3();
+  },
+
+  init: async (idaAddress, open3Box) => {
     let getAccounts = promisify(web3.eth.getAccounts);
     let accounts = await getAccounts();
     if (accounts.length > 0) {

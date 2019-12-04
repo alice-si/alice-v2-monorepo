@@ -502,10 +502,6 @@
         }
       }
     },
-    beforeCreate: function () {
-      let idaAddress = this.$route.params.ida;
-      Contracts.init(idaAddress);
-    },
     methods: {
       getDemoTokens: async function () {
         this.processing = true;
