@@ -22,6 +22,13 @@
         <span class="md-title">Submit Claim</span>
       </md-toolbar>
 
+      <div class="text" v-if="ida.data">
+        Please provide a short description that will allow <b>{{ida.data['validator-name']}}</b>
+        to identify and validate the claim.
+      </div>
+
+
+
       <div class="form">
         <div class="md-layout-item md-small-size-100">
           <md-field>
@@ -255,7 +262,7 @@
       <div class="md-layout-item md-size-66">
         <md-tabs class="md-transparent" md-alignment="fixed">
 
-          <md-tab id="tab-funding" :md-label="ida.isOwner? 'Collect Funds' : 'Fund Promises'">
+          <md-tab id="tab-funding" :md-label="ida.isOwner? 'Collect Funds' : 'Fund Promises'" v-if="!ida.isValidator">
             <md-card class="funding">
               <md-ripple>
 
@@ -314,7 +321,7 @@
             </md-card>
           </md-tab>
 
-          <md-tab id="tab-investing" :md-label="ida.isOwner ? 'Raise investment' : 'Invest in this IDA'">
+          <md-tab id="tab-investing" :md-label="ida.isOwner ? 'Raise investment' : 'Invest in this IDA'" v-if="!ida.isValidator">
             <md-card class="investing">
               <md-ripple>
 
@@ -385,13 +392,13 @@
               </md-ripple>
             </md-card>
           </md-tab>
-          <md-tab id="tab-impact" :md-label="ida.isOwner ? 'Report Impact' : 'Track Impact'">
+          <md-tab id="tab-impact" :md-label="ida.isOwner ? 'Report Impact' : ida.isValidator? 'Validate impact' : 'Track Impact'">
             <md-card class="impact">
               <md-ripple>
 
                 <md-card-header>
                   <md-card-header-text>
-                    <div class="md-title">{{ida.isOwner ? 'Report Impact' : 'Track Impact'}}</div>
+                    <div class="md-title">{{ida.isOwner ? 'Report Impact' : ida.isValidator? 'Validate impact' : 'Track Impact'}}</div>
                   </md-card-header-text>
 
                 </md-card-header>
