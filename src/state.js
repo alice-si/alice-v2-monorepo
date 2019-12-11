@@ -22,6 +22,7 @@ let state = {
     show: false,
     list: []
   },
+  isBoxLoaded: false,
   paymentTokens: [],
   ida: {
     address: null,

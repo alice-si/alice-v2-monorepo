@@ -41,6 +41,24 @@
 
     <md-app-content>
 
+      <md-dialog :md-active.sync="show3Box">
+        <md-app-toolbar class="md-primary">
+          <span class="md-title">Connect to 3 Box</span>
+          <div class="md-toolbar-section-end">
+            <md-button class="md-icon-button md-dense md-primary" @click="show3Box = false">
+              <md-icon>close</md-icon>
+            </md-button>
+          </div>
+
+        </md-app-toolbar>
+
+        <md-dialog-content>
+          In order to create an IDA, you must first connect to the 3Box protocol in order to store this IDAs metadata
+          (don't worry it's decentralized, secure and free).
+        </md-dialog-content>
+
+      </md-dialog>
+
       <md-dialog :md-active.sync="showWelcome">
         <md-app-toolbar class="md-primary">
           <span class="md-title">Welcome to the IDA dApp!</span>
@@ -128,6 +146,7 @@
         showWelcome: false,
         showNoWeb3: false,
         showWrongNetwork: false,
+        show3Box: false,
         ida: State.ida
       }
     },
@@ -139,22 +158,32 @@
     },
     watch: {
       '$route' (to, from) {
+        if (to.name == "creator" && !State.isBoxLoaded) {
+          this.show3Box = true;
+        }
         Contracts.init(to.params.ida, to.name === "creator");
       }
     },
-    mounted: function () {
+    mounted: async function () {
       let that = this;
-      Contracts.setupNetwork().then(function () {
+      try {
+        await Contracts.setupNetwork();
+
         let idaAddress = that.$route.params.ida;
+        console.log("3box loaded: " + State.isBoxLoaded);
+        console.log("Route name: " + that.$route.name);
+        if (that.$route.name == "creator" && !State.isBoxLoaded) {
+          this.show3Box = true;
+        }
         Contracts.init(idaAddress, that.$route.name == "creator");
         that.showWelcome = true;
-      }).catch(function (err) {
-        if (err === 'NO_WEB3') {
-          that.showNoWeb3 = true;
-        } else if (err === 'WRONG_NETWORK') {
-          that.showWrongNetwork = true;
-        }
-      })
+      } catch (err) {
+          if (err === 'NO_WEB3') {
+            that.showNoWeb3 = true;
+          } else if (err === 'WRONG_NETWORK') {
+            that.showWrongNetwork = true;
+          }
+      }
     }
   }
 </script>

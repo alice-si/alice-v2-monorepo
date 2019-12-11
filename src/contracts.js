@@ -22,23 +22,6 @@ const AUSD_ADDRESS = "0x22d64d4A9DD6e3531BE6A93a532084f3093B388f";
 const IDA_FACTORY_ADDRESS = "0x173aB8C479ba6c1b8a4C32142A353900389800Af";
 
 
-var connectWeb3 = async function() {
-  if (typeof ethereum !== 'undefined') {
-    await ethereum.enable();
-    web3 = new Web3(ethereum);
-  } else if (typeof web3 !== 'undefined') {
-    web3 = new Web3(web3.currentProvider);
-  } else {
-    throw 'NO_WEB3'
-  }
-  let getNetwork = promisify(web3.version.getNetwork);
-  let netId = await getNetwork();
-  if (netId != 4) {
-    throw 'WRONG_NETWORK'
-  }
-};
-
-
 var setup = function(json) {
   let c = contract(json);
   c.setProvider(web3.currentProvider);
@@ -59,7 +42,40 @@ const CLAIMS_REGISTRY = setup(CLAIMS_REGISTRY_JSON);
 
 var main, ausd, idaFactory, ida, impactPromise, paymentRights, sts, claimsRegistry, owner, box;
 
+
+var connectWeb3 = async function() {
+  if (typeof ethereum !== 'undefined') {
+    await ethereum.enable();
+    web3 = new Web3(ethereum);
+  } else if (typeof web3 !== 'undefined') {
+    web3 = new Web3(web3.currentProvider);
+  } else {
+    throw 'NO_WEB3'
+  }
+  let getNetwork = promisify(web3.version.getNetwork);
+  let netId = await getNetwork();
+  if (netId != 4) {
+    throw 'WRONG_NETWORK'
+  }
+};
+
+var getBox = async function() {
+  console.log("BOX: " + box);
+  if (!box) {
+    console.log("Loading box...");
+    box = await Box.openBox(main, web3.currentProvider)
+    if (box) {
+      state.isBoxLoaded = true;
+    }
+  }
+  return box;
+}
+
+
+
+
 async function saveDetailsIn3Box(newIda) {
+  let box = await getBox();
   const space = await box.openSpace(newIda.name);
   await space.public.set('project-description', newIda.projectDescription);
   await space.public.set('organisation-name', newIda.organisationName);
@@ -320,7 +336,8 @@ const Contracts = {
     await connectWeb3();
   },
 
-  init: async (idaAddress, open3Box) => {
+  init: async (idaAddress, isCreator) => {
+    console.log("INIT ida: " + idaAddress + " creator: " + isCreator);
     let getAccounts = promisify(web3.eth.getAccounts);
     let accounts = await getAccounts();
     if (accounts.length > 0) {
@@ -338,10 +355,6 @@ const Contracts = {
 
     idaFactory = await IDA_FACTORY.at(IDA_FACTORY_ADDRESS);
     console.log("Linked Ida factory: " + idaFactory.address);
-
-    if (open3Box) {
-      box = await Box.openBox(main, web3.currentProvider)
-    }
 
     if (idaAddress) {
       console.log("Fetching IDA: " + idaAddress);
@@ -405,8 +418,13 @@ const Contracts = {
       updateFunding();
       updateHoldings();
       await this.a.updateIda();
-
     }
+
+    if (isCreator) {
+      console.log("Getting box...");
+      await getBox();
+    }
+
   }
 };
 
