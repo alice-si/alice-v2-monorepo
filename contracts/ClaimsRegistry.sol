@@ -10,6 +10,14 @@ contract ClaimsRegistry {
 
     mapping(address => mapping(address => mapping(bytes32 => bytes32))) public registry;
 
+    /**
+     * @dev An event that is emitted every time a claim is submitted by a service provider
+     * @param issuer  the service provider that is submitting the claim
+     * @param subject  the address of the IDA contract that is managing this type of impact
+     * @param key  an unique identifier (code) for an instance of impact
+     * @param value  an amount of money that is being unlocked when the impact is verified
+     * @param updatedAt  the timestamp when a claim was submitted
+     */
     event ClaimSet(
         address indexed issuer,
         address indexed subject,
@@ -18,6 +26,15 @@ contract ClaimsRegistry {
         uint updatedAt);
 
 
+    /**
+     * @dev An event that is emitted every time a claim is validated by a nominated validator
+     * @param approver  the Validator that verifies and signs off the impact proof
+     * @param issuer  the service provider that is submitting the claim
+     * @param subject  the address of the IDA contract that is managing this type of impact
+     * @param key  an unique identifier (code) for an instance of impact
+     * @param value  an amount of money that is being unlocked when the impact is verified
+     * @param approvedAt  the timestamp when a claim was approved
+     */
     event ClaimApproved(
         address approver,
         address indexed issuer,
@@ -26,40 +43,78 @@ contract ClaimsRegistry {
         bytes32 value,
         uint approvedAt);
 
+
+    /**
+     * @dev An event that is emitted when a service provider decides to withdraw claim and cancel the validation procedure
+     * @param issuer  the service provider that is submitting the claim
+     * @param subject  the address of the IDA contract that is managing this type of impact
+     * @param key  an unique identifier (code) for an instance of impact
+     * @param removedAt  the timestamp when a claim was removed
+     */
     event ClaimRemoved(
         address indexed issuer,
         address indexed subject,
         bytes32 indexed key,
         uint removedAt);
 
-    // create or update clams
+
+    /**
+     * @dev A method that allows a service provider (msg.sender) to submit a claim with the following params:
+     *
+     * @param subject  the address of the IDA contract that is managing this type of impact
+     * @param key  an unique identifier (code) for an instance of impact
+     * @param removedAt  the timestamp when a claim was removed
+     */
     function setClaim(address subject, bytes32 key, bytes32 value) public {
         registry[msg.sender][subject][key] = value;
         emit ClaimSet(msg.sender, subject, key, value, now);
     }
 
-    function setSelfClaim(bytes32 key, bytes32 value) public {
-        setClaim(msg.sender, key, value);
-    }
 
-    function getClaim(address issuer, address subject, bytes32 key) public view returns(bytes32) {
-        return registry[issuer][subject][key];
-    }
-
+    /**
+     * @dev A method to remove an existing claim. It could be used by a service provider to revoke a claim made
+     *      by a mistake or the one that is not ready to be validated.
+     *
+     * @param subject  the address of the IDA contract that is managing this type of impact
+     * @param key  an unique identifier (code) for an instance of impact
+     * @param removedAt  the timestamp when a claim was removed
+     */
     function removeClaim(address subject, bytes32 key) public {
-        delete registry[msg.sender][subject][key];
-        emit ClaimRemoved(msg.sender, subject, key, now);
+      require(getClaim(msg.sender, subject, key) != bytes32(0), "Claim with given subject and key doesn't exists");
+      delete registry[msg.sender][subject][key];
+
+      emit ClaimRemoved(msg.sender, subject, key, now);
     }
 
-    // Explicit approvals are not currently used, claims are approved implicitly
-    // by Project.validateOutcome function.
 
+    /**
+     * @dev A method to validate an existing claim.
+     *
+     * @param subject  the address of the IDA contract that is managing this type of impact
+     * @param key  an unique identifier (code) for an instance of impact
+     * @param removedAt  the timestamp when a claim was removed
+     */
     function approveClaim(address issuer, address subject, bytes32 key) public {
         bytes32 value = getClaim(issuer, subject, key);
+        require(value != bytes32(0), "Claim with given subject and key doesn't exists");
+
         registry[msg.sender][subject][key] = value;
         emit ClaimApproved(msg.sender, issuer, subject, key, value, now);
     }
 
+
+    /**
+     * @dev Returns all of the details of the claim specified.
+     */
+    function getClaim(address issuer, address subject, bytes32 key) public view returns(bytes32) {
+      return registry[issuer][subject][key];
+    }
+
+
+    /**
+     * @dev Returns true if a claim with given subject and key was issued by the provided issuer
+     *      and validated by the provided approver.
+     */
     function isApproved(address approver, address issuer, address subject, bytes32 key) public view returns(bool) {
         return registry[issuer][subject][key] == registry[approver][subject][key];
     }
