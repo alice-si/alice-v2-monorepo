@@ -505,32 +505,46 @@
     methods: {
       getDemoTokens: async function () {
         this.processing = true;
-        await Contracts.getDemoTokens();
-        this.processing = false;
-
+        try {
+          await Contracts.getDemoTokens();
+        } finally {
+          this.processing = false;
+        }
       },
       unlockFunding: async function () {
         this.processing = true;
-        await Contracts.unlockFunding();
-        this.processing = false;
+        try {
+          await Contracts.unlockFunding();
+        } finally {
+          this.processing = false;
+        }
       },
       unlockInvesting: async function () {
         this.processing = true;
-        await Contracts.unlockInvesting();
-        this.processing = false;
+        try {
+          await Contracts.unlockInvesting();
+        } finally {
+          this.processing = false;
+        }
       },
       unlockDistribution: async function () {
         this.processing = true;
-        await Contracts.unlockDistribution();
-        this.processing = false;
+        try {
+          await Contracts.unlockDistribution();
+        } finally {
+          this.processing = false;
+        }
       },
       fund: async function () {
         this.$v.fundingForm.$touch()
         if (!this.$v.fundingForm.$invalid) {
           this.processing = true;
-          await Contracts.fund(this.fundingForm.fundingAmount);
-          this.processing = false;
-          this.showFundPanel = false;
+          try {
+            await Contracts.fund(this.fundingForm.fundingAmount);
+            this.showFundPanel = false;
+          } finally {
+            this.processing = false;
+          }
         }
       },
       distribute: async function () {
@@ -538,34 +552,49 @@
       },
       updateConditions: async function () {
         this.processing = true;
-        await Contracts.updateConditions(this.distributeAmount, this.distributeDiscount);
-        this.processing = false;
-        this.showDistributePanel = false;
+        try {
+          await Contracts.updateConditions(this.distributeAmount, this.distributeDiscount);
+          this.showDistributePanel = false;
+        } finally {
+          this.processing = false;
+        }
       },
       invest: async function () {
         this.$v.investmentForm.$touch();
         if (!this.$v.investmentForm.$invalid) {
           this.processing = true;
-          await Contracts.invest(this.investmentForm.investmentAmount);
-          this.processing = false;
-          this.showInvestPanel = false;
+          try {
+            await Contracts.invest(this.investmentForm.investmentAmount);
+            this.showInvestPanel = false;
+          } finally {
+            this.processing = false;
+          }
         }
       },
       submitClaim: async function () {
         this.processing = true;
-        await Contracts.submitClaim(this.claimKey);
-        this.processing = false;
-        this.showClaimPanel = false;
+        try {
+          await Contracts.submitClaim(this.claimKey);
+          this.showClaimPanel = false;
+        } finally {
+          this.processing = false;
+        }
       },
       validateClaim: async function (claimKey) {
         this.processing = true;
-        await Contracts.validateClaim(claimKey);
-        this.processing = false;
+        try {
+          await Contracts.validateClaim(claimKey);
+        } finally {
+          this.processing = false;
+        }
       },
       redeem: async function () {
         this.processing = true;
-        await Contracts.redeem();
-        this.processing = false;
+        try {
+          await Contracts.redeem();
+        } finally {
+          this.processing = false;
+        }
       },
       getValidationClass(formName, fieldName) {
         const field = this.$v[formName][fieldName]

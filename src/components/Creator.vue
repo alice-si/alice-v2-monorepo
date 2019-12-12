@@ -159,12 +159,12 @@
     methods: {
       deployIda: async function () {
         this.deploying = true;
-        let idaAddress = await Contracts.deployIda(this.newIda);
-        this.deploying = false;
-        this.$router.push({path: '/dashboard/' + idaAddress});
-      },
-      test: async function () {
-        await Contracts.box3();
+        try {
+          let idaAddress = await Contracts.deployIda(this.newIda);
+          this.$router.push({path: '/dashboard/' + idaAddress});
+        } finally {
+          this.deploying = false;
+        }
       }
     }
   }
