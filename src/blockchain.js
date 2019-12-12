@@ -201,16 +201,14 @@ const Blockchain = {
         }
       }
     };
+
     if (state.accounts.escrow.address) {
       state.accounts.escrow.unlocked = (await escrow.unlocked()).toString();
       console.log("Unlocked: " + state.accounts.escrow.unlocked);
       state.accounts.investor.available = (await paymentRights.getAvailableToRedeem({from: investor})).toString();
       state.accounts.main.available = (await paymentRights.getAvailableToRedeem({from: main})).toString();
     }
-    // if (state.accounts.ifu.escrow) {
-    //   state.accounts.ifu.escrow.balance =   (await gbp.balanceOf(state.accounts.ifu.escrow.address)).valueOf();
-    //   console.log("Escrow: " + state.accounts.ifu.escrow.balance);
-    // }
+
   },
 
   updateImpact: async () => {

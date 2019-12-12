@@ -146,7 +146,7 @@
               <md-input name="investmentAmount" id="investmentAmount" v-model="investmentForm.investmentAmount"
                         :disabled="processing"/>
               <span class="md-error" v-if="!$v.investmentForm.investmentAmount.required">Please provide the amount to invest</span>
-              <span class="md-error" v-else-if="!$v.investmentForm.investmentAmount.maxValue">You can invest up to ${{ida.maxInvestment}}</span>
+              <span class="md-error" v-else-if="!$v.investmentForm.investmentAmount.maxValue">You can invest up to ${{ida.distributeAmount}}</span>
               <span class="md-error" v-else-if="!$v.investmentForm.investmentAmount.maxAvailable">You only have ${{balance.tokens}} tokens to invest</span>
             </md-field>
             This will cost you ${{investmentForm.investmentAmount * ((100-ida.distributeDiscount)/100)}}
@@ -198,11 +198,11 @@
           <md-card-header>
             <md-card-header-text>
               <div class="md-title" v-if="balance.tokens == 0">
-                You currently don't have any funds to invest
+                You currently don't have any tokens to invest or fund
                 <md-button class="funds-button" @click="getDemoTokens()">Get $100 demo tokens</md-button>
               </div>
               <div class="md-title" v-else>
-                You currently have <b>${{balance.tokens}}</b> to invest
+                You currently have <b>${{balance.tokens}}</b> to invest or fund
                 <md-button class="funds-button" @click="getDemoTokens()">Get $100 more tokens</md-button>
               </div>
 
@@ -497,8 +497,8 @@
       investmentForm: {
         investmentAmount: {
           required,
-          maxValue: (value, model) => value <= State.ida.maxInvestment,
-          maxAvailable: (value, model) => value <= State.balance.tokens
+          maxValue: (value, model) => parseFloat(value) <= parseFloat(State.ida.distributeAmount),
+          maxAvailable: (value, model) => parseFloat(value) <= parseFloat(State.balance.tokens)
         }
       }
     },

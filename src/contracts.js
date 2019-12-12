@@ -212,7 +212,7 @@ const Contracts = {
 
   getDemoTokens: async () => {
     await ausd.publicMint({from: main});
-    await this.a.updateBalances();
+    updateHoldings();
   },
 
   unlockFunding: async() => {
@@ -284,7 +284,7 @@ const Contracts = {
     await paymentRights.redeem(available, {from: main, gas: 1000000});
 
     state.balance.redeemable = web3.fromWei((await paymentRights.getAvailableToRedeem({from: main})), 'ether');
-    state.balance.tokens = parseInt(web3.fromWei(await ausd.balanceOf(main), 'ether'));
+    updateHoldings();
   },
 
   updateIda: async () => {
