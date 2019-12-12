@@ -139,6 +139,7 @@
 <script>
   import State from '@/state'
   import Contracts from '@/contracts'
+  import { EventBus } from './event-bus.js';
 
   export default {
     data() {
@@ -158,23 +159,20 @@
     },
     watch: {
       '$route' (to, from) {
-        if (to.name == "creator" && !State.isBoxLoaded) {
-          this.show3Box = true;
-        }
         Contracts.init(to.params.ida, to.name === "creator");
       }
     },
     mounted: async function () {
       let that = this;
+
+      EventBus.$on('3box-login', function() {
+        that.show3Box = true;
+      });
+
       try {
         await Contracts.setupNetwork();
 
         let idaAddress = that.$route.params.ida;
-        console.log("3box loaded: " + State.isBoxLoaded);
-        console.log("Route name: " + that.$route.name);
-        if (that.$route.name == "creator" && !State.isBoxLoaded) {
-          this.show3Box = true;
-        }
         Contracts.init(idaAddress, that.$route.name == "creator");
         that.showWelcome = true;
       } catch (err) {

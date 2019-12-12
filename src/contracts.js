@@ -1,6 +1,7 @@
 /* eslint-disable */
 const {promisify} = require("es6-promisify");
 
+import { EventBus } from './event-bus.js';
 import state from "@/state";
 import contract from 'truffle-contract'
 import AUSD_JSON from '@contracts/AliceUSD.json'
@@ -60,12 +61,13 @@ var connectWeb3 = async function() {
 };
 
 var getBox = async function() {
-  console.log("BOX: " + box);
   if (!box) {
-    console.log("Loading box...");
-    box = await Box.openBox(main, web3.currentProvider)
-    if (box) {
-      state.isBoxLoaded = true;
+    if (!Box.isLoggedIn(main)) {
+      EventBus.$emit('3box-login');
+      box = await Box.openBox(main, web3.currentProvider);
+      if (box) {
+        state.isBoxLoaded = true;
+      }
     }
   }
   return box;
@@ -421,7 +423,6 @@ const Contracts = {
     }
 
     if (isCreator) {
-      console.log("Getting box...");
       await getBox();
     }
 
