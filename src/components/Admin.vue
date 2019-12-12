@@ -38,16 +38,6 @@
       },
       deployAliceUSD: async function () {
         await Contracts.deployAliceUSD();
-      },
-      test: async function() {
-        State.investedChart.Invested = State.investedChart.Invested + 1;
-        State.investedChart.Total = State.investedChart.Invested + 3;
-        //this.$set(this.chartData, 'kuba', this.chartData['kuba'] + 1);
-        //console.log();
-        // console.log(this.$refs['ch']);
-        // this.$refs['ch'].updateChart();
-        // //this.$data._chart.update();
-        // console.log("Data changed");
       }
     },
     beforeCreate: function () {

@@ -32,87 +32,109 @@
 
 
         <md-card-content>
-          <div class="form">
+          <form novalidate>
+            <div class="form">
 
             <div class="md-layout md-gutter">
 
               <div class="md-layout-item md-size-50">
-                <md-field>
+                <md-field :class="getValidationClass('idaForm', 'name')">
                   <label>Project name</label>
-                  <md-input v-model="newIda.name"></md-input>
+                  <md-input name="name" v-model="idaForm.name"></md-input>
+                  <span class="md-error" v-if="!$v.idaForm.name.required">Please provide the name</span>
                 </md-field>
               </div>
 
               <div class="md-layout-item md-size-50">
-                <md-field>
+                <md-field :class="getValidationClass('idaForm', 'projectDescription')">
                   <label>Project description</label>
-                  <md-input v-model="newIda.projectDescription"></md-input>
+                  <md-input v-model="idaForm.projectDescription"></md-input>
+                  <span class="md-error" v-if="!$v.idaForm.projectDescription.required">Please provide the description</span>
                 </md-field>
               </div>
 
               <div class="md-layout-item md-size-50">
-                <md-field>
+                <md-field :class="getValidationClass('idaForm', 'organisationName')">
                   <label>Your name or organization name</label>
-                  <md-input v-model="newIda.organisationName"></md-input>
+                  <md-input v-model="idaForm.organisationName"></md-input>
+                  <span class="md-error" v-if="!$v.idaForm.name.required">Please provide the name</span>
                 </md-field>
               </div>
 
               <div class="md-layout-item md-size-50">
-                <md-field>
+                <md-field :class="getValidationClass('idaForm', 'organisationDescription')">
                   <label>Describe who you are</label>
-                  <md-input v-model="newIda.organisationDescription"></md-input>
+                  <md-input v-model="idaForm.organisationDescription"></md-input>
+                  <span class="md-error" v-if="!$v.idaForm.organisationDescription.required">Please provide the description</span>
                 </md-field>
               </div>
 
               <div class="md-layout-item md-size-50">
-                <md-field>
+                <md-field :class="getValidationClass('idaForm', 'outcomesNumber')">
                   <label>Number of promises</label>
-                  <md-input v-model="newIda.outcomesNumber"></md-input>
+                  <md-input v-model="idaForm.outcomesNumber"></md-input>
+                  <span class="md-error" v-if="!$v.idaForm.outcomesNumber.required">Please provide the number of promises</span>
+                  <span class="md-error" v-if="!$v.idaForm.outcomesNumber.numeric">Please provide a valid number</span>
                 </md-field>
               </div>
 
               <div class="md-layout-item md-size-50">
-                <md-field>
+                <md-field :class="getValidationClass('idaForm', 'promiseDescription')">
                   <label>Promise description</label>
-                  <md-input v-model="newIda.promiseDescription"></md-input>
+                  <md-input v-model="idaForm.promiseDescription"></md-input>
+                  <span class="md-error" v-if="!$v.idaForm.promiseDescription.required">Please provide the promise description</span>
                 </md-field>
               </div>
 
 
               <div class="md-layout-item md-size-50">
-                <md-field>
+                <md-field :class="getValidationClass('idaForm', 'outcomesPrice')">
                   <label>Price per promise</label>
-                  <md-input v-model="newIda.outcomesPrice"></md-input>
+                  <md-input v-model="idaForm.outcomesPrice"></md-input>
+                  <span class="md-error" v-if="!$v.idaForm.outcomesPrice.required">Please provide the price per promise</span>
+                  <span class="md-error" v-if="$v.idaForm.outcomesPrice.required && !$v.idaForm.outcomesPrice.numeric">
+                    Please provide a valid number
+                  </span>
                 </md-field>
               </div>
 
               <div class="md-layout-item md-size-50">
-                <md-field>
+                <md-field :class="getValidationClass('idaForm', 'paymentToken')">
                   <label for="paymentToken">Payment Token</label>
-                  <md-select v-model="newIda.paymentToken" name="paymentToken" id="paymentToken">
+                  <md-select v-model="idaForm.paymentToken" name="paymentToken" id="paymentToken">
                     <md-option v-for="(p, index) in paymentTokens" :value="p.address" :key="p.address">{{p.name}}
                     </md-option>
                   </md-select>
+                  <span class="md-error" v-if="!$v.idaForm.paymentToken.required">Please provide the payment token</span>
                 </md-field>
               </div>
 
               <div class="md-layout-item md-size-50">
-                <md-field>
+                <md-field :class="getValidationClass('idaForm', 'validatorName')">
                   <label>Validator Name and Description</label>
-                  <md-input v-model="newIda.validatorName"></md-input>
+                  <md-input v-model="idaForm.validatorName"></md-input>
+                  <span class="md-error" v-if="!$v.idaForm.validatorName.required">Please provide the validator name</span>
                 </md-field>
               </div>
 
               <div class="md-layout-item md-size-50">
-                <md-field>
+                <md-field :class="getValidationClass('idaForm', 'validator')">
                   <label>Validator Ethereum Address</label>
-                  <md-input v-model="newIda.validator"></md-input>
+                  <md-input v-model="idaForm.validator"></md-input>
+                  <span class="md-error" v-if="!$v.idaForm.validator.required">Please provide the validator Ethereum address</span>
+                  <span class="md-error" v-if="$v.idaForm.validator.required && !$v.idaForm.validator.ethAddress">
+                    Please provide the valid Ethereum address
+                  </span>
                 </md-field>
               </div>
 
               <div class="md-layout-item md-size-50">
-              <md-datepicker v-model="newIda.endTime">
+              <md-datepicker v-model="idaForm.endTime" :class="getValidationClass('idaForm', 'endTime')">
                 <label>Project deadline</label>
+                <span class="md-error" v-if="!$v.idaForm.endTime.required">Please provide the project deadline</span>
+                <span class="md-error" v-if="$v.idaForm.endTime.required && !$v.idaForm.endTime.notInThePast">
+                  The project deadline must be in the future
+                </span>
               </md-datepicker>
               </div>
 
@@ -120,6 +142,7 @@
             </div>
 
           </div>
+          </form>
         </md-card-content>
 
 
@@ -135,10 +158,16 @@
 <script>
   import Contracts from '@/contracts'
   import State from '@/state'
+  import {validationMixin} from 'vuelidate'
+  import {
+    required,
+    numeric
+  } from 'vuelidate/lib/validators'
 
 
   export default {
     name: 'Creator',
+    mixins: [validationMixin],
     data() {
       return {
         validator: State.accounts.validator,
@@ -150,21 +179,54 @@
         impact: State.impact,
         paymentTokens: State.paymentTokens,
         showSidepanel: false,
-        newIda: {
-          validator: "0xcC554f8c7C2b49151AE0A81524c3434307dE33cC"
+        idaForm: {
+
         },
         deploying: false
       }
     },
     methods: {
       deployIda: async function () {
-        this.deploying = true;
-        try {
-          let idaAddress = await Contracts.deployIda(this.newIda);
-          this.$router.push({path: '/dashboard/' + idaAddress});
-        } finally {
-          this.deploying = false;
+        this.$v.idaForm.$touch();
+        if (!this.$v.idaForm.$invalid) {
+          this.deploying = true;
+          try {
+            let idaAddress = await Contracts.deployIda(this.idaForm);
+            this.$router.push({path: '/dashboard/' + idaAddress});
+          } finally {
+            this.deploying = false;
+          }
         }
+      },
+      getValidationClass(formName, fieldName) {
+        const field = this.$v[formName][fieldName]
+
+        if (field) {
+          return {
+            'md-invalid': field.$invalid && field.$dirty
+          }
+        }
+      },
+    },
+    validations: {
+      idaForm: {
+        name: {required},
+        projectDescription: {required},
+        organisationName: {required},
+        organisationDescription: {required},
+        outcomesNumber: {required, numeric},
+        promiseDescription: {required},
+        outcomesPrice: {required, numeric},
+        paymentToken: {required},
+        validatorName: {required},
+        validator: {
+          required,
+          ethAddress: (value, model) => web3.isAddress(value)
+        },
+        endTime: {
+          required,
+          notInThePast: (value, model) => value >= new Date()
+        },
       }
     }
   }

@@ -71,20 +71,17 @@
         </md-app-toolbar>
 
         <md-dialog-content>
-          Impact Delivery Agreements (IDAs) are a new primitive that turn the delivery of impact into
-          a transparent financial instrument. Think of them as investable bounty contracts.
+          Impact Delivery Agreements (IDAs) are a new primitive that turn the delivery of impact into transparent
+          financial instruments. Think of them as bounty fundraising contracts with investable future cash flows.
           <br/><br/>
 
-          IDAs allow you to make promises about actions you aim to achieve, and raise funds that will be paid only
-          if you actually achieve them. If you need money upfront to get started, you can sell your payment rights
-          as an investment, meaning that investors will receive the IDA's unlocked funds instead of you.
-          IDAs are essentially cashflow financing tools for the delivery of impact (in its broadest possible sense).
+          Use IDAs to make promises about "impact" you aim to achieve, and raise funds that will be paid only if you deliver.
+          To get money upfront, you can sell your payment rights to investors who will receive the IDA's future payments
+          instead of you.
           <br/><br/>
 
-          This dApp is built on the Alice protocol (www.alice.si), and is still in test mode.
-          Please make sure you're connected to Rinkeby or our Skale endpoint: [endpoint].
-          We'd appreciate it if you could send your feedback to IDA@alice.si.
-          Ask us anything via Twitter: @alice_si_
+          This dApp is built on the Alice protocol (www.alice.si), and is still in test mode. Please connect to
+          Rinkeby or Skale and send feedback to IDA@alice.si or @alice_si_.
         </md-dialog-content>
 
       </md-dialog>

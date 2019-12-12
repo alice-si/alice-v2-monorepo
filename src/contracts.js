@@ -61,13 +61,13 @@ var connectWeb3 = async function() {
 };
 
 var getBox = async function() {
-  if (!box) {
+  if (box === undefined) {
     if (!Box.isLoggedIn(main)) {
       EventBus.$emit('3box-login');
-      box = await Box.openBox(main, web3.currentProvider);
-      if (box) {
-        state.isBoxLoaded = true;
-      }
+    }
+    box = await Box.openBox(main, web3.currentProvider);
+    if (box) {
+      state.isBoxLoaded = true;
     }
   }
   return box;
@@ -314,12 +314,15 @@ const Contracts = {
         let rawName = web3.toAscii('0x'+results[i].data.substring(194));
         let promisePrice = web3.fromWei((web3.toDecimal(results[i].data.substring(0,66))), 'ether');
 
+
+
         let name = '';
-        for(var i=0; i<rawName.length;i++) {
-          if (rawName.charCodeAt(i) != 0) {
-            name += rawName.charAt(i);
+        for(var j=0; j<rawName.length; j++) {
+          if (rawName.charCodeAt(j) != 0) {
+            name += rawName.charAt(j);
           }
         }
+
         let description = await Box.getSpace(serviceProvider, name);
 
         state.allIdas.push({
@@ -349,7 +352,7 @@ const Contracts = {
     ausd = await AUSD.at(AUSD_ADDRESS);
     if (state.paymentTokens.length == 0) {
       state.paymentTokens.push({
-        name: "Alice USD",
+        name: "Test tokens",
         address: ausd.address
       });
     }
