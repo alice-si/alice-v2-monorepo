@@ -24,9 +24,11 @@ const IDA_FACTORY_ADDRESS = "0x173aB8C479ba6c1b8a4C32142A353900389800Af";
 
 
 var setup = function(json) {
-  let c = contract(json);
-  c.setProvider(web3.currentProvider);
-  return c;
+  if (web3) {
+    let c = contract(json);
+    c.setProvider(web3.currentProvider);
+    return c;
+  }
 };
 
 const AUSD = setup(AUSD_JSON);
@@ -61,7 +63,7 @@ var connectWeb3 = async function() {
 };
 
 var getBox = async function() {
-  if (box === undefined) {
+  if (box === undefined && web3) {
     if (!Box.isLoggedIn(main)) {
       EventBus.$emit('3box-login');
     }
