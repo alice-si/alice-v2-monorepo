@@ -31,101 +31,99 @@
         </md-tabs>
 
       </div>
-
-      <div class="md-toolbar-row">
-
-
-
-      </div>
-    </md-app-toolbar>
+     </md-app-toolbar>
 
     <md-app-content>
+      <div class="mobile-screen-content">
+        You can only access this dApp from a desktop computer for now. Apologies for the inconvenience.
+      </div>
+      <div class="full-screen-content">
+        <md-dialog :md-active.sync="show3Box">
+          <md-app-toolbar class="md-primary">
+            <span class="md-title">Connect to 3 Box</span>
+            <div class="md-toolbar-section-end">
+              <md-button class="md-icon-button md-dense md-primary" @click="show3Box = false">
+                <md-icon>close</md-icon>
+              </md-button>
+            </div>
 
-      <md-dialog :md-active.sync="show3Box">
-        <md-app-toolbar class="md-primary">
-          <span class="md-title">Connect to 3 Box</span>
-          <div class="md-toolbar-section-end">
-            <md-button class="md-icon-button md-dense md-primary" @click="show3Box = false">
-              <md-icon>close</md-icon>
-            </md-button>
-          </div>
+          </md-app-toolbar>
 
-        </md-app-toolbar>
+          <md-dialog-content>
+            In order to create an IDA, you must first connect to the 3Box protocol in order to store this IDAs metadata
+            (don't worry it's decentralized, secure and free).
+          </md-dialog-content>
 
-        <md-dialog-content>
-          In order to create an IDA, you must first connect to the 3Box protocol in order to store this IDAs metadata
-          (don't worry it's decentralized, secure and free).
-        </md-dialog-content>
+        </md-dialog>
 
-      </md-dialog>
+        <md-dialog :md-active.sync="showWelcome">
+          <md-app-toolbar class="md-primary">
+            <span class="md-title">Welcome to the IDA dApp!</span>
+            <div class="md-toolbar-section-end">
+              <md-button class="md-icon-button md-dense md-primary" @click="showWelcome = false">
+                <md-icon>close</md-icon>
+              </md-button>
+            </div>
 
-      <md-dialog :md-active.sync="showWelcome">
-        <md-app-toolbar class="md-primary">
-          <span class="md-title">Welcome to the IDA dApp!</span>
-          <div class="md-toolbar-section-end">
-            <md-button class="md-icon-button md-dense md-primary" @click="showWelcome = false">
-              <md-icon>close</md-icon>
-            </md-button>
-          </div>
+          </md-app-toolbar>
 
-        </md-app-toolbar>
+          <md-dialog-content>
+            Impact Delivery Agreements (IDAs) are a new primitive that turn the delivery of impact into transparent
+            financial instruments. Think of them as bounty fundraising contracts with investable future cash flows.
+            <br/><br/>
 
-        <md-dialog-content>
-          Impact Delivery Agreements (IDAs) are a new primitive that turn the delivery of impact into transparent
-          financial instruments. Think of them as bounty fundraising contracts with investable future cash flows.
-          <br/><br/>
+            Use IDAs to make promises about "impact" you aim to achieve, and raise funds that will be paid only if you deliver.
+            To get money upfront, you can sell your payment rights to investors who will receive the IDA's future payments
+            instead of you.
+            <br/><br/>
 
-          Use IDAs to make promises about "impact" you aim to achieve, and raise funds that will be paid only if you deliver.
-          To get money upfront, you can sell your payment rights to investors who will receive the IDA's future payments
-          instead of you.
-          <br/><br/>
+            This dApp is built on the Alice protocol (www.alice.si), and is still in test mode. Please connect to
+            Rinkeby or Skale and send feedback to IDA@alice.si or @alice_si_.
+          </md-dialog-content>
 
-          This dApp is built on the Alice protocol (www.alice.si), and is still in test mode. Please connect to
-          Rinkeby or Skale and send feedback to IDA@alice.si or @alice_si_.
-        </md-dialog-content>
+        </md-dialog>
 
-      </md-dialog>
-
-      <md-dialog :md-active.sync="showNoWeb3">
-        <md-app-toolbar class="md-accent">
-          <span class="md-title">
-            <md-icon>warning</md-icon>
-            Cannot connect to the Ethereum Blockchain
-          </span>
-
-
-        </md-app-toolbar>
-
-        <md-dialog-content>
-          Viewing this content requires using a Web3 browser such as Metamask.
-          Please connect to the Rinkeby testnet.
-          <br/><br/>
-          Please refresh the window after setting up the Web3 plugin.
-
-        </md-dialog-content>
-
-      </md-dialog>
-
-      <md-dialog :md-active.sync="showWrongNetwork">
-        <md-app-toolbar class="md-accent">
-          <span class="md-title">
-            <md-icon>warning</md-icon>
-            Cannot connect to the Rinkeby testnet
-          </span>
+        <md-dialog :md-active.sync="showNoWeb3">
+          <md-app-toolbar class="md-accent">
+            <span class="md-title">
+              <md-icon>warning</md-icon>
+              Cannot connect to the Ethereum Blockchain
+            </span>
 
 
-        </md-app-toolbar>
+          </md-app-toolbar>
 
-        <md-dialog-content>
-          Please make sure you are connecting to the Rinkeby testnet using your web3 browser.
-          <br/><br/>
-          Please refresh the window after updating the Web3 plugin.
+          <md-dialog-content>
+            Viewing this content requires using a Web3 browser such as Metamask.
+            Please connect to the Rinkeby testnet.
+            <br/><br/>
+            Please refresh the window after setting up the Web3 plugin.
 
-        </md-dialog-content>
+          </md-dialog-content>
 
-      </md-dialog>
+        </md-dialog>
 
-      <router-view></router-view>
+        <md-dialog :md-active.sync="showWrongNetwork">
+          <md-app-toolbar class="md-accent">
+            <span class="md-title">
+              <md-icon>warning</md-icon>
+              Cannot connect to the Rinkeby testnet
+            </span>
+
+
+          </md-app-toolbar>
+
+          <md-dialog-content>
+            Please make sure you are connecting to the Rinkeby testnet using your web3 browser.
+            <br/><br/>
+            Please refresh the window after updating the Web3 plugin.
+
+          </md-dialog-content>
+
+        </md-dialog>
+
+        <router-view></router-view>
+      </div>
     </md-app-content>
 
   </md-app>
@@ -213,6 +211,26 @@
   .md-dialog-content {
     padding: 20px;
   }
+  @media only screen and (min-width: 961px) {
+    .mobile-screen-content {
+      display: none;
+    }
+  }
+
+  @media only screen and (max-width: 960px) {
+    .full-screen-content {
+      display: none;
+    }
+
+    .mobile-screen-content {
+      font-size: 18px;
+      text-align: center;
+      height: 500px;
+      padding-top: 20px;
+    }
+  }
+
+
 
 
 </style>
