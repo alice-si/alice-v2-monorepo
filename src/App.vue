@@ -34,10 +34,7 @@
      </md-app-toolbar>
 
     <md-app-content>
-      <div class="mobile-screen-content">
-        You can only access this dApp from a desktop computer for now. Apologies for the inconvenience.
-      </div>
-      <div class="full-screen-content">
+      <div>
         <md-dialog :md-active.sync="show3Box">
           <md-app-toolbar class="md-primary">
             <span class="md-title">Connect to 3 Box</span>
@@ -122,7 +119,24 @@
 
         </md-dialog>
 
-        <router-view></router-view>
+        <md-dialog :md-active.sync="showMobileScreen">
+          <md-app-toolbar class="md-accent">
+            <span class="md-title">
+              <md-icon>warning</md-icon>
+              Desktop only
+            </span>
+
+
+          </md-app-toolbar>
+
+          <md-dialog-content>
+            You can only access this dApp from a desktop computer for now. Apologies for the inconvenience.
+
+          </md-dialog-content>
+
+        </md-dialog>
+
+        <router-view v-if="desktopScreen"></router-view>
       </div>
     </md-app-content>
 
@@ -143,7 +157,9 @@
         showNoWeb3: false,
         showWrongNetwork: false,
         show3Box: false,
-        ida: State.ida
+        ida: State.ida,
+        desktopScreen: false,
+        showMobileScreen: false
       }
     },
     methods: {
@@ -160,22 +176,27 @@
     mounted: async function () {
       let that = this;
 
-      EventBus.$on('3box-login', function() {
-        that.show3Box = true;
-      });
+      if (screen.width <= 960) {
+        that.showMobileScreen = true;
+      } else {
+        that.desktopScreen = true;
+        EventBus.$on('3box-login', function () {
+          that.show3Box = true;
+        });
 
-      try {
-        await Contracts.setupNetwork();
+        try {
+          await Contracts.setupNetwork();
 
-        let idaAddress = that.$route.params.ida;
-        Contracts.init(idaAddress, that.$route.name == "creator");
-        that.showWelcome = true;
-      } catch (err) {
+          let idaAddress = that.$route.params.ida;
+          Contracts.init(idaAddress, that.$route.name == "creator");
+          that.showWelcome = true;
+        } catch (err) {
           if (err === 'NO_WEB3') {
             that.showNoWeb3 = true;
           } else if (err === 'WRONG_NETWORK') {
             that.showWrongNetwork = true;
           }
+        }
       }
     }
   }
@@ -211,27 +232,6 @@
   .md-dialog-content {
     padding: 20px;
   }
-  @media only screen and (min-width: 961px) {
-    .mobile-screen-content {
-      display: none;
-    }
-  }
-
-  @media only screen and (max-width: 960px) {
-    .full-screen-content {
-      display: none;
-    }
-
-    .mobile-screen-content {
-      font-size: 18px;
-      text-align: center;
-      height: 500px;
-      padding-top: 20px;
-    }
-  }
-
-
-
 
 </style>
 
