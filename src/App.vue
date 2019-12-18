@@ -119,7 +119,7 @@
 
         </md-dialog>
 
-        <md-dialog :md-active.sync="showMobileScreen">
+        <md-dialog :md-active.sync="showMobileScreen" style="width: 100%">
           <md-app-toolbar class="md-accent">
             <span class="md-title">
               <md-icon>warning</md-icon>
@@ -129,8 +129,9 @@
 
           </md-app-toolbar>
 
-          <md-dialog-content>
-            You can only access this dApp from a desktop computer for now. Apologies for the inconvenience.
+          <md-dialog-content style="font-size: 32px; line-height: 32px;">
+            You can only access this dApp from a desktop computer for now. <br/>
+            Apologies for the inconvenience.
 
           </md-dialog-content>
 

@@ -1,5 +1,6 @@
 /* eslint-disable */
 const {promisify} = require("es6-promisify");
+const detectNetwork = require('web3-detect-network')
 
 import { EventBus } from './event-bus.js';
 import state from "@/state";
@@ -55,9 +56,9 @@ var connectWeb3 = async function() {
   } else {
     throw 'NO_WEB3'
   }
-  let getNetwork = promisify(web3.version.getNetwork);
-  let netId = await getNetwork();
-  if (netId != 4) {
+  let network = await detectNetwork(web3.currentProvider);
+
+  if (network.id != 4) {
     throw 'WRONG_NETWORK'
   }
 };

@@ -63,7 +63,7 @@ contract ClaimsRegistry {
      *
      * @param subject  the address of the IDA contract that is managing this type of impact
      * @param key  an unique identifier (code) for an instance of impact
-     * @param removedAt  the timestamp when a claim was removed
+     * @param value  the price of a claim
      */
     function setClaim(address subject, bytes32 key, bytes32 value) public {
         registry[msg.sender][subject][key] = value;
@@ -77,7 +77,6 @@ contract ClaimsRegistry {
      *
      * @param subject  the address of the IDA contract that is managing this type of impact
      * @param key  an unique identifier (code) for an instance of impact
-     * @param removedAt  the timestamp when a claim was removed
      */
     function removeClaim(address subject, bytes32 key) public {
       require(getClaim(msg.sender, subject, key) != bytes32(0), "Claim with given subject and key doesn't exists");
@@ -92,7 +91,6 @@ contract ClaimsRegistry {
      *
      * @param subject  the address of the IDA contract that is managing this type of impact
      * @param key  an unique identifier (code) for an instance of impact
-     * @param removedAt  the timestamp when a claim was removed
      */
     function approveClaim(address issuer, address subject, bytes32 key) public {
         bytes32 value = getClaim(issuer, subject, key);
