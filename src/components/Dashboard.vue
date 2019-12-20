@@ -272,11 +272,10 @@
                   <md-card-header-text>
                     <div class="md-title">{{ida.isOwner ? 'Collect Funds' : 'Fund Promises'}}</div>
                     <div class="md-subhead">
-                      by {{ida.isOwner ? 'selling' : 'buying'}} the Impact Promise Token
+                      by {{ida.isOwner ? 'selling' : 'buying'}} this IDA's promise tokens
                       <md-button :href="'https://rinkeby.etherscan.io/token/'+ ida.promiseToken"
-                                 target="_blank" class="token-button">
-                        {{ida.promiseToken}}
-                        <md-icon style="font-size: 14px !important; padding-bottom: 4px;">open_in_new</md-icon>
+                                 target="_blank" class="md-icon-button token-button" >
+                        <md-icon style="font-size: 16px !important; padding-bottom: 4px;">open_in_new</md-icon>
                         <md-tooltip md-direction="top">View on Etherscan</md-tooltip>
                       </md-button>
 
@@ -296,7 +295,7 @@
 
                     <div class="md-layout-item md-size-33" v-if="!ida.isOwner">
                       <div class="value-big">${{balance.funded}}</div>
-                      <div class="value-subtitle">funded by You</div>
+                      <div class="value-subtitle">funded by you</div>
                     </div>
 
                     <div class="md-layout-item md-size-33" v-if="ida.isOwner">
@@ -331,11 +330,10 @@
                   <md-card-header-text>
                     <div class="md-title">{{ida.isOwner ? 'Raise investment' : 'Invest in this IDA'}}</div>
                     <div class="md-subhead">
-                      by {{ida.isOwner ? 'selling' : 'buying'}} the Payment Rights Token
+                      by {{ida.isOwner ? 'selling' : 'buying'}} this IDA's payment rights tokens
                       <md-button :href="'https://rinkeby.etherscan.io/token/'+ ida.paymentRightsToken"
-                                 target="_blank" class="token-button">
-                        {{ida.paymentRightsToken}}
-                        <md-icon style="font-size: 14px !important; padding-bottom: 4px;">open_in_new</md-icon>
+                                 target="_blank" class="md-icon-button token-button">
+                        <md-icon style="font-size: 16px !important; padding-bottom: 4px;">open_in_new</md-icon>
                         <md-tooltip md-direction="top">View on Etherscan</md-tooltip>
                       </md-button>
 
@@ -359,7 +357,7 @@
 
                     <div class="md-layout-item md-size-33" v-else>
                       <div class="value-big">${{balance.invested}}</div>
-                      <div class="value-subtitle">invested by You</div>
+                      <div class="value-subtitle">invested by you</div>
                     </div>
 
                     <div class="md-layout-item md-size-33">
@@ -814,9 +812,8 @@
   }
 
   .token-button {
-    font-size: 12px;
-    color: white !important;
-    height: 22px;
+    margin-left: -5px !important;
+    padding-top:3px;
   }
 
   .token-button .md-icon.md-theme-default {
