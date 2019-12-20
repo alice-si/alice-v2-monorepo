@@ -37,7 +37,7 @@
       <div>
         <md-dialog :md-active.sync="show3Box">
           <md-app-toolbar class="md-primary">
-            <span class="md-title">Connect to 3 Box</span>
+            <span class="md-title">Connect to 3Box</span>
             <div class="md-toolbar-section-end">
               <md-button class="md-icon-button md-dense md-primary" @click="show3Box = false">
                 <md-icon>close</md-icon>
@@ -47,7 +47,7 @@
           </md-app-toolbar>
 
           <md-dialog-content>
-            In order to create an IDA, you must first connect to the 3Box protocol in order to store this IDAs metadata
+            In order to create an IDA, you must first connect to the 3Box protocol in order to store this IDA's metadata
             (don't worry it's decentralized, secure and free).
           </md-dialog-content>
 
