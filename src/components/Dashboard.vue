@@ -414,20 +414,34 @@
 
                 <md-card-content style="text-align: left">
 
-
+                  <div style="text-align: center" v-if="ida.data">
+                    {{ida.data['organisation-name']}} has fulfilled <b>{{ida.validatedNumber}}</b> promises, and <b>{{ida.pending}}</b> more are pending validation. <br/>
+                    The deadline to fulfill the remaining  <b>{{ida.promisesNumber - ida.validatedNumber}}</b> promises is <b>{{ida.endTime}}</b>.
+                  </div>
 
 
                   <md-table v-if="ida.claims && ida.claims.length > 0">
                     <md-table-row>
-                      <md-table-head md-numeric>ID</md-table-head>
                       <md-table-head>Code</md-table-head>
+                      <md-table-head>Submitted at</md-table-head>
+                      <md-table-head>Validated at</md-table-head>
                       <md-table-head v-if="ida.isValidator">Validate</md-table-head>
-                      <md-table-head v-else>Validated</md-table-head>
+                      <md-table-head v-else>Status</md-table-head>
                     </md-table-row>
 
                     <md-table-row v-for="(claim, index) in ida.claims" :key="claim.code">
-                      <md-table-cell md-numeric>{{index + 1}}</md-table-cell>
+
                       <md-table-cell>{{claim.code}}</md-table-cell>
+                      <md-table-cell>{{claim.submittedAt}}</md-table-cell>
+                      <md-table-cell>
+                        {{claim.validatedAt}}
+                        <md-button :href="'https://rinkeby.etherscan.io/tx/'+ claim.validationTx"
+                                   target="_blank" class="md-icon-button" style="height:20px;"
+                                   v-if="claim.validationTx">
+                          <md-icon style="font-size: 16px !important; padding-bottom: 4px;">open_in_new</md-icon>
+                          <md-tooltip md-direction="top">View on Etherscan</md-tooltip>
+                        </md-button>
+                      </md-table-cell>
                       <md-table-cell>
                         <md-button @click="validateClaim(claim.code)"
                                    class="md-icon-button md-raised md-dense md-accent"

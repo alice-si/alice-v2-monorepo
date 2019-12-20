@@ -131,7 +131,6 @@ async function updateHoldings() {
 }
 
 async function getAllClaims() {
-  state.ida.claims = [];
   let idaTopic = '0x' + web3.padLeft(ida.address.substring(2).toLocaleLowerCase(), 64);
   let ownerTopic = '0x' + web3.padLeft(owner.substring(2).toLocaleLowerCase(), 64);
   console.log(idaTopic);
@@ -152,19 +151,33 @@ async function getAllClaims() {
     ]
   });
 
+  let validatedTimesLookup = {};
+  let validatedTxLookup = {};
   filterValidated.get(async function (err, validatedEvents) {
-
     let validated = validatedEvents.reduce(function (map, obj) {
-      map[web3.toAscii(obj.topics[3])] = true;
+      let code = web3.toAscii(obj.topics[3]);
+      map[code] = true;
+      validatedTimesLookup[code] = new Date(parseInt(obj.data.slice(-8), 16)*1000).toLocaleDateString("en-GB");
+      validatedTxLookup[code] = obj.transactionHash;
       return map;
     }, {});
 
     filter.get(async function (err, results) {
+      state.ida.claims = [];
       console.log("Claims size: " + results.length);
+      state.ida.pending = results.length;
+
       for (var i = 0; i < results.length; i++) {
+        console.log(results[i]);
+        let submittedAt = new Date(parseInt(results[i].data.slice(-8), 16)*1000).toLocaleDateString("en-GB");
         let code = web3.toAscii(results[i].topics[3]);
+        state.ida.pending -= validated[code] ? 1 : 0;
+
         state.ida.claims.push({
           code: code,
+          submittedAt: submittedAt,
+          validatedAt: validatedTimesLookup[code],
+          validationTx: validatedTxLookup[code],
           isValidated: validated[code]
         })
       }
@@ -385,6 +398,7 @@ const Contracts = {
       state.ida.name = (await ida.name());
       state.ida.address = idaAddress;
       state.ida.promisesNumber = (await ida.outcomesNumber()).toString();
+      state.ida.validatedNumber = (await ida.validatedNumber()).toString();
       state.ida.promisePrice = web3.fromWei((await ida.outcomePrice()), 'ether');
       state.ida.validator = await ida.validator();
       state.ida.endTime = new Date(await ida.endTime()*1000).toLocaleDateString("en-GB");
