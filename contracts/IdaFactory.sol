@@ -32,11 +32,13 @@ contract IdaFactory {
       uint256 _outcomesNumber,
       uint256 _outcomesPrice,
       address _validator,
-      uint256 _endTime
+      address _arbiter,
+      uint256 _endTime,
+      uint256 _validationCoolOffPeriod
   ) public returns (Ida) {
 
     ImpactPromise promiseToken = impactPromiseFactory.createImpactPromise();
-    Ida ida = new Ida(_paymentToken, promiseToken, claimsRegistry, _name, _outcomesNumber, _outcomesPrice, _validator, _endTime, msg.sender);
+    Ida ida = new Ida(_paymentToken, promiseToken, claimsRegistry, _name, _outcomesNumber, _outcomesPrice, _validator, _arbiter, _validationCoolOffPeriod, _endTime, msg.sender);
     promiseToken.addMinter(address(ida));
     SimpleTokenSeller sts = simpleTokenSellerFactory.createSimpleTokenSeller(ida.paymentToken(), ida.paymentRights(), msg.sender);
 

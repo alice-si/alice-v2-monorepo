@@ -21,7 +21,12 @@ contract FluidEscrow is Escrow {
     constructor(ERC20 _paymentToken, uint256 _capacity, address _operator) public
         Escrow(_paymentToken, _capacity, _operator, address(new FluidToken(_capacity))) {
         paymentRights = FluidToken(recipient);
-        paymentRights.transfer(msg.sender, _capacity);
+        paymentRights.transfer(_operator, _capacity);
+    }
+
+
+    function createFluidEscrow(ERC20 _paymentToken, uint256 _capacity, address _operator) public {
+
     }
 
 }

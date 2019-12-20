@@ -19,10 +19,12 @@ contract IdaMock is Ida {
     uint256 _outcomesNumber,
     uint256 _outcomesPrice,
     address _validator,
+    address _arbiter,
     uint256 _endTime,
+    uint256 _validationCoolOffPeriod,
     address _serviceProvider
   ) public
-    Ida(_paymentToken, _impactPromise, _claimsRegistry, _name, _outcomesNumber, _outcomesPrice, _validator, _endTime, _serviceProvider) {
+    Ida(_paymentToken, _impactPromise, _claimsRegistry, _name, _outcomesNumber, _outcomesPrice, _validator, _arbiter, _endTime, _validationCoolOffPeriod, _serviceProvider) {
   }
 
   function setEnd() public {
