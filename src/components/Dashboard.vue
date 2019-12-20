@@ -126,11 +126,13 @@
       </md-toolbar>
 
       <div class="text" v-if="ida.data && ida.distributeAmount > 0">
-        <b>{{ida.data['organisation-name']}}</b> has made <b>{{ida.distributeAmount}}</b> payment rights investable
-        at a <b>{{ida.distributeDiscount}}%</b> discount.
-        Buying these will allow you to claim the funds that are unlocked each time a promise is fulfilled,
-        with a maximum return of <b>{{100 / (100-ida.distributeDiscount) * 100 - 100}}%</b> on your investment.
+        <b>{{ida.data['organisation-name']}}</b> is selling <b>{{ida.distributeAmount}}</b> payment rights at
+        at a <b>${{(100-ida.distributeDiscount)/100 * ida.promisePrice}}</b> each.
+
+        Each payment right has a nominal value of <b>${{ida.promisePrice}}</b>, which means that your maximum return on this investment is <b>{{(100 / (100-ida.distributeDiscount) * 100 - 100).toFixed(0)}}%</b> if all the promises are fulfilled.
+
         You risk losing your investment if promises are not delivered.
+
       </div>
 
       <div class="text" v-if="ida.data && ida.distributeAmount == 0">
@@ -142,7 +144,7 @@
         <form novalidate>
           <div class="form-container">
             <md-field :class="getValidationClass('investmentForm', 'investmentAmount')">
-              <label for="fundingAmount">Number of payment rights to buy</label>
+              <label for="fundingAmount">Nominal value of payment rights to buy</label>
               <md-input name="investmentAmount" id="investmentAmount" v-model="investmentForm.investmentAmount"
                         :disabled="processing"/>
               <span class="md-error" v-if="!$v.investmentForm.investmentAmount.required">Please provide the amount to invest</span>
@@ -411,6 +413,8 @@
 
 
                 <md-card-content style="text-align: left">
+
+
 
 
                   <md-table v-if="ida.claims && ida.claims.length > 0">
