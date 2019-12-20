@@ -149,7 +149,9 @@
               <span class="md-error" v-else-if="!$v.investmentForm.investmentAmount.maxValue">You can invest up to ${{ida.distributeAmount}}</span>
               <span class="md-error" v-else-if="!$v.investmentForm.investmentAmount.maxAvailable">You only have ${{balance.tokens}} tokens to invest</span>
             </md-field>
-            This will cost you ${{investmentForm.investmentAmount * ((100-ida.distributeDiscount)/100)}}
+            <div style="margin-top:10px">
+            This will cost you ${{(investmentForm.investmentAmount * ((100-ida.distributeDiscount)/100)).toFixed(2)}}
+            </div>
           </div>
         </form>
 
