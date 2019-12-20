@@ -256,7 +256,9 @@ const Contracts = {
   updateConditions: async(distributeAmount, distributeDiscount) => {
     console.log("Distribute: " + distributeAmount + " with discount: " + distributeDiscount);
     await sts.updateConditions(web3.toWei(distributeAmount, 'ether'), distributeDiscount, {from: main, gas: 1000000});
-    await this.a.updateIda();
+
+    state.ida.distributeAmount = distributeAmount;
+    state.ida.distributeDiscount = distributeDiscount;
   },
 
   invest: async (amount) => {

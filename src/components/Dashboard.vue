@@ -226,17 +226,18 @@
 
               <div>
                 <md-divider></md-divider>
-                <md-subheader>{{ida.data['organisation-name']}}</md-subheader>
+                <md-subheader>Creator</md-subheader>
                 <div class="text">
-                  {{ida.data['organisation-description']}}
+                  {{ida.data['organisation-name']}} : {{ida.data['organisation-description']}}
                 </div>
               </div>
 
               <div>
                 <md-divider></md-divider>
-                <md-subheader>{{ida.promisesNumber}} x ${{ida.promisePrice}}</md-subheader>
+                <md-subheader>Promises</md-subheader>
                 <div class="text">
-                  {{ida.data['promise-description']}}
+                  {{ida.data['promise-description']}}<br><br>
+                  {{ida.promisesNumber}} promises at ${{ida.promisePrice}} each
                 </div>
               </div>
 
@@ -357,12 +358,12 @@
 
                     <div class="md-layout-item md-size-33" v-else>
                       <div class="value-big">${{balance.invested}}</div>
-                      <div class="value-subtitle">invested by you</div>
+                      <div class="value-subtitle">value of your investment</div>
                     </div>
 
                     <div class="md-layout-item md-size-33">
                       <div class="value-big">${{balance.totalInvested}} / ${{ida.budget}}</div>
-                      <div class="value-subtitle">total invested / market cap</div>
+                      <div class="value-subtitle">total distributed / market cap</div>
                     </div>
 
                     <div class="md-layout-item md-size-33">
@@ -374,6 +375,10 @@
                 </md-card-content>
 
                 <div class="button-box">
+
+                  <div  style="margin-top: 10px;">
+                    Your investment market currently has <b>${{ida.distributeAmount}}</b> payment rights for sale at a <b>{{ida.distributeDiscount}}%</b> discount.
+                  </div>
 
                   <md-button class="md-primary md-raised action-button" @click="showDistributePanel = true" v-if="ida.isOwner">
                     Update market conditions
@@ -392,6 +397,7 @@
               </md-ripple>
             </md-card>
           </md-tab>
+
           <md-tab id="tab-impact" :md-label="ida.isOwner ? 'Report Impact' : ida.isValidator? 'Validate impact' : 'Track Impact'">
             <md-card class="impact">
               <md-ripple>
