@@ -148,7 +148,7 @@
               <md-input name="investmentAmount" id="investmentAmount" v-model="investmentForm.investmentAmount"
                         :disabled="processing"/>
               <span class="md-error" v-if="!$v.investmentForm.investmentAmount.required">Please provide the amount to invest</span>
-              <span class="md-error" v-else-if="!$v.investmentForm.investmentAmount.maxValue">You can invest up to ${{ida.distributeAmount}}</span>
+              <span class="md-error" v-else-if="!$v.investmentForm.investmentAmount.maxValue">You can invest up to ${{(ida.distributeAmount * (100-ida.distributeDiscount)/100).toFixed(2)}}</span>
               <span class="md-error" v-else-if="!$v.investmentForm.investmentAmount.maxAvailable">You only have ${{balance.tokens}} tokens to invest</span>
             </md-field>
             <div style="margin-top:10px">
@@ -522,7 +522,7 @@
         investmentAmount: {
           required,
           maxValue: (value, model) => parseFloat(value) <= parseFloat(State.ida.distributeAmount),
-          maxAvailable: (value, model) => parseFloat(value) <= parseFloat(State.balance.tokens)
+          maxAvailable: (value, model) => parseFloat(value * (100-State.ida.distributeDiscount)/100) <= parseFloat(State.balance.tokens)
         }
       }
     },
