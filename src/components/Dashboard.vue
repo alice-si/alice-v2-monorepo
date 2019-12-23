@@ -126,8 +126,8 @@
       </md-toolbar>
 
       <div class="text" v-if="ida.data && ida.distributeAmount > 0">
-        <b>{{ida.data['organisation-name']}}</b> is selling <b>{{ida.distributeAmount}}</b> payment rights at
-        at a <b>${{(100-ida.distributeDiscount)/100 * ida.promisePrice}}</b> each.
+        <b>{{ida.data['organisation-name']}}</b> is selling <b>{{ida.distributeAmount}}</b> payment rights
+        at <b>${{(100-ida.distributeDiscount)/100 * ida.promisePrice}}</b> each.
 
         Each payment right has a nominal value of <b>${{ida.promisePrice}}</b>, which means that your maximum return on this investment is <b>{{(100 / (100-ida.distributeDiscount) * 100 - 100).toFixed(0)}}%</b> if all the promises are fulfilled.
 
@@ -758,10 +758,9 @@
   .value-big {
     height: 100px;
     font-family: Avenir;
-    font-size: 36px;
+    font-size: 28px;
     text-align: center;
-    padding-top: 50px;
-    margin: 4px;
+    padding-top: 65px;
     border-bottom: 1px solid lightgray;
   }
 
