@@ -454,14 +454,12 @@
                     </md-table-row>
                   </md-table>
 
+                  <div class="button-box" v-if="ida.isOwner">
+                    <md-button class="md-primary action-button md-raised" @click="showClaimPanel = true">Submit Claim
+                    </md-button>
+                  </div>
+
                 </md-card-content>
-
-                <div class="button-box" v-if="ida.isOwner">
-                  <md-button class="md-primary action-button md-raised" @click="showClaimPanel = true">Submit Claim
-                  </md-button>
-                </div>
-
-                <div style="height: 20px" v-else></div>
 
               </md-ripple>
             </md-card>
@@ -790,15 +788,11 @@
 
   .md-app-content .md-card.investing, .md-app-content .md-card.funding, .md-app-content .md-card.impact {
     margin: 20px 10px 0 10px;
-    height: 408px;
+    min-height: 408px;
   }
 
   .md-tab {
     padding: 0;
-  }
-
-  .md-tabs-content {
-    height: 450px !important;
   }
 
   .form-container {
@@ -851,6 +845,10 @@
 
   .md-subhead .md-button .md-icon {
     color: white !important;
+  }
+
+  div.button-box {
+    text-align: center;
   }
 
 </style>

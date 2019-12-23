@@ -296,6 +296,7 @@ const Contracts = {
     let key = web3.fromAscii(claimKey);
     await ida.validateOutcome(key, {from: main, gas: 1000000});
     await getAllClaims();
+    state.ida.validatedNumber = (await ida.validatedNumber()).toString();
   },
 
   redeem: async () => {
