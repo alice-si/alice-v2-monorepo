@@ -21,7 +21,7 @@ let web3 = window.web3;
 
 const START_BLOCK = 5549491;
 const AUSD_ADDRESS = "0x22d64d4A9DD6e3531BE6A93a532084f3093B388f";
-const IDA_FACTORY_ADDRESS = "0x173aB8C479ba6c1b8a4C32142A353900389800Af";
+const IDA_FACTORY_ADDRESS = "0x9ae1F89fD3C0dC0B339C398B91F9D0080Ae33adc";
 
 
 var setup = function(json) {
@@ -107,7 +107,12 @@ async function updateInvestments() {
   state.investingChartData.Others = state.balance.totalInvested - state.balance.invested;
 
   state.investingTotalChartData.Invested = state.balance.totalInvested;
-  state.investingTotalChartData.Remaining = state.ida.budget - state.balance.totalInvested;
+  state.investingTotalChartData['For sale'] = state.ida.distributeAmount;
+  state.investingTotalChartData.Remaining = state.ida.budget - state.ida.distributeAmount -state.balance.totalInvested;
+
+  state.fluidBalanceChartData.Redeemed = web3.fromWei((await paymentRights.getRedeemed({from: main})), 'ether');
+  state.fluidBalanceChartData.Validated = state.balance.redeemable;
+  state.fluidBalanceChartData.Potential = state.balance.invested - state.balance.redeemable - state.fluidBalanceChartData.Redeemed;
 
 }
 
@@ -133,7 +138,6 @@ async function updateHoldings() {
 async function getAllClaims() {
   let idaTopic = '0x' + web3.padLeft(ida.address.substring(2).toLocaleLowerCase(), 64);
   let ownerTopic = '0x' + web3.padLeft(owner.substring(2).toLocaleLowerCase(), 64);
-  console.log(idaTopic);
   let filter = web3.eth.filter({
     fromBlock: START_BLOCK,
     topics: [
@@ -306,6 +310,7 @@ const Contracts = {
 
     state.balance.redeemable = web3.fromWei((await paymentRights.getAvailableToRedeem({from: main})), 'ether');
     updateHoldings();
+    updateInvestments();
   },
 
   updateIda: async () => {

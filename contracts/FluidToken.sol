@@ -62,6 +62,9 @@ contract FluidToken is ERC20 {
         emit Redeemed(msg.sender, _amount);
     }
 
+    function getRedeemed() public view returns(uint256) {
+      return _redeemed[msg.sender];
+    }
 
     function getAvailableToRedeem() public view returns(uint256) {
         uint256 potential = Math.min(escrow.unlocked(), escrow.funded());

@@ -92,20 +92,24 @@
 
       <div class="form" v-if="ida.distributionUnlocked">
 
-        <div class="md-layout-item md-small-size-100">
-          <md-field>
-            <label for="fundingAmount">Discount (%)</label>
-            <md-input name="fundingAmount" id="discount" v-model="distributeDiscount" :disabled="processing"/>
-          </md-field>
-        </div>
+        <form novalidate>
+          <div class="form-container">
+            <md-field :class="getValidationClass('distributionForm', 'distributeDiscount')">
+              <label for="distributeDiscount">Discount (%)</label>
+              <md-input name="distributeDiscount" id="distributeDiscount" v-model="distributionForm.distributeDiscount" :disabled="processing"/>
+              <span class="md-error" v-if="!$v.distributionForm.distributeDiscount.required">Please provide the discount</span>
+              <span class="md-error" v-else-if="!$v.distributionForm.distributeDiscount.maxValue">You can invest up to ${{(ida.distributeAmount * (100-ida.distributeDiscount)/100).toFixed(2)}}</span>
+              <span class="md-error" v-else-if="!$v.distributionForm.distributeDiscount.maxAvailable">You only have ${{balance.tokens}} tokens to invest</span>
+            </md-field>
 
-
-        <div class="md-layout-item md-small-size-100">
-          <md-field>
-            <label for="fundingAmount">Amount</label>
-            <md-input name="distributeAmount" id="distributeAmount" v-model="distributeAmount" :disabled="processing"/>
-          </md-field>
-        </div>
+            <md-field :class="getValidationClass('distributionForm', 'distributeAmount')">
+              <label for="distributeAmount">Amount</label>
+              <md-input name="distributeAmount" id="distributeAmount" v-model="distributionForm.distributeAmount" :disabled="processing"/>
+              <span class="md-error" v-if="!$v.distributionForm.distributeAmount.required">Please provide the amount to distribute</span>
+              <span class="md-error" v-else-if="!$v.distributionForm.distributeAmount.maxValue">You can distribute up to ${{investingTotalChartData.Remaining}}</span>
+            </md-field>
+          </div>
+        </form>
 
         <md-button class="md-primary md-raised" @click="updateConditions()">Update conditions</md-button>
       </div>
@@ -354,6 +358,18 @@
                 <md-card-content style="text-align: left">
                   <div class="md-layout md-gutter">
 
+                    <div class="md-layout-item md-size-33" style="text-align: center">
+                      <ratio-chart second-color="#01C0EF" :values="fluidBalanceChartData"></ratio-chart>
+
+                      <div  style="margin-top: 10px;">
+                        You can gradually redeem your investment along with the progress of promises validation.
+                      </div>
+
+                      <md-button class="md-primary md-raised action-button" v-if="balance.redeemable > 0" @click="redeem()">
+                        Redeem ${{balance.redeemable}}
+                      </md-button>
+                    </div>
+
                     <div class="md-layout-item md-size-33" v-if="ida.isOwner">
 
                     </div>
@@ -363,38 +379,31 @@
                       <div class="value-subtitle">value of your investment</div>
                     </div>
 
-                    <div class="md-layout-item md-size-33">
-                      <div class="value-big">${{balance.totalInvested}} / ${{ida.budget}}</div>
-                      <div class="value-subtitle">total distributed / market cap</div>
-                    </div>
+                    <!--<div class="md-layout-item md-size-33">-->
+                      <!--<div class="value-big">${{balance.totalInvested}} / ${{ida.budget}}</div>-->
+                      <!--<div class="value-subtitle">total distributed / market cap</div>-->
+                    <!--</div>-->
 
-                    <div class="md-layout-item md-size-33">
+                    <div class="md-layout-item md-size-33" style="text-align: center;">
                       <ratio-chart second-color="#01C0EF" :values="investingTotalChartData"></ratio-chart>
+
+                      <div  style="margin-top: 10px;">
+                        There are <b>${{ida.distributeAmount}}</b> payment rights for sale at a <b>{{ida.distributeDiscount}}%</b> discount.
+                      </div>
+
+                      <md-button class="md-primary md-raised action-button" @click="showDistributePanel = true" v-if="ida.isOwner">
+                        Update market conditions
+                      </md-button>
+
+                      <md-button class="md-primary md-raised action-button" @click="showInvestPanel = true" v-else>
+                        Invest
+                      </md-button>
+
                     </div>
 
                   </div>
 
                 </md-card-content>
-
-                <div class="button-box">
-
-                  <div  style="margin-top: 10px;">
-                    Your investment market currently has <b>${{ida.distributeAmount}}</b> payment rights for sale at a <b>{{ida.distributeDiscount}}%</b> discount.
-                  </div>
-
-                  <md-button class="md-primary md-raised action-button" @click="showDistributePanel = true" v-if="ida.isOwner">
-                    Update market conditions
-                  </md-button>
-
-                  <md-button class="md-primary md-raised action-button" @click="showInvestPanel = true" v-else>
-                    Invest
-                  </md-button>
-
-
-                  <md-button class="md-primary md-raised action-button" v-if="balance.redeemable > 0" @click="redeem()">
-                    Redeem ${{balance.redeemable}}
-                  </md-button>
-                </div>
 
               </md-ripple>
             </md-card>
@@ -494,8 +503,10 @@
           fundingAmount: null
         },
         showDistributePanel: false,
-        distributeAmount: State.ida.distributeAmount,
-        distributeDiscount: State.ida.distributeDiscount,
+        distributionForm: {
+          distributeAmount: State.ida.distributeAmount,
+          distributeDiscount: State.ida.distributeDiscount,
+        },
         showInvestPanel: false,
         investmentForm: {
           investmentAmount: null
@@ -505,7 +516,8 @@
         investingChartData: State.investingChartData,
         fundingChartData: State.fundingChartData,
         investingTotalChartData: State.investingTotalChartData,
-        fundingTotalChartData: State.fundingTotalChartData
+        fundingTotalChartData: State.fundingTotalChartData,
+        fluidBalanceChartData: State.fluidBalanceChartData
       }
     },
     validations: {
@@ -521,6 +533,16 @@
           required,
           maxValue: (value, model) => parseFloat(value) <= parseFloat(State.ida.distributeAmount),
           maxAvailable: (value, model) => parseFloat(value * (100-State.ida.distributeDiscount)/100) <= parseFloat(State.balance.tokens)
+        }
+      },
+      distributionForm: {
+        distributeAmount: {
+          required,
+          maxValue: (value, model) => parseFloat(value) <= parseFloat(State.investingTotalChartData.Remaining),
+        },
+        distributeDiscount: {
+          required,
+          maxValue: (value, model) => value > 0 && value < 100
         }
       }
     },
@@ -573,12 +595,15 @@
         this.showDistributePanel = true;
       },
       updateConditions: async function () {
-        this.processing = true;
-        try {
-          await Contracts.updateConditions(this.distributeAmount, this.distributeDiscount);
-          this.showDistributePanel = false;
-        } finally {
-          this.processing = false;
+        this.$v.distributionForm.$touch()
+        if (!this.$v.distributionForm.$invalid) {
+          this.processing = true;
+          try {
+            await Contracts.updateConditions(this.distributionForm.distributeAmount, this.distributionForm.distributeDiscount);
+            this.showDistributePanel = false;
+          } finally {
+            this.processing = false;
+          }
         }
       },
       invest: async function () {

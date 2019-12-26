@@ -46,8 +46,9 @@ let state = {
   allIdas: [],
   investingChartData: {You: 0, Others: 0},
   fundingChartData: {You: 0, Others: 0},
-  investingTotalChartData: {Invested: 0, Remaining: 0},
-  fundingTotalChartData: {Funded: 0, Remaining: 0}
+  investingTotalChartData: {Invested: 0, 'For sale': 0, Remaining: 0},
+  fundingTotalChartData: {Funded: 0, Remaining: 0},
+  fluidBalanceChartData: {Redeemed: 0, Validated: 0, Potential: 0}
 
 };
 
