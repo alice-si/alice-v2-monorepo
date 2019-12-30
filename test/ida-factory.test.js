@@ -15,7 +15,7 @@ const { time } = require('openzeppelin-test-helpers');
 
 contract('Ida Factory', function ([owner, validator, investor, unauthorised]) {
   var escrow;
-  var gbp;
+  var usd;
   var ida;
   var paymentRights;
   var impactPromise;
@@ -23,19 +23,20 @@ contract('Ida Factory', function ([owner, validator, investor, unauthorised]) {
   var factory, sts, claimsRegistry;
   var end;
 
-  before("deploy Ida factory & gbp", async function () {
+  before("deploy Ida factory & usd", async function () {
     end = await time.latest() + time.duration.years(1);
-    gbp = await AUSD.new();
+    usd = await AUSD.new();
     let impactPromiseFactory = await ImpactPromiseFactory.new();
     let stsFactory = await StsFactory.new();
     claimsRegistry = await ClaimsRegistry.new();
-    factory = await IdaFactory.new(stsFactory.address, impactPromiseFactory.address, claimsRegistry.address, {gas: 6000000});
+    factory = await IdaFactory.new(stsFactory.address, impactPromiseFactory.address, claimsRegistry.address, {gas: 6500000});
   });
 
   it("should create a new Ida", async function () {
 
-    let tx = await factory.createIda(gbp.address, "TEST", 10, 100, validator, end, {gas: 6500000});
+    let tx = await factory.createIda(usd.address, "TEST", 10, 100, validator, end, {gas: 6700000});
     console.log("Gas used: " + tx.receipt.gasUsed);
+
     let idaAddress = tx.receipt.logs[0].args.ida;
     let stsAddress = tx.receipt.logs[0].args.sts;
     ida = await Ida.at(idaAddress);
@@ -53,12 +54,12 @@ contract('Ida Factory', function ([owner, validator, investor, unauthorised]) {
 
     escrow = await Escrow.at(await ida.escrow());
     (await escrow.capacity()).should.be.bignumber.equal('1000');
-    (await gbp.balanceOf(escrow.address)).should.be.bignumber.equal('0');
+    (await usd.balanceOf(escrow.address)).should.be.bignumber.equal('0');
   });
 
 
   it("should not allow buying before price is set up", async function () {
-    await gbp.mint(investor, 100);
+    await usd.mint(investor, 100);
     await sts.buy(100, {from: investor}).shouldBeReverted();
   });
 
@@ -78,14 +79,14 @@ contract('Ida Factory', function ([owner, validator, investor, unauthorised]) {
 
 
   it("should buy tokens by investor", async function () {
-    await gbp.approve(sts.address, 100, {from:investor});
+    await usd.approve(sts.address, 100, {from:investor});
 
     await sts.buy(50, {from: investor});
 
-    (await gbp.balanceOf(owner)).should.be.bignumber.equal('25');
-    (await gbp.balanceOf(investor)).should.be.bignumber.equal('75');
+    (await usd.balanceOf(owner)).should.be.bignumber.equal('25');
+    (await usd.balanceOf(investor)).should.be.bignumber.equal('75');
 
-    (await paymentRights.balanceOf(owner)).should.be.bignumber.equal('950');
+    (await paymentRights.balanceOf(sts.address)).should.be.bignumber.equal('50');
     (await paymentRights.balanceOf(investor)).should.be.bignumber.equal('50');
   });
 

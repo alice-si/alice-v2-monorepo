@@ -110,7 +110,7 @@ async function updateInvestments() {
   state.investingTotalChartData['For sale'] = state.ida.distributeAmount;
   state.investingTotalChartData.Remaining = state.ida.budget - state.ida.distributeAmount -state.balance.totalInvested;
 
-  state.fluidBalanceChartData.Redeemed = web3.fromWei((await paymentRights.getRedeemed({from: main})), 'ether');
+  state.fluidBalanceChartData.Redeemed = web3.fromWei((await paymentRights.getRedeemed(main, {from: main})), 'ether');
   state.fluidBalanceChartData.Validated = state.balance.redeemable;
   state.fluidBalanceChartData.Potential = state.balance.invested - state.balance.redeemable - state.fluidBalanceChartData.Redeemed;
 
