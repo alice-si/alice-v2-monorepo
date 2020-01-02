@@ -95,7 +95,7 @@
         <form novalidate>
           <div class="form-container">
             <md-field :class="getValidationClass('distributionForm', 'distributeDiscount')">
-              <label for="distributeDiscount">Discount (%)</label>
+              <label for="distributeDiscount">Discount on unredeemed value (%)</label>
               <md-input name="distributeDiscount" id="distributeDiscount" v-model="distributionForm.distributeDiscount" :disabled="processing"/>
               <span class="md-error" v-if="!$v.distributionForm.distributeDiscount.required">Please provide the discount</span>
               <span class="md-error" v-else-if="!$v.distributionForm.distributeDiscount.maxValue">You can invest up to ${{(ida.distributeAmount * (100-ida.distributeDiscount)/100).toFixed(2)}}</span>
@@ -130,10 +130,13 @@
       </md-toolbar>
 
       <div class="text" v-if="ida.data && ida.distributeAmount > 0">
-        <b>{{ida.data['organisation-name']}}</b> is selling <b>{{ida.distributeAmount}}</b> payment rights
-        at <b>${{(100-ida.distributeDiscount)/100 * ida.promisePrice}}</b> each.
+        <b>{{ida.data['organisation-name']}}</b> is selling <b>${{ida.distributeAmount}}</b> worth of payment rights
+        for <b>${{ida.distributePrice}}</b> which could be redeemed for
+        <b>${{(ida.distributePrice * (100 / (100-ida.distributeDiscount))).toFixed(0)}}</b>
+        if all of the unfulfilled promises are validated. <br/>
 
-        Each payment right has a nominal value of <b>${{ida.promisePrice}}</b>, which means that your maximum return on this investment is <b>{{(100 / (100-ida.distributeDiscount) * 100 - 100).toFixed(0)}}%</b> if all the promises are fulfilled.
+
+        It means that your maximum return on this investment is <b>{{(100 / (100-ida.distributeDiscount) * 100 - 100).toFixed(0)}}%</b> if all the promises are fulfilled.
 
         You risk losing your investment if promises are not delivered.
 
@@ -156,7 +159,7 @@
               <span class="md-error" v-else-if="!$v.investmentForm.investmentAmount.maxAvailable">You only have ${{balance.tokens}} tokens to invest</span>
             </md-field>
             <div style="margin-top:10px">
-            This will cost you ${{(investmentForm.investmentAmount * ((100-ida.distributeDiscount)/100)).toFixed(2)}}
+            This will cost you ${{(investmentForm.investmentAmount * (ida.distributePrice/ida.distributeAmount)).toFixed(2)}}
             </div>
           </div>
         </form>
@@ -361,7 +364,11 @@
                     <div class="md-layout-item md-size-33" style="text-align: center">
                       <ratio-chart second-color="#01C0EF" :values="fluidBalanceChartData"></ratio-chart>
 
-                      <div  style="margin-top: 10px;">
+                      <div  style="margin-top: 10px;" v-if="ida.isOwner">
+                        You can gradually redeem your holdings along with the progress of promises validation.
+                      </div>
+
+                      <div  style="margin-top: 10px;" v-else>
                         You can gradually redeem your investment along with the progress of promises validation.
                       </div>
 
@@ -532,7 +539,7 @@
         investmentAmount: {
           required,
           maxValue: (value, model) => parseFloat(value) <= parseFloat(State.ida.distributeAmount),
-          maxAvailable: (value, model) => parseFloat(value * (100-State.ida.distributeDiscount)/100) <= parseFloat(State.balance.tokens)
+          maxAvailable: (value, model) => parseFloat(value * (State.ida.distributePrice/State.ida.distributeAmount)) <= parseFloat(State.balance.tokens)
         }
       },
       distributionForm: {
