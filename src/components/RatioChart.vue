@@ -35,7 +35,7 @@
           labels: Object.keys(this.values),
           datasets: [
             {
-              backgroundColor: ['#8A48DB', this.secondColor],
+              backgroundColor: ['#8A48DB', this.secondColor, '#00C0D1'],
               data: Object.values(this.values)
             }
           ]

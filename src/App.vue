@@ -1,7 +1,7 @@
 <template>
   <md-app id="app">
     <md-app-toolbar class="md-primary">
-      <span class="md-title">{{$router.currentRoute.name == 'creator' ? 'Create a new IDA' : $router.currentRoute.name == 'List' ? 'Browse IDAs' : ida.name}}</span>
+      <span class="md-title">{{$router.currentRoute.name == 'creator' ? 'Create a new IDA' : $router.currentRoute.name == 'List' ? 'Browse IDA\'s' : ida.name}}</span>
       <md-button :href="'https://rinkeby.etherscan.io/address/'+ ida.address" target="_blank" style="padding-top: 5px;"
                  v-if="$router.currentRoute.name == 'Dashboard' && ida.address">
         {{ida.address}}
@@ -16,7 +16,7 @@
           <md-tab
             key="list"
             to="/"
-            md-label="Browse IDAs"
+            md-label="Browse IDA's"
             exact>
 
           </md-tab>
@@ -37,7 +37,7 @@
       <div>
         <md-dialog :md-active.sync="show3Box">
           <md-app-toolbar class="md-primary">
-            <span class="md-title">Connect to 3 Box</span>
+            <span class="md-title">Connect to 3Box</span>
             <div class="md-toolbar-section-end">
               <md-button class="md-icon-button md-dense md-primary" @click="show3Box = false">
                 <md-icon>close</md-icon>
@@ -47,7 +47,7 @@
           </md-app-toolbar>
 
           <md-dialog-content>
-            In order to create an IDA, you must first connect to the 3Box protocol in order to store this IDAs metadata
+            In order to create an IDA, you must first connect to the 3Box protocol in order to store this IDA's metadata
             (don't worry it's decentralized, secure and free).
           </md-dialog-content>
 
@@ -65,11 +65,11 @@
           </md-app-toolbar>
 
           <md-dialog-content>
-            Impact Delivery Agreements (IDAs) are a new primitive that turn the delivery of impact into transparent
+            Impact Delivery Agreements (IDA's) are a new primitive that turn the delivery of impact into transparent
             financial instruments. Think of them as bounty fundraising contracts with investable future cash flows.
             <br/><br/>
 
-            Use IDAs to make promises about "impact" you aim to achieve, and raise funds that will be paid only if you deliver.
+            Use IDA's to make promises about "impact" you aim to achieve, and raise funds that will be paid only if you deliver.
             To get money upfront, you can sell your payment rights to investors who will receive the IDA's future payments
             instead of you.
             <br/><br/>

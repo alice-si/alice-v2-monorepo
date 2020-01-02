@@ -49,9 +49,11 @@ contract('Impact Delivery Agreement', function ([owner, validator, funder, inves
     (await gbp.balanceOf(escrow.address)).should.be.bignumber.equal('0');
   });
 
+
   it("should get impact payment rights", async function () {
     await paymentRights.approve(sts.address, 100, {from: owner});
     await sts.updateConditions(100, 50);
+    (await paymentRights.balanceOf(sts.address)).should.be.bignumber.equal('100');
 
     await gbp.mint(investor, 100);
     await gbp.approve(sts.address, 100, {from: investor});
@@ -67,6 +69,7 @@ contract('Impact Delivery Agreement', function ([owner, validator, funder, inves
     (await paymentRights.balanceOf(investor)).should.be.bignumber.equal('100');
   });
 
+
   it("should fund", async function () {
     await gbp.mint(funder, 200);
     await gbp.approve(ida.address, 200, {from: funder});
@@ -75,6 +78,7 @@ contract('Impact Delivery Agreement', function ([owner, validator, funder, inves
     (await impactPromise.balanceOf(funder)).should.be.bignumber.equal('200');
     (await gbp.balanceOf(escrow.address)).should.be.bignumber.equal('200');
   });
+
 
   it("should not validate before registering a claim", async function () {
     await ida.validateOutcome(web3.utils.fromAscii("TEST"), {from: validator}).shouldBeReverted();;

@@ -42,26 +42,27 @@ contract FluidToken is ERC20 {
      * Can transfer non-zero amounts only.
      * After the transfer we update both the token balance and the amount redeemed.
      */
-    function transfer(address recipient, uint256 amount) public returns (bool) {
-        uint256 redeemedProRata = amount.mul(_redeemed[msg.sender]).div(balanceOf(msg.sender));
+    function _transfer(address sender, address recipient, uint256 amount) internal {
+        uint256 redeemedProRata = amount.mul(_redeemed[sender]).div(balanceOf(sender));
 
-        _redeemed[msg.sender] = _redeemed[msg.sender].sub(redeemedProRata);
+        _redeemed[sender] = _redeemed[sender].sub(redeemedProRata);
         _redeemed[recipient] = _redeemed[recipient].add(redeemedProRata);
 
-        _transfer(msg.sender, recipient, amount);
-
-        return true;
+        super._transfer(sender, recipient, amount);
     }
 
     function redeem(uint256 _amount) public {
         uint256 available = getAvailableToRedeem();
-        require(_amount <= available);
+        require(_amount <= available, "Cannot redeem more tokens than available");
 
         escrow.withdraw(msg.sender, _amount);
         _redeemed[msg.sender] = _redeemed[msg.sender].add(_amount);
         emit Redeemed(msg.sender, _amount);
     }
 
+    function getRedeemed(address account) public view returns(uint256) {
+      return _redeemed[account];
+    }
 
     function getAvailableToRedeem() public view returns(uint256) {
         uint256 potential = Math.min(escrow.unlocked(), escrow.funded());
