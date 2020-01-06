@@ -14,6 +14,7 @@ contract IdaMock is Ida {
   constructor(
     ERC20 _paymentToken,
     ImpactPromise _impactPromise,
+    Escrow _escrow,
     ClaimsRegistry _claimsRegistry,
     string memory _name,
     uint256 _outcomesNumber,
@@ -24,7 +25,7 @@ contract IdaMock is Ida {
     uint256 _validationCoolOffPeriod,
     address _serviceProvider
   ) public
-    Ida(_paymentToken, _impactPromise, _claimsRegistry, _name, _outcomesNumber, _outcomesPrice, _validator, _arbiter, _endTime, _validationCoolOffPeriod, _serviceProvider) {
+    Ida(_paymentToken, _impactPromise, _escrow, _claimsRegistry, _name, _outcomesNumber, _outcomesPrice, _validator, _arbiter, _endTime, _validationCoolOffPeriod, _serviceProvider) {
   }
 
   function setEnd() public {

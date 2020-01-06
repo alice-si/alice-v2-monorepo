@@ -3,7 +3,6 @@ pragma solidity ^0.5.2;
 import 'openzeppelin-solidity/contracts/token/ERC20/ERC20.sol';
 import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
 import './Escrow.sol';
-import './FluidEscrow.sol';
 import './PaymentRights.sol';
 import './ImpactPromise.sol';
 import './ClaimsRegistry.sol';
@@ -62,6 +61,7 @@ contract Ida {
     constructor(
       ERC20 _paymentToken,
       ImpactPromise _impactPromise,
+      Escrow _escrow,
       ClaimsRegistry _claimsRegistry,
       string memory _name,
       uint256 _outcomesNumber,
@@ -87,9 +87,8 @@ contract Ida {
         validationCoolOffPeriod = _validationCoolOffPeriod;
         serviceProvider = _serviceProvider;
 
-        escrow = new FluidEscrow(_paymentToken, outcomePrice.mul(outcomesNumber), address(this));
+        escrow = _escrow;
         paymentRights = PaymentRights(escrow.recipient());
-        paymentRights.transfer(serviceProvider, outcomePrice.mul(outcomesNumber));
 
         emit Created(serviceProvider, outcomesNumber, outcomePrice, name);
     }
@@ -111,6 +110,7 @@ contract Ida {
         require(claimsRegistry.getClaim(serviceProvider, address(this), key) == bytes32(outcomePrice), "The claim must be registered before validation");
         require(!claimsRegistry.isApproved(validator, serviceProvider, address(this), key), "The claim has already been approved");
 
+        pendingValidations[key] = now;
         emit ValidationProposed(key);
     }
 
@@ -127,10 +127,18 @@ contract Ida {
     }
 
 
-    function executeValidation(bytes32 key) public {
-      require(pendingValidations[key] > 0, "The validation has not been proposed");
-      require(now.sub(pendingValidations[key]) >= validationCoolOffPeriod);
+    function acceptValidation(bytes32 key) public onlyArbiter {
+      executeValidation(key);
+    }
 
+
+    function processUnchallengedValidation(bytes32 key) public onlyArbiter {
+      require(now.sub(pendingValidations[key]) >= validationCoolOffPeriod);
+    }
+
+
+    function executeValidation(bytes32 key) internal {
+      removeValidationProposal(key);
 
       claimsRegistry.approveClaim(serviceProvider, address(this), key);
       escrow.unlock(outcomePrice);
@@ -141,7 +149,6 @@ contract Ida {
 
     function removeValidationProposal(bytes32 key) private {
       require(pendingValidations[key] > 0, "The validation has not been proposed");
-      require(now.sub(pendingValidations[key]) < validationCoolOffPeriod);
 
       delete pendingValidations[key];
     }

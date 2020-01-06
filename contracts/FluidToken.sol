@@ -33,8 +33,8 @@ contract FluidToken is ERC20 {
     mapping (address => uint256) private _redeemed;
 
 
-    constructor(uint256 _initialSupply) public {
-        escrow = Escrow(msg.sender);
+    constructor(Escrow _escrow, uint256 _initialSupply) public {
+        escrow = Escrow(_escrow);
         _mint(msg.sender, _initialSupply);
     }
 
