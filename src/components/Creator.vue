@@ -233,7 +233,7 @@
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style lang="scss">
+<style lang="scss" scoped>
 
   div.page {
     padding: 0 20px 0 20px;
