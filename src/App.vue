@@ -66,7 +66,7 @@
 
           <md-dialog-content>
             Impact Delivery Agreements (IDA's) are a new primitive that turn the delivery of impact into transparent
-            financial instruments. Think of them as bounty fundraising contracts with investable future cash flows.
+            financial instruments. Think of them as bounty contracts with investable future cash flows.
             <br/><br/>
 
             Use IDA's to make promises about "impact" you aim to achieve, and raise funds that will be paid only if you deliver.

@@ -130,15 +130,12 @@
       </md-toolbar>
 
       <div class="text" v-if="ida.data && ida.distributeAmount > 0">
-        <b>{{ida.data['organisation-name']}}</b> is selling <b>${{ida.distributeAmount}}</b> worth of payment rights
-        for <b>${{ida.distributePrice}}</b> which could be redeemed for
-        <b>${{(ida.distributePrice * (100 / (100-ida.distributeDiscount))).toFixed(0)}}</b>
-        if all of the unfulfilled promises are validated. <br/>
 
+        <b>{{ida.data['organisation-name']}}</b> is selling <b>${{ida.distributeAmount}}</b> tokens for <b>${{ida.distributePrice}}</b>
+        which could be redeemed for <b>${{(ida.distributePrice * (100 / (100-ida.distributeDiscount))).toFixed(0)}}</b> if all of this IDA's promises are fulfilled. <br/><br/>
 
-        It means that your maximum return on this investment is <b>{{(100 / (100-ida.distributeDiscount) * 100 - 100).toFixed(0)}}%</b> if all the promises are fulfilled.
-
-        You risk losing your investment if promises are not delivered.
+        This means that your maximum return on this investment is <b>{{(100 / (100-ida.distributeDiscount) * 100 - 100).toFixed(0)}}%</b>.
+        You risk losing your investment if promises are not delivered or fully funded.
 
       </div>
 
@@ -151,11 +148,11 @@
         <form novalidate>
           <div class="form-container">
             <md-field :class="getValidationClass('investmentForm', 'investmentAmount')">
-              <label for="fundingAmount">Nominal value of payment rights to buy</label>
+              <label for="fundingAmount">Number of payment rights tokens to buy</label>
               <md-input name="investmentAmount" id="investmentAmount" v-model="investmentForm.investmentAmount"
                         :disabled="processing"/>
               <span class="md-error" v-if="!$v.investmentForm.investmentAmount.required">Please provide the amount to invest</span>
-              <span class="md-error" v-else-if="!$v.investmentForm.investmentAmount.maxValue">You can invest up to ${{(ida.distributeAmount * (100-ida.distributeDiscount)/100).toFixed(2)}}</span>
+              <span class="md-error" v-else-if="!$v.investmentForm.investmentAmount.maxValue">You can buy up to {{ida.distributeAmount}} tokens</span>
               <span class="md-error" v-else-if="!$v.investmentForm.investmentAmount.maxAvailable">You only have ${{balance.tokens}} tokens to invest</span>
             </md-field>
             <div style="padding-top:10px">
