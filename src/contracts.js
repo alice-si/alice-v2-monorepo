@@ -115,6 +115,7 @@ async function updateInvestments() {
   state.investingTotalChartData.Invested = state.balance.totalInvested;
   state.investingTotalChartData['For sale'] = state.ida.distributeAmount;
   state.investingTotalChartData.Remaining = state.ida.budget - state.ida.distributeAmount -state.balance.totalInvested;
+  state.ida.unsold = state.ida.budget - state.balance.totalInvested
 
   state.fluidBalanceChartData.Redeemed = web3.fromWei((await paymentRights.getRedeemed(main, {from: main})), 'ether');
   state.fluidBalanceChartData.Validated = state.balance.redeemable;
@@ -280,8 +281,7 @@ const Contracts = {
     console.log("Distribute: " + distributeAmount + " with discount: " + distributeDiscount);
     await sts.updateConditions(web3.toWei(distributeAmount, 'ether'), distributeDiscount, {from: main, gas: 1000000});
 
-    state.ida.distributeAmount = distributeAmount;
-    state.ida.distributeDiscount = distributeDiscount;
+    await updateInvestments();
   },
 
   invest: async (amount) => {

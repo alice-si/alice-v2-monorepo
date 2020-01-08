@@ -41,7 +41,8 @@ let state = {
     distributeDiscount: 0,
     claims: [],
     paymentRightsToken: null,
-    promiseToken: null
+    promiseToken: null,
+    unsold: 0
   },
   allIdas: [],
   investingChartData: {You: 0, Others: 0},

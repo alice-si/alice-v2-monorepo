@@ -98,7 +98,7 @@
               <label for="distributeDiscount">Discount on unredeemed value (%)</label>
               <md-input name="distributeDiscount" id="distributeDiscount" v-model="distributionForm.distributeDiscount" :disabled="processing"/>
               <span class="md-error" v-if="!$v.distributionForm.distributeDiscount.required">Please provide the discount</span>
-              <span class="md-error" v-else-if="!$v.distributionForm.distributeDiscount.maxValue">You can invest up to ${{(ida.distributeAmount * (100-ida.distributeDiscount)/100).toFixed(2)}}</span>
+              <span class="md-error" v-else-if="!$v.distributionForm.distributeDiscount.maxValue">Max discount must be less than 100%</span>
               <span class="md-error" v-else-if="!$v.distributionForm.distributeDiscount.maxAvailable">You only have ${{balance.tokens}} tokens to invest</span>
             </md-field>
 
@@ -106,7 +106,7 @@
               <label for="distributeAmount">Amount</label>
               <md-input name="distributeAmount" id="distributeAmount" v-model="distributionForm.distributeAmount" :disabled="processing"/>
               <span class="md-error" v-if="!$v.distributionForm.distributeAmount.required">Please provide the amount to distribute</span>
-              <span class="md-error" v-else-if="!$v.distributionForm.distributeAmount.maxValue">You can distribute up to ${{investingTotalChartData.Remaining}}</span>
+              <span class="md-error" v-else-if="!$v.distributionForm.distributeAmount.maxValue">You can distribute up to ${{ida.unsold}}</span>
             </md-field>
           </div>
         </form>
@@ -545,7 +545,7 @@
       distributionForm: {
         distributeAmount: {
           required,
-          maxValue: (value, model) => parseFloat(value) <= parseFloat(State.investingTotalChartData.Remaining),
+          maxValue: (value, model) => parseFloat(value) <= parseFloat(State.ida.unsold),
         },
         distributeDiscount: {
           required,
