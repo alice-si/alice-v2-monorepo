@@ -1,7 +1,7 @@
 <template>
   <md-app id="app">
     <md-app-toolbar class="md-primary">
-      <span class="md-title">{{$router.currentRoute.name == 'creator' ? 'Create a new IDA' : $router.currentRoute.name == 'List' ? 'Browse IDA\'s' : ida.name}}</span>
+      <span class="md-title">{{$router.currentRoute.name == 'creator' ? 'Create a new IDA' : $router.currentRoute.name == 'List' ? 'Browse IDAs' : ida.name}}</span>
       <md-button :href="'https://rinkeby.etherscan.io/address/'+ ida.address" target="_blank" style="padding-top: 5px;"
                  v-if="$router.currentRoute.name == 'Dashboard' && ida.address">
         {{ida.address}}
@@ -16,7 +16,7 @@
           <md-tab
             key="list"
             to="/"
-            md-label="Browse IDA's"
+            md-label="Browse IDAs"
             exact>
 
           </md-tab>
