@@ -6,7 +6,7 @@ import { EventBus } from './event-bus.js';
 import state from "@/state";
 import contract from 'truffle-contract'
 import AUSD_JSON from '@contracts/AliceUSD.json'
-import IDA_JSON from '@contracts/IdaMock.json'
+import IDA_JSON from '@contracts/Ida.json'
 import IP_JSON from '@contracts/ImpactPromise.json'
 import FT_JSON from '@contracts/FluidToken.json'
 import ESCROW_JSON from '@contracts/Escrow.json'
@@ -20,8 +20,8 @@ let ethereum = window.ethereum;
 let web3 = window.web3;
 
 const START_BLOCK = 5549491;
-const AUSD_ADDRESS = "0x22d64d4A9DD6e3531BE6A93a532084f3093B388f";
-const IDA_FACTORY_ADDRESS = "0x7c70b210F63c86C667D7a9cEDd9D4Ea1A7f640Cc";
+const AUSD_ADDRESS = "0xeE863BfADb5e768Ae6bCc3927F330b22e486eE0B";
+const IDA_FACTORY_ADDRESS = "0xa380EE49B0bC006aDc240D599EFDd626e6B1e00E";
 
 
 var setup = function(json) {

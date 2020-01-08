@@ -315,7 +315,6 @@
   .md-field label {
     font-size: 14px !important;
     margin: 0 !important;
-    left: 0 !important;
   }
 
   .md-field .md-input {
