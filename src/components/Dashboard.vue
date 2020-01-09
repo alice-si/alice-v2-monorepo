@@ -375,7 +375,7 @@
                       </div>
 
                       <md-button class="md-primary md-raised action-button" v-if="balance.redeemable > 0" @click="redeem()">
-                        Redeem ${{balance.redeemable}}
+                        Redeem ${{balance.redeemable | number('0.00')}}
                       </md-button>
                     </div>
 

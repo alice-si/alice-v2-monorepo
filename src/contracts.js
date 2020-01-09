@@ -117,9 +117,9 @@ async function updateInvestments() {
   state.investingTotalChartData.Remaining = state.ida.budget - state.ida.distributeAmount -state.balance.totalInvested;
   state.ida.unsold = state.ida.budget - state.balance.totalInvested
 
-  state.fluidBalanceChartData.Redeemed = web3.fromWei((await paymentRights.getRedeemed(main, {from: main})), 'ether');
-  state.fluidBalanceChartData.Validated = state.balance.redeemable;
-  state.fluidBalanceChartData.Potential = state.balance.invested - state.balance.redeemable - state.fluidBalanceChartData.Redeemed;
+  state.fluidBalanceChartData.Redeemed = web3.fromWei((await paymentRights.getRedeemed(main, {from: main})), 'ether').toLocaleString('en-GB', { maximumFractionDigits: 2 });
+  state.fluidBalanceChartData.Validated = parseFloat(state.balance.redeemable).toLocaleString('en-GB', { maximumFractionDigits: 2 });
+  state.fluidBalanceChartData.Potential = (state.balance.invested - state.balance.redeemable - state.fluidBalanceChartData.Redeemed).toLocaleString('en-GB', { maximumFractionDigits: 2 });
 
 }
 
