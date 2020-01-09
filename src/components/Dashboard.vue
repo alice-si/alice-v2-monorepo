@@ -27,18 +27,23 @@
         to identify and validate the claim.
       </div>
 
-
-
-      <div class="form">
-        <div class="md-layout-item md-small-size-100">
-          <md-field>
-            <label for="fundingAmount">Code</label>
-            <md-input name="fundingAmount" id="claimKey" v-model="claimKey" :disabled="processing"/>
-          </md-field>
+      <form novalidate>
+        <div class="form-container">
+          <md-field :class="getValidationClass('validationForm', 'claimKey')">
+            <label for="claimKey">Code</label>
+            <md-input name="claimKey" id="claimKey" v-model="validationForm.claimKey"
+                      :disabled="processing"/>
+            <span class="md-error"
+                  v-if="!$v.validationForm.claimKey.required">Please provide the claim key</span>
+            <span class="md-error"
+                  v-else-if="!$v.validationForm.claimKey.maxLength">The key cannot be longer than 32 characters</span>
+            </md-field>
         </div>
 
         <md-button class="md-primary md-raised" @click="submitClaim()">Submit</md-button>
-      </div>
+
+      </form>
+
     </md-drawer>
 
     <md-drawer class="md-drawer md-right" :md-active.sync="showFundPanel" md-swipeable>
@@ -490,7 +495,7 @@
   import {validationMixin} from 'vuelidate'
   import {
     required,
-    maxValue
+    maxLength
   } from 'vuelidate/lib/validators'
 
   export default {
@@ -516,7 +521,9 @@
           investmentAmount: null
         },
         showClaimPanel: false,
-        claimKey: null,
+        validationForm: {
+          claimKey: null
+        },
         investingChartData: State.investingChartData,
         fundingChartData: State.fundingChartData,
         investingTotalChartData: State.investingTotalChartData,
@@ -548,7 +555,14 @@
           required,
           maxValue: (value, model) => value > 0 && value < 100
         }
+      },
+      validationForm: {
+        claimKey: {
+          required,
+          maxLength: maxLength(32),
+        }
       }
+
     },
     methods: {
       getDemoTokens: async function () {
@@ -623,12 +637,15 @@
         }
       },
       submitClaim: async function () {
-        this.processing = true;
-        try {
-          await Contracts.submitClaim(this.claimKey);
-          this.showClaimPanel = false;
-        } finally {
-          this.processing = false;
+        this.$v.validationForm.$touch();
+        if (!this.$v.validationForm.$invalid) {
+          this.processing = true;
+          try {
+            await Contracts.submitClaim(this.validationForm.claimKey);
+            this.showClaimPanel = false;
+          } finally {
+            this.processing = false;
+          }
         }
       },
       validateClaim: async function (claimKey) {
