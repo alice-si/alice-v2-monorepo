@@ -1,6 +1,6 @@
 <template>
   <div>
-    <reactive-doughnut :chart-data="datacollection"></reactive-doughnut>
+    <reactive-doughnut :chart-data="datacollection" :options="options" style="height: 150px;"></reactive-doughnut>
   </div>
 </template>
 
@@ -15,7 +15,14 @@
     },
     data () {
       return {
-        datacollection: {}
+        datacollection: {},
+        options: {
+          legend: {
+            position: 'right'
+          },
+          responsive: true,
+          maintainAspectRatio: false,
+        }
       }
     },
     mounted () {

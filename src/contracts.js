@@ -90,9 +90,10 @@ async function saveDetailsIn3Box(newIda) {
 }
 
 async function updateInvestments() {
+  console.log("Updating investment...");
+
   let investingAllowance = await ausd.allowance(main, sts.address);
   state.ida.investingUnlocked = investingAllowance > 0;
-  console.log("Is investing unlocked: " + state.ida.investingUnlocked);
 
   //Distribution
   let rawSupply = await sts.currentSupply();
@@ -112,10 +113,10 @@ async function updateInvestments() {
   state.investingChartData.You = state.balance.invested;
   state.investingChartData.Others = state.balance.totalInvested - state.balance.invested;
 
-  state.investingTotalChartData.Invested = state.balance.totalInvested;
-  state.investingTotalChartData['For sale'] = state.ida.distributeAmount;
-  state.investingTotalChartData.Remaining = state.ida.budget - state.ida.distributeAmount -state.balance.totalInvested;
-  state.ida.unsold = state.ida.budget - state.balance.totalInvested
+  state.investingTotalChartData.Sold = state.balance.totalInvested;
+  state.investingTotalChartData.Available = state.ida.distributeAmount;
+  //state.investingTotalChartData.Remaining = state.ida.budget - state.ida.distributeAmount -state.balance.totalInvested;
+  state.ida.unsold = state.ida.budget - state.balance.totalInvested;
 
   state.fluidBalanceChartData.Redeemed = web3.fromWei((await paymentRights.getRedeemed(main, {from: main})), 'ether').toLocaleString('en-GB', { maximumFractionDigits: 2 });
   state.fluidBalanceChartData.Validated = parseFloat(state.balance.redeemable).toLocaleString('en-GB', { maximumFractionDigits: 2 });

@@ -361,54 +361,66 @@
 
 
                 <md-card-content style="text-align: left">
+
+                  <div class="tab-desc">
+                    You can buy this IDA’s future payments as an investment here.<br/>
+                    Learn more about IDA markets and fluid balance tokens.
+                  </div>
+
+
                   <div class="md-layout md-gutter">
 
-                    <div class="md-layout-item md-size-33" style="text-align: center">
+                    <div class="md-layout-item md-size-50 tab-section" style="border-right: 1px solid black;">
+
+                      <div class="tab-section-title">
+                        Current investment market
+                      </div>
+
+                      <div class="tab-section-desc">
+                        <b>{{ida.distributeAmount}}</b> Payment rights for sale <br/>
+                        <b>{{(100 / (100-ida.distributeDiscount) * 100 - 100).toFixed(0)}}%</b> Potential ROI
+                          <md-icon class="question-icon">help
+                            <md-tooltip md-direction="right">
+                              ROI is conditional of IDA's promises being funded and fulfilled.
+                            </md-tooltip>
+                          </md-icon>
+
+                      </div>
+
+
+                      <staked-chart second-color="#01C0EF" :values="investingTotalChartData"></staked-chart>
+
+                      <div style="text-align: center; margin-top: 25px;">
+                        <md-button class="md-primary md-raised action-button" @click="showDistributePanel = true" v-if="ida.isOwner">
+                          Update market conditions
+                        </md-button>
+
+                        <md-button class="md-primary md-raised action-button" @click="showInvestPanel = true" v-else>
+                          Invest
+                        </md-button>
+                      </div>
+
+                    </div>
+
+                    <div class="md-layout-item md-size-50 tab-section" >
+
+                      <div class="tab-section-title">
+                        Your holdings
+                      </div>
+
+                      <div class="tab-section-desc">
+                        Payment rights you own: <b>{{balance.invested}}</b>
+                      </div>
+
                       <ratio-chart second-color="#01C0EF" :values="fluidBalanceChartData"></ratio-chart>
-
-                      <div  style="margin-top: 10px;" v-if="ida.isOwner">
-                        You can gradually redeem your holdings along with the progress of promises validation.
-                      </div>
-
-                      <div  style="margin-top: 10px;" v-else>
-                        You can gradually redeem your investment along with the progress of promises validation.
-                      </div>
-
+                      <div style="text-align: center;">
                       <md-button class="md-primary md-raised action-button" v-if="balance.redeemable > 0" @click="redeem()">
                         Redeem ${{balance.redeemable | number('0.00')}}
                       </md-button>
-                    </div>
-
-                    <div class="md-layout-item md-size-33" v-if="ida.isOwner">
-
-                    </div>
-
-                    <div class="md-layout-item md-size-33" v-else>
-                      <div class="value-big">${{balance.invested}}</div>
-                      <div class="value-subtitle">value of your investment</div>
-                    </div>
-
-                    <!--<div class="md-layout-item md-size-33">-->
-                      <!--<div class="value-big">${{balance.totalInvested}} / ${{ida.budget}}</div>-->
-                      <!--<div class="value-subtitle">total distributed / market cap</div>-->
-                    <!--</div>-->
-
-                    <div class="md-layout-item md-size-33" style="text-align: center;">
-                      <ratio-chart second-color="#01C0EF" :values="investingTotalChartData"></ratio-chart>
-
-                      <div  style="margin-top: 10px;">
-                        There are <b>${{ida.distributeAmount}}</b> payment rights for sale at a <b>{{ida.distributeDiscount}}%</b> discount.
                       </div>
-
-                      <md-button class="md-primary md-raised action-button" @click="showDistributePanel = true" v-if="ida.isOwner">
-                        Update market conditions
-                      </md-button>
-
-                      <md-button class="md-primary md-raised action-button" @click="showInvestPanel = true" v-else>
-                        Invest
-                      </md-button>
-
                     </div>
+
+
 
                   </div>
 
@@ -432,7 +444,7 @@
 
                 <md-card-content style="text-align: left">
 
-                  <div style="text-align: center" v-if="ida.data">
+                  <div class="tab-desc" v-if="ida.data">
                     {{ida.data['organisation-name']}} has fulfilled <b>{{ida.validatedNumber}}</b> promises, and <b>{{ida.pending}}</b> more are pending validation. <br/>
                     The deadline to fulfill the remaining  <b>{{ida.promisesNumber - ida.validatedNumber}}</b> promises is <b>{{ida.endTime}}</b>.
                   </div>
@@ -492,6 +504,7 @@
   import Contracts from '@/contracts'
   import State from '@/state'
   import RatioChart from './RatioChart'
+  import StakedChart from './StakedChart'
   import {validationMixin} from 'vuelidate'
   import {
     required,
@@ -501,7 +514,7 @@
   export default {
     name: 'Dashboard',
     mixins: [validationMixin],
-    components: {RatioChart},
+    components: {RatioChart, StakedChart},
     data() {
       return {
         ida: State.ida,
@@ -895,6 +908,40 @@
 
   div.button-box {
     text-align: center;
+  }
+
+  div.tab-desc {
+    text-align: center;
+    color: #898989;
+    font-style: italic;
+  }
+
+  div.tab-section-title {
+    font-weight: bolder;
+    font-size: 16px;
+  }
+
+  div.tab-section-desc {
+    margin: 20px 0 20px 0;
+    color: #898989;
+    font-size: 16px;
+  }
+
+  .tab-section {
+    margin-top: 20px;
+    padding-left: 10% !important;
+    padding-right: 10% !important;
+    margin-bottom: 20px;
+  }
+
+  .tab-section .action-button {
+    margin-bottom: 0px;
+  }
+
+  .question-icon {
+    font-size: 12px !important;
+    margin-top: -8px;
+    margin-left: -8px;
   }
 
 </style>
