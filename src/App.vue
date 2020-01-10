@@ -234,5 +234,9 @@
     padding: 20px;
   }
 
+  .md-app-container {
+    overflow-x: hidden;
+  }
+
 </style>
 
