@@ -136,7 +136,7 @@
 
       <div class="text" v-if="ida.data && ida.distributeAmount > 0">
 
-        <b>{{ida.data['organisation-name']}}</b> is selling <b>${{ida.distributeAmount}}</b> tokens for <b>${{ida.distributePrice}}</b>
+        <b>{{ida.data['organisation-name']}}</b> is selling <b>{{ida.distributeAmount}}</b> tokens for <b>${{ida.distributePrice}}</b>
         which could be redeemed for <b>${{(ida.distributePrice * (100 / (100-ida.distributeDiscount))).toFixed(0)}}</b> if all of this IDA's promises are fulfilled. <br/><br/>
 
         This means that your maximum return on this investment is <b>{{(100 / (100-ida.distributeDiscount) * 100 - 100).toFixed(0)}}%</b>.
@@ -412,7 +412,7 @@
                         Payment rights you own: <b>{{balance.invested}}</b>
                       </div>
 
-                      <ratio-chart second-color="#01C0EF" :values="fluidBalanceChartData"></ratio-chart>
+                      <ratio-chart v-if="balance.invested>0" second-color="#01C0EF" :values="fluidBalanceChartData"></ratio-chart>
                       <div style="text-align: center;">
                       <md-button class="md-primary md-raised action-button" v-if="balance.redeemable > 0" @click="redeem()">
                         Redeem ${{balance.redeemable | number('0.00')}}
