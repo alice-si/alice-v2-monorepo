@@ -111,7 +111,7 @@
               <label for="distributeAmount">Amount</label>
               <md-input name="distributeAmount" id="distributeAmount" v-model="distributionForm.distributeAmount" :disabled="processing"/>
               <span class="md-error" v-if="!$v.distributionForm.distributeAmount.required">Please provide the amount to distribute</span>
-              <span class="md-error" v-else-if="!$v.distributionForm.distributeAmount.maxValue">You can distribute up to ${{ida.unsold}}</span>
+              <span class="md-error" v-else-if="!$v.distributionForm.distributeAmount.maxValue">You can distribute up to {{ida.unsold}} tokens</span>
             </md-field>
           </div>
         </form>
