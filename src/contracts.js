@@ -1,6 +1,7 @@
 /* eslint-disable */
 const {promisify} = require("es6-promisify");
 const detectNetwork = require('web3-detect-network')
+const BN = require('bn.js');
 
 import { EventBus } from './event-bus.js';
 import state from "@/state";
@@ -45,7 +46,7 @@ const CLAIMS_REGISTRY = setup(CLAIMS_REGISTRY_JSON);
 
 
 var main, ausd, idaFactory, ida, impactPromise, paymentRights, sts, claimsRegistry, owner, box;
-
+var getBlockNumber;
 
 var connectWeb3 = async function() {
   if (typeof ethereum !== 'undefined') {
@@ -57,6 +58,8 @@ var connectWeb3 = async function() {
     throw 'NO_WEB3'
   }
   let network = await detectNetwork(web3.currentProvider);
+
+  getBlockNumber = promisify(web3.eth.getBlockNumber);
 
   if (network.id != 4) {
     throw 'WRONG_NETWORK'
@@ -100,6 +103,8 @@ async function updateInvestments() {
   state.ida.distributeAmount = web3.fromWei(rawSupply, 'ether');
   state.ida.distributeDiscount = (await sts.currentDiscount()).toString();
   state.ida.distributePrice = web3.fromWei((await sts.getEffectivePrice(rawSupply)), 'ether');
+
+  console.log("Loaded... Distribute: " + state.ida.distributeAmount + " with discount: " + state.ida.distributeDiscount);
 
   state.balance.invested = web3.fromWei((await paymentRights.balanceOf(main)), 'ether');
   console.log("Invested by You: " + state.balance.invested);
@@ -262,8 +267,8 @@ const Contracts = {
   },
 
   unlockDistribution: async() => {
-    let amount = await paymentRights.totalSupply();
-    console.log("Unlocking distribution: " + amount);
+    console.log("Unlocking max amount");
+    let amount = (new BN("2").pow(new BN("255")));
     await paymentRights.approve(sts.address, amount, {from: main});
 
     state.ida.distributionUnlocked = true;
@@ -274,7 +279,7 @@ const Contracts = {
     let wei = web3.toWei(amount, 'ether');
     await ida.fund(wei, {from: main, gas: 1000000});
 
-    await updateFunding();
+    setTimeout(updateFunding, 1000);
     await updateHoldings();
   },
 
@@ -282,14 +287,17 @@ const Contracts = {
     console.log("Distribute: " + distributeAmount + " with discount: " + distributeDiscount);
     await sts.updateConditions(web3.toWei(distributeAmount, 'ether'), distributeDiscount, {from: main, gas: 1000000});
 
-    await updateInvestments();
+    //state.ida.distributeAmount = distributeAmount;
+    //state.ida.distributeDiscount = distributeDiscount;
+
+    setTimeout(updateInvestments, 1000);
   },
 
   invest: async (amount) => {
     console.log("Investing: " + amount);
     await sts.buy(web3.toWei(amount, 'ether'), {from: main, gas: 1000000});
 
-    await updateInvestments();
+    setTimeout(updateInvestments, 1000);
     await updateHoldings();
   },
 

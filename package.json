@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "3box": "^1.13.2",
+    "bn.js": "^5.1.1",
     "chart.js": "^2.9.3",
     "solidity-docgen": "^0.3.13",
     "truffle-contract": "^4.0.31",

@@ -396,8 +396,17 @@
 
                       <div class="tab-section-desc">
                         <b>{{ida.distributeAmount}}</b> Payment rights for sale <br/>
-                        <b>{{(100 / (100-ida.distributeDiscount) * 100 - 100).toFixed(0)}}%</b>
-                        {{ida.isOwner ? 'Discount' : 'Potential ROI'}}
+                        <span v-if="ida.isOwner">
+                          <b>{{ida.distributeDiscount}}%</b>
+                          Discount
+                        </span>
+                        <span v-else>
+                          <b>{{(100 / (100-ida.distributeDiscount) * 100 - 100).toFixed(0)}}%</b>
+                          Potential ROI
+                        </span>
+
+                        <button @click="unlockDistribution()">Unlock</button>
+
                           <md-icon class="question-icon">help
                             <md-tooltip md-direction="right" v-if="ida.isOwner">
                               Applied on the unredeemed value of PR tokens (redeemable + still locked).
@@ -410,11 +419,11 @@
                       </div>
 
 
-                      <staked-chart second-color="#01C0EF" :values="investingTotalChartData"></staked-chart>
+                      <staked-chart v-if="ida.distributeAmount > 0" second-color="#01C0EF" :values="investingTotalChartData"></staked-chart>
 
                       <div style="text-align: center; margin-top: 25px;">
                         <md-button class="md-primary md-raised action-button" @click="showDistributePanel = true" v-if="ida.isOwner">
-                          Update market conditions
+                          {{ida.distributeAmount > 0 ? 'Update market conditions' : 'Create market'}}
                         </md-button>
 
                         <md-button class="md-primary md-raised action-button" @click="showInvestPanel = true" v-else>
