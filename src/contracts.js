@@ -108,7 +108,7 @@ async function updateInvestments() {
   state.ida.maxInvestment = state.ida.budget - state.balance.totalInvested;
   console.log("Invested by others");
   state.balance.redeemable = web3.fromWei((await paymentRights.getAvailableToRedeem({from: main})), 'ether');
-  console.log("Reedemable: " + state.balance.redeemable);
+  console.log("Redeemable: " + state.balance.redeemable);
 
   state.investingChartData.You = state.balance.invested;
   state.investingChartData.Others = state.balance.totalInvested - state.balance.invested;
@@ -119,8 +119,8 @@ async function updateInvestments() {
   state.ida.unsold = state.ida.budget - state.balance.totalInvested;
 
   state.fluidBalanceChartData.Redeemed = web3.fromWei((await paymentRights.getRedeemed(main, {from: main})), 'ether').toLocaleString('en-GB', { maximumFractionDigits: 2 });
-  state.fluidBalanceChartData.Validated = parseFloat(state.balance.redeemable).toLocaleString('en-GB', { maximumFractionDigits: 2 });
-  state.fluidBalanceChartData.Potential = (state.balance.invested - state.balance.redeemable - state.fluidBalanceChartData.Redeemed).toLocaleString('en-GB', { maximumFractionDigits: 2 });
+  state.fluidBalanceChartData.Redeemable = parseFloat(state.balance.redeemable).toLocaleString('en-GB', { maximumFractionDigits: 2 });
+  state.fluidBalanceChartData['Still locked'] = (state.balance.invested - state.balance.redeemable - state.fluidBalanceChartData.Redeemed).toLocaleString('en-GB', { maximumFractionDigits: 2 });
 
 }
 

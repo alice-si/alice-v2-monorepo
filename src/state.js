@@ -49,7 +49,7 @@ let state = {
   fundingChartData: {You: 0, Others: 0},
   investingTotalChartData: {Sold: 0, Available: 0},
   fundingTotalChartData: {Funded: 0, Remaining: 0},
-  fluidBalanceChartData: {Redeemed: 0, Validated: 0, Potential: 0}
+  fluidBalanceChartData: {Redeemed: 0, Redeemable: 0, 'Still locked': 0}
 
 };
 

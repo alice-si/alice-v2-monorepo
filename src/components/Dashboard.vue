@@ -303,6 +303,20 @@
 
 
                 <md-card-content style="text-align: left">
+
+                  <div class="tab-desc" v-if="ida.isOwner">
+                    Keep track of how much funding you have raised to deliver your impact here. <br/>
+                    Learn more [link to blog post] about IDAs and conditional impact payments.
+                  </div>
+
+                  <div class="tab-desc" v-else>
+                    If you want to see this IDA’s impact happen, fund it here! <br/>
+                    Your money will only be paid out if promises are fulfilled. <br/>
+                    Learn more about IDAs and conditional impact payments.
+                  </div>
+
+
+
                   <div class="md-layout md-gutter">
 
                     <div class="md-layout-item md-size-33" v-if="!ida.isOwner">
@@ -362,11 +376,15 @@
 
                 <md-card-content style="text-align: left">
 
-                  <div class="tab-desc">
-                    You can buy this IDA’s future payments as an investment here.<br/>
+                  <div class="tab-desc" v-if="ida.isOwner">
+                    You can sell this IDA’s future payments as an investment here.<br/>
                     Learn more about IDA markets and fluid balance tokens.
                   </div>
 
+                  <div class="tab-desc" v-else>
+                    You can buy this IDA’s future payments as an investment here.<br/>
+                    Learn more about IDA markets and fluid balance tokens.
+                  </div>
 
                   <div class="md-layout md-gutter">
 
@@ -378,9 +396,13 @@
 
                       <div class="tab-section-desc">
                         <b>{{ida.distributeAmount}}</b> Payment rights for sale <br/>
-                        <b>{{(100 / (100-ida.distributeDiscount) * 100 - 100).toFixed(0)}}%</b> Potential ROI
+                        <b>{{(100 / (100-ida.distributeDiscount) * 100 - 100).toFixed(0)}}%</b>
+                        {{ida.isOwner ? 'Discount' : 'Potential ROI'}}
                           <md-icon class="question-icon">help
-                            <md-tooltip md-direction="right">
+                            <md-tooltip md-direction="right" v-if="ida.isOwner">
+                              Applied on the unredeemed value of PR tokens (redeemable + still locked).
+                            </md-tooltip>
+                            <md-tooltip md-direction="right" v-else>
                               ROI is conditional of IDA's promises being funded and fulfilled.
                             </md-tooltip>
                           </md-icon>
