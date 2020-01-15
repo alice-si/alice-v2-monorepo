@@ -1,8 +1,8 @@
-/*
-This is a new token type that gives the holder right to funds that may not yet be available.
-It is based and compatible with the ERC20 token standard but has a double bottom line:
-funds that are available for a holder and funds that have been already redeemed.
-Both balances are automatically update when tokens are transferred making it fully tradable.
+/**
+This token type manages the redemption rights to funds that may or may not be currently held in an escrow account. It ensures that token holders may only ever redeem a fair, pro-rata share of funds that are available in a partially filled escrow at any given time, even if they are nominally entitled to more.
+Fluid tokens are based on and compatible with the ERC20 token standard but have a double balance:
+funds that are available for a holder to redeem, and funds that have been redeemed already.
+If tokens are transferred to someone who already owns fluid tokens, then the balances of each set of tokens are combined, making them easily tradable.
 */
 
 pragma solidity ^0.5.2;
@@ -17,7 +17,7 @@ contract FluidToken is ERC20 {
 
 
     /**
-    * @dev Emitted when tokens are redeemed for funds locked in the escrow
+    * @dev Emitted when tokens are redeemed for funds locked in the escrow contract
     */
     event Redeemed(address indexed to, uint256 value);
 
@@ -39,8 +39,8 @@ contract FluidToken is ERC20 {
     }
 
     /**
-     * Can transfer non-zero amounts only.
-     * After the transfer we update both the token balance and the amount redeemed.
+     * @dev Only allows transfers of non-zero amounts.
+     * After the transfer, the token balance and amount redeemed are both updated.
      */
     function _transfer(address sender, address recipient, uint256 amount) internal {
         uint256 redeemedProRata = amount.mul(_redeemed[sender]).div(balanceOf(sender));
@@ -53,7 +53,7 @@ contract FluidToken is ERC20 {
 
     function redeem(uint256 _amount) public {
         uint256 available = getAvailableToRedeem();
-        require(_amount <= available, "Cannot redeem more tokens than available");
+        require(_amount <= available, "Cannot redeem more than available");
 
         escrow.withdraw(msg.sender, _amount);
         _redeemed[msg.sender] = _redeemed[msg.sender].add(_amount);
@@ -70,8 +70,5 @@ contract FluidToken is ERC20 {
         available = available.div(escrow.capacity());
         return available;
     }
-
-
-
 
 }

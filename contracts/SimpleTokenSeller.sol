@@ -6,7 +6,7 @@ import './Ida.sol';
 import './FluidToken.sol';
 
 /**
- * @title SimpleSeller - a contract designed to orchestrate Ida creation
+ * @title SimpleSeller - a contract designed to orchestrate IDA creation
  * by automatically deploying and linking payment rights seller contract
  *
  */
