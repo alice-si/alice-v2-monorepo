@@ -1,0 +1,164 @@
+<!-- See https://codepen.io/ElaineXu/pen/jAzGAw for the original effect. -->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Filling water animation</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+
+<button id="button"
+        class="button"
+        onClick="action()">START</button>
+
+
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" style="display: none;">
+  <symbol id="wave">
+    <path d="M420,20c21.5-0.4,38.8-2.5,51.1-4.5c13.4-2.2,26.5-5.2,27.3-5.4C514,6.5,518,4.7,528.5,2.7c7.1-1.3,17.9-2.8,31.5-2.7c0,0,0,0,0,0v20H420z"></path>
+    <path d="M420,20c-21.5-0.4-38.8-2.5-51.1-4.5c-13.4-2.2-26.5-5.2-27.3-5.4C326,6.5,322,4.7,311.5,2.7C304.3,1.4,293.6-0.1,280,0c0,0,0,0,0,0v20H420z"></path>
+    <path d="M140,20c21.5-0.4,38.8-2.5,51.1-4.5c13.4-2.2,26.5-5.2,27.3-5.4C234,6.5,238,4.7,248.5,2.7c7.1-1.3,17.9-2.8,31.5-2.7c0,0,0,0,0,0v20H140z"></path>
+    <path d="M140,20c-21.5-0.4-38.8-2.5-51.1-4.5c-13.4-2.2-26.5-5.2-27.3-5.4C46,6.5,42,4.7,31.5,2.7C24.3,1.4,13.6-0.1,0,0c0,0,0,0,0,0l0,20H140z"></path>
+  </symbol>
+</svg>
+
+
+<!-- A percent counter -->
+<div class="counter left">
+  <div id="count-left"
+       class="counter__value">0</div>
+  <div class="counter__unit">%</div>
+</div>
+
+<div class="counter right">
+  <div id="count-right"
+       class="counter__value">0</div>
+  <div class="counter__unit">%</div>
+</div>
+
+<!-- A glass -->
+<div id="glass-left" class="glass left">
+
+  <!-- Liquid from the top -->
+  <div id="pour-left"
+       class="pour left pour--hidden"><!-- empty --></div>
+
+  <!-- The "content" of your glass -->
+  <div class="glass__inner">
+    <div id="liquid-left"
+         class="liquid liquid--hidden">
+
+      <!-- Wave No. 1 -->
+      <svg viewBox="0 0 560 20"
+           class="liquid__wave liquid__wave--back">
+        <use xlink:href="#wave"></use>
+      </svg>
+
+      <!-- Wave No. 2 -->
+      <svg viewBox="0 0 560 20"
+           class="liquid__wave liquid__wave--front">
+        <use xlink:href="#wave"></use>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<div id="glass-right" class="glass right">
+
+  <!-- Liquid from the top -->
+  <div id="pour-right"
+       class="pour right pour--hidden"><!-- empty --></div>
+
+  <!-- The "content" of your glass -->
+  <div class="glass__inner">
+    <div id="liquid-right"
+         class="liquid liquid--hidden">
+
+      <!-- Wave No. 1 -->
+      <svg viewBox="0 0 560 20"
+           class="liquid__wave liquid__wave--back">
+        <use xlink:href="#wave"></use>
+      </svg>
+
+      <!-- Wave No. 2 -->
+      <svg viewBox="0 0 560 20"
+           class="liquid__wave liquid__wave--front">
+        <use xlink:href="#wave"></use>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<script>
+  const action = async () => {
+    await fillGlass('left', 80, 10);
+    await fillGlass('right', 40, 10);
+    await mergeGlasses();
+    await balanceLevel('left', 80, 60, 50);
+    await balanceLevel('right', 40, 60, 50);
+  };
+
+  const fillGlass = async (position, filledLevel, speed) => {
+
+    // Get all assets.
+    const glassElement = document.getElementById('glass-' + position);
+    //const counterElement = document.getElementById('count-' + position);
+    const pourElement = document.getElementById('pour-' + position);
+    const liquidElement = document.getElementById('liquid-' + position);
+
+
+    // Let it flow 🌊
+    pourElement.classList.remove('pour--hidden');
+    liquidElement.classList.remove('liquid--hidden');
+
+    await animateLiquid(liquidElement, 0, filledLevel, speed);
+
+    pourElement.classList.add('pour--end');
+  };
+
+  const mergeGlasses = async () => {
+    document.getElementById('glass-left').classList.remove('left');
+    document.getElementById('glass-right').classList.remove('right');
+
+    return new Promise(resolve => {
+      setTimeout(() => {
+        document.getElementById('glass-left').classList.add('merged-left');
+        document.getElementById('glass-right').classList.add('merged-right');
+        resolve()
+      }, 1000);
+    });
+  };
+
+  const balanceLevel = (position, base, balance, speed) => {
+    const liquidElement = document.getElementById('liquid-' + position);
+    animateLiquid(liquidElement, base, balance, speed);
+  };
+
+  function animateLiquid(liquid, start, target, speed) {
+    return new Promise(resolve => {
+      var percent = start;
+      const step = (target > start) ? 1 : -1;
+      setTimeout(() => {
+
+        // Fill the glass.
+        const interval = setInterval(() => {
+          percent = percent + step;
+          //counter.innerHTML = percent;
+          liquid.style.transform = `translate(0, +${(100 - percent)}%)`;
+
+          // Stop the flow.
+          if((target && target == percent)){
+            clearInterval(interval);
+            resolve();
+          }
+        }, speed);
+      }, 500);
+    });
+  }
+
+
+
+</script>
+</body>
+</html>
