@@ -64,7 +64,7 @@ Fluid balance tokens (FBTs) are a new type of token that manage the rights to fu
 
 We call the balances of these tokens “fluid” because they are automatically combined when transferred, making them easy to trade. FBTs are therefore “semi-fungible”, and offer significant advantages to both fungible and non-fungible tokens.
 
-[Kuba to add fluid balance animation]
+![FBT animation](https://github.com/alice-si/ida/blob/RM-readme/images/Fluid%20balance%20tokens%20animation.gif)
 
 ### Basic example: combining balances
 
