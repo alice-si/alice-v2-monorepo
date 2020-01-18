@@ -37,7 +37,26 @@ This can be helpful in many different use cases, such as allowing service provid
 
 ### Reference use case
 
-[Graphs]
+When an IDA is first created, its initial state is the following:
+
+![IDA initial state](https://github.com/alice-si/ida/blob/RM-readme/images/Initial%20state.png)
+  
+<br/>
+At this point, funders can send money to the escrow account, and the service provider can sell her payment rights tokens to investors:
+
+![IDA funding and investment](https://github.com/alice-si/ida/blob/RM-readme/images/Funding%20and%20investment.png)
+
+<br/>
+It's now time for the service provider to make a promise fulfilment claim. If the claim is validated, payment rights holders can redeem the unlocked funds from escrow.
+
+![IDA claims and redemptions](https://github.com/alice-si/ida/blob/RM-readme/images/Claims%20and%20redemptions.png)
+
+<br/>
+If no new promises are fulfilled, funders can use their promise tokens to obtain a refund for whatever is left in escrow after the IDA's end date.
+
+![IDA refunds](https://github.com/alice-si/ida/blob/RM-readme/images/Refund.png)
+
+<br/>
 
 # Fluid balance tokens
 
