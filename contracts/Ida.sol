@@ -10,13 +10,12 @@ import './ClaimsRegistry.sol';
 
 /**
  * @title Impact Delivery Agreement
- * @dev Contract to manage social impact projects in a flexible way.
- *
+ * @dev Contract to create flexible bounties with multiple actions to be completed (impact promises) and distributable reward payments.
  */
 contract Ida {
     using SafeMath for uint256;
 
-    event Created(address indexed creator, uint256 indexed outcomesNumber, uint256 outcomePrice, string name);
+    event Created(address indexed creator, uint256 indexed promiseNumber, uint256 promisePrice, string name);
     event Funded(address indexed funder, uint256 amount, uint256 totalFunded);
     event Validated(uint256 amount);
 
@@ -35,11 +34,10 @@ contract Ida {
     Escrow public escrow;
     ClaimsRegistry public claimsRegistry;
 
-
     string public name;
-    uint256 public outcomesNumber;
+    uint256 public promiseNumber;
     uint256 public validatedNumber;
-    uint256 public outcomePrice;
+    uint256 public promisePrice;
     address public validator;
     uint256 public endTime;
     address public serviceProvider;
@@ -49,8 +47,8 @@ contract Ida {
       ImpactPromise _impactPromise,
       ClaimsRegistry _claimsRegistry,
       string memory _name,
-      uint256 _outcomesNumber,
-      uint256 _outcomesPrice,
+      uint256 _promiseNumber,
+      uint256 _promisePrice,
       address _validator,
       uint256 _endTime,
       address _serviceProvider
@@ -62,23 +60,25 @@ contract Ida {
         paymentToken = _paymentToken;
         impactPromise = _impactPromise;
         claimsRegistry = _claimsRegistry;
-        outcomesNumber = _outcomesNumber;
-        outcomePrice = _outcomesPrice;
+        promiseNumber = _promiseNumber;
+        promisePrice = _promisePrice;
         validator = _validator;
         endTime = _endTime;
         serviceProvider = _serviceProvider;
 
-        escrow = new FluidEscrow(_paymentToken, outcomePrice.mul(outcomesNumber), address(this));
+        escrow = new FluidEscrow(_paymentToken, promisePrice.mul(promiseNumber), address(this));
         paymentRights = PaymentRights(escrow.recipient());
-        paymentRights.transfer(serviceProvider, outcomePrice.mul(outcomesNumber));
+        paymentRights.transfer(serviceProvider, promisePrice.mul(promiseNumber));
 
-        emit Created(serviceProvider, outcomesNumber, outcomePrice, name);
+        emit Created(serviceProvider, promiseNumber, promisePrice, name);
     }
 
-
+    /**
+    * @dev Allows people to fund the IDA with payments held in escrow until an impact promise is validated.
+    */
     function fund(uint256 _amount) public {
         require(!hasEnded());
-        require(paymentToken.balanceOf(address(escrow)).add(_amount) <= outcomePrice.mul(outcomesNumber), "The funding amount exceed allowed impact budget");
+        require(paymentToken.balanceOf(address(escrow)).add(_amount) <= promisePrice.mul(promiseNumber), "The funding amount exceeds allowed funding cap");
         paymentToken.transferFrom(msg.sender, address(escrow), _amount);
         impactPromise.mint(msg.sender, _amount);
 
@@ -86,19 +86,20 @@ contract Ida {
     }
 
 
-    function validateOutcome(bytes32 key) public onlyValidator {
-        require(validatedNumber < outcomesNumber, "All of the outcomes have been already validated");
-        require(claimsRegistry.getClaim(serviceProvider, address(this), key) == bytes32(outcomePrice), "The claim must be registered before validation");
-        require(!claimsRegistry.isApproved(validator, serviceProvider, address(this), key), "The claim has already been approved");
+    function validatePromise(bytes32 key) public onlyValidator {
+        require(validatedNumber < promiseNumber, "All the promises have already been validated");
+        require(claimsRegistry.getClaim(serviceProvider, address(this), key) == bytes32(promisePrice), "A claim must be registered before validation");
+        require(!claimsRegistry.isApproved(validator, serviceProvider, address(this), key), "This promise has already been validated");
 
         claimsRegistry.approveClaim(serviceProvider, address(this), key);
-        escrow.unlock(outcomePrice);
+        escrow.unlock(promisePrice);
         validatedNumber = validatedNumber.add(1);
-        emit Validated(outcomePrice);
+        emit Validated(promisePrice);
     }
 
-    function check(bytes32 val) public view returns(bool) {
-      return val == bytes32(outcomePrice);
+
+    function checkPrice(bytes32 val) public view returns(bool) {
+      return val == bytes32(promisePrice);
     }
 
 
