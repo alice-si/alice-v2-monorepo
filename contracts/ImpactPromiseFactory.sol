@@ -5,7 +5,7 @@ import './ImpactPromise.sol';
 
 /**
  * @title ImpactPromiseFactory - a helper contract orchestrating the creation
- * of different ImpactPromises per IDA
+ * of dedicated ImpactPromise tokens for each new IDA
  */
 contract ImpactPromiseFactory {
 

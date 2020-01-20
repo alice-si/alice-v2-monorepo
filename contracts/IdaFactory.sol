@@ -6,7 +6,7 @@ import './SimpleTokenSeller.sol';
 import './ImpactPromiseFactory.sol';
 
 /**
- * @title IdaFactory - a contract designed to orchestrate Ida creation
+ * @title IdaFactory - a contract designed to orchestrate the creation of IDAs
  * by automatically deploying and linking payment rights seller contract
  *
  */
@@ -29,14 +29,14 @@ contract IdaFactory {
   function createIda(
       ERC20 _paymentToken,
       string memory _name,
-      uint256 _outcomesNumber,
-      uint256 _outcomesPrice,
+      uint256 _promiseNumber,
+      uint256 _promisePrice,
       address _validator,
       uint256 _endTime
   ) public returns (Ida) {
 
     ImpactPromise promiseToken = impactPromiseFactory.createImpactPromise();
-    Ida ida = new Ida(_paymentToken, promiseToken, claimsRegistry, _name, _outcomesNumber, _outcomesPrice, _validator, _endTime, msg.sender);
+    Ida ida = new Ida(_paymentToken, promiseToken, claimsRegistry, _name, _promiseNumber, _promisePrice, _validator, _endTime, msg.sender);
     promiseToken.addMinter(address(ida));
     SimpleTokenSeller sts = simpleTokenSellerFactory.createSimpleTokenSeller(ida.paymentToken(), ida.paymentRights(), msg.sender);
 

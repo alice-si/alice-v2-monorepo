@@ -7,7 +7,8 @@ import './Escrow.sol';
 /**
  * @title RefundableEscrow
  * @dev An extension to the Escrow contract that allows the owner to withdraw
- * the funds that haven't been yet unlocked.
+ * the funds that haven't been yet unlocked so that they can be returned to
+ * ImpactPromise token holders after an IDA's endTime.
  *
  */
 contract RefundableEscrow is Escrow {

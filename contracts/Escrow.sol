@@ -5,7 +5,7 @@ import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
 
 /**
  * @title Escrow
- * @dev Contract dedicated to holds funds that may be gradually unlocked to the recipient.
+ * @dev Contract dedicated to holding funds that can be gradually unlocked by claim validations.
  *
  */
 contract Escrow {
