@@ -41,14 +41,15 @@ let state = {
     distributeDiscount: 0,
     claims: [],
     paymentRightsToken: null,
-    promiseToken: null
+    promiseToken: null,
+    unsold: 0
   },
   allIdas: [],
   investingChartData: {You: 0, Others: 0},
   fundingChartData: {You: 0, Others: 0},
-  investingTotalChartData: {Invested: 0, 'For sale': 0, Remaining: 0},
+  investingTotalChartData: {Sold: 0, Available: 0},
   fundingTotalChartData: {Funded: 0, Remaining: 0},
-  fluidBalanceChartData: {Redeemed: 0, Validated: 0, Potential: 0}
+  fluidBalanceChartData: {Redeemed: 0, Redeemable: 0, 'Still locked': 0}
 
 };
 

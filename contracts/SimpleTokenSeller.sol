@@ -30,7 +30,7 @@ contract SimpleTokenSeller is Ownable {
   }
 
   function updateConditions(uint256 supply, uint256 discount) public onlyOwner {
-    require(supply <= offeredToken.balanceOf(address(owner())), "Cannot set supply greater than the amount of tokens available");
+    require(supply <= offeredToken.balanceOf(address(owner())).add(currentSupply), "Cannot set supply greater than the amount of tokens available");
     require(discount < 100, "Discount must be less than 100%");
 
     //Unlock unsold tokens

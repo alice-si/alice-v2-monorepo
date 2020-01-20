@@ -42,6 +42,8 @@
                   <label>Project name</label>
                   <md-input name="name" v-model="idaForm.name"></md-input>
                   <span class="md-error" v-if="!$v.idaForm.name.required">Please provide the name</span>
+                  <span class="md-error"
+                        v-else-if="!$v.idaForm.name.maxLength">The name cannot be longer than 32 characters</span>
                 </md-field>
               </div>
 
@@ -50,6 +52,8 @@
                   <label>Project description</label>
                   <md-input v-model="idaForm.projectDescription"></md-input>
                   <span class="md-error" v-if="!$v.idaForm.projectDescription.required">Please provide the description</span>
+                  <span class="md-error"
+                        v-else-if="!$v.idaForm.projectDescription.maxLength">The description cannot be longer than 256 characters</span>
                 </md-field>
               </div>
 
@@ -57,7 +61,9 @@
                 <md-field :class="getValidationClass('idaForm', 'organisationName')">
                   <label>Your name or organization name</label>
                   <md-input v-model="idaForm.organisationName"></md-input>
-                  <span class="md-error" v-if="!$v.idaForm.name.required">Please provide the name</span>
+                  <span class="md-error" v-if="!$v.idaForm.organisationName.required">Please provide the name</span>
+                  <span class="md-error"
+                        v-else-if="!$v.idaForm.organisationName.maxLength">The name cannot be longer than 64 characters</span>
                 </md-field>
               </div>
 
@@ -66,15 +72,17 @@
                   <label>Describe who you are</label>
                   <md-input v-model="idaForm.organisationDescription"></md-input>
                   <span class="md-error" v-if="!$v.idaForm.organisationDescription.required">Please provide the description</span>
+                  <span class="md-error"
+                        v-else-if="!$v.idaForm.organisationDescription.maxLength">The description cannot be longer than 256 characters</span>
                 </md-field>
               </div>
 
               <div class="md-layout-item md-size-50">
-                <md-field :class="getValidationClass('idaForm', 'outcomesNumber')">
+                <md-field :class="getValidationClass('idaForm', 'promiseNumber')">
                   <label>Number of promises</label>
-                  <md-input v-model="idaForm.outcomesNumber"></md-input>
-                  <span class="md-error" v-if="!$v.idaForm.outcomesNumber.required">Please provide the number of promises</span>
-                  <span class="md-error" v-if="!$v.idaForm.outcomesNumber.numeric">Please provide a valid number</span>
+                  <md-input v-model="idaForm.promiseNumber"></md-input>
+                  <span class="md-error" v-if="!$v.idaForm.promiseNumber.required">Please provide the number of promises</span>
+                  <span class="md-error" v-if="!$v.idaForm.promiseNumber.numeric">Please provide a valid number</span>
                 </md-field>
               </div>
 
@@ -83,6 +91,8 @@
                   <label>Promise description</label>
                   <md-input v-model="idaForm.promiseDescription"></md-input>
                   <span class="md-error" v-if="!$v.idaForm.promiseDescription.required">Please provide the promise description</span>
+                  <span class="md-error"
+                        v-else-if="!$v.idaForm.promiseDescription.maxLength">The description cannot be longer than 256 characters</span>
                 </md-field>
               </div>
 
@@ -114,6 +124,8 @@
                   <label>Validator Name and Description</label>
                   <md-input v-model="idaForm.validatorName"></md-input>
                   <span class="md-error" v-if="!$v.idaForm.validatorName.required">Please provide the validator name</span>
+                  <span class="md-error"
+                        v-else-if="!$v.idaForm.validatorName.maxLength">The description cannot be longer than 64 characters</span>
                 </md-field>
               </div>
 
@@ -161,7 +173,8 @@
   import {validationMixin} from 'vuelidate'
   import {
     required,
-    numeric
+    numeric,
+    maxLength
   } from 'vuelidate/lib/validators'
 
 
@@ -210,15 +223,33 @@
     },
     validations: {
       idaForm: {
-        name: {required},
-        projectDescription: {required},
-        organisationName: {required},
-        organisationDescription: {required},
-        outcomesNumber: {required, numeric},
-        promiseDescription: {required},
+        name: {
+          required,
+          maxLength: maxLength(32),
+        },
+        projectDescription: {
+          required,
+          maxLength: maxLength(256),
+        },
+        organisationName: {
+          required,
+          maxLength: maxLength(64),
+        },
+        organisationDescription: {
+          required,
+          maxLength: maxLength(256),
+        },
+        promiseNumber: {required, numeric},
+        promiseDescription: {
+          required,
+          maxLength: maxLength(256),
+        },
         outcomesPrice: {required, numeric},
         paymentToken: {required},
-        validatorName: {required},
+        validatorName: {
+          required,
+          maxLength: maxLength(64),
+        },
         validator: {
           required,
           ethAddress: (value, model) => web3.isAddress(value)
@@ -233,7 +264,7 @@
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style lang="scss">
+<style lang="scss" scoped>
 
   div.page {
     padding: 0 20px 0 20px;
@@ -315,7 +346,6 @@
   .md-field label {
     font-size: 14px !important;
     margin: 0 !important;
-    left: 0 !important;
   }
 
   .md-field .md-input {

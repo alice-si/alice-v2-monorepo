@@ -27,18 +27,23 @@
         to identify and validate the claim.
       </div>
 
-
-
-      <div class="form">
-        <div class="md-layout-item md-small-size-100">
-          <md-field>
-            <label for="fundingAmount">Code</label>
-            <md-input name="fundingAmount" id="claimKey" v-model="claimKey" :disabled="processing"/>
-          </md-field>
+      <form novalidate>
+        <div class="form-container">
+          <md-field :class="getValidationClass('validationForm', 'claimKey')">
+            <label for="claimKey">Code</label>
+            <md-input name="claimKey" id="claimKey" v-model="validationForm.claimKey"
+                      :disabled="processing"/>
+            <span class="md-error"
+                  v-if="!$v.validationForm.claimKey.required">Please provide the claim key</span>
+            <span class="md-error"
+                  v-else-if="!$v.validationForm.claimKey.maxLength">The key cannot be longer than 32 characters</span>
+            </md-field>
         </div>
 
         <md-button class="md-primary md-raised" @click="submitClaim()">Submit</md-button>
-      </div>
+
+      </form>
+
     </md-drawer>
 
     <md-drawer class="md-drawer md-right" :md-active.sync="showFundPanel" md-swipeable>
@@ -98,7 +103,7 @@
               <label for="distributeDiscount">Discount on unredeemed value (%)</label>
               <md-input name="distributeDiscount" id="distributeDiscount" v-model="distributionForm.distributeDiscount" :disabled="processing"/>
               <span class="md-error" v-if="!$v.distributionForm.distributeDiscount.required">Please provide the discount</span>
-              <span class="md-error" v-else-if="!$v.distributionForm.distributeDiscount.maxValue">You can invest up to ${{(ida.distributeAmount * (100-ida.distributeDiscount)/100).toFixed(2)}}</span>
+              <span class="md-error" v-else-if="!$v.distributionForm.distributeDiscount.maxValue">Max discount must be less than 100%</span>
               <span class="md-error" v-else-if="!$v.distributionForm.distributeDiscount.maxAvailable">You only have ${{balance.tokens}} tokens to invest</span>
             </md-field>
 
@@ -106,7 +111,7 @@
               <label for="distributeAmount">Amount</label>
               <md-input name="distributeAmount" id="distributeAmount" v-model="distributionForm.distributeAmount" :disabled="processing"/>
               <span class="md-error" v-if="!$v.distributionForm.distributeAmount.required">Please provide the amount to distribute</span>
-              <span class="md-error" v-else-if="!$v.distributionForm.distributeAmount.maxValue">You can distribute up to ${{investingTotalChartData.Remaining}}</span>
+              <span class="md-error" v-else-if="!$v.distributionForm.distributeAmount.maxValue">You can distribute up to {{ida.unsold}} tokens</span>
             </md-field>
           </div>
         </form>
@@ -130,15 +135,12 @@
       </md-toolbar>
 
       <div class="text" v-if="ida.data && ida.distributeAmount > 0">
-        <b>{{ida.data['organisation-name']}}</b> is selling <b>${{ida.distributeAmount}}</b> worth of payment rights
-        for <b>${{ida.distributePrice}}</b> which could be redeemed for
-        <b>${{(ida.distributePrice * (100 / (100-ida.distributeDiscount))).toFixed(0)}}</b>
-        if all of the unfulfilled promises are validated. <br/>
 
+        <b>{{ida.data['organisation-name']}}</b> is selling <b>{{ida.distributeAmount}}</b> tokens for <b>${{ida.distributePrice}}</b>
+        which could be redeemed for <b>${{(ida.distributePrice * (100 / (100-ida.distributeDiscount))).toFixed(0)}}</b> if all of this IDA's promises are fulfilled. <br/><br/>
 
-        It means that your maximum return on this investment is <b>{{(100 / (100-ida.distributeDiscount) * 100 - 100).toFixed(0)}}%</b> if all the promises are fulfilled.
-
-        You risk losing your investment if promises are not delivered.
+        This means that your maximum return on this investment is <b>{{(100 / (100-ida.distributeDiscount) * 100 - 100).toFixed(0)}}%</b>.
+        You risk losing your investment if promises are not delivered or fully funded.
 
       </div>
 
@@ -151,14 +153,14 @@
         <form novalidate>
           <div class="form-container">
             <md-field :class="getValidationClass('investmentForm', 'investmentAmount')">
-              <label for="fundingAmount">Nominal value of payment rights to buy</label>
+              <label for="fundingAmount">Number of payment rights tokens to buy</label>
               <md-input name="investmentAmount" id="investmentAmount" v-model="investmentForm.investmentAmount"
                         :disabled="processing"/>
               <span class="md-error" v-if="!$v.investmentForm.investmentAmount.required">Please provide the amount to invest</span>
-              <span class="md-error" v-else-if="!$v.investmentForm.investmentAmount.maxValue">You can invest up to ${{(ida.distributeAmount * (100-ida.distributeDiscount)/100).toFixed(2)}}</span>
+              <span class="md-error" v-else-if="!$v.investmentForm.investmentAmount.maxValue">You can buy up to {{ida.distributeAmount}} tokens</span>
               <span class="md-error" v-else-if="!$v.investmentForm.investmentAmount.maxAvailable">You only have ${{balance.tokens}} tokens to invest</span>
             </md-field>
-            <div style="margin-top:10px">
+            <div style="padding-top:10px">
             This will cost you ${{(investmentForm.investmentAmount * (ida.distributePrice/ida.distributeAmount)).toFixed(2)}}
             </div>
           </div>
@@ -210,11 +212,11 @@
             <md-card-header-text>
               <div class="md-title" v-if="balance.tokens == 0">
                 You currently don't have any tokens to invest or fund
-                <md-button class="funds-button" @click="getDemoTokens()">Get $100 demo tokens</md-button>
+                <md-button class="funds-button" @click="getDemoTokens()">Get $1000 demo tokens</md-button>
               </div>
               <div class="md-title" v-else>
                 You currently have <b>${{balance.tokens}}</b> to invest or fund
-                <md-button class="funds-button" @click="getDemoTokens()">Get $100 more tokens</md-button>
+                <md-button class="funds-button" @click="getDemoTokens()">Get $1000 more tokens</md-button>
               </div>
 
             </md-card-header-text>
@@ -301,6 +303,20 @@
 
 
                 <md-card-content style="text-align: left">
+
+                  <div class="tab-desc" v-if="ida.isOwner">
+                    Keep track of how much funding you have raised to deliver your impact here. <br/>
+                    Learn more [link to blog post] about IDAs and conditional impact payments.
+                  </div>
+
+                  <div class="tab-desc" v-else>
+                    If you want to see this IDA’s impact happen, fund it here! <br/>
+                    Your money will only be paid out if promises are fulfilled. <br/>
+                    Learn more about IDAs and conditional impact payments.
+                  </div>
+
+
+
                   <div class="md-layout md-gutter">
 
                     <div class="md-layout-item md-size-33" v-if="!ida.isOwner">
@@ -359,54 +375,83 @@
 
 
                 <md-card-content style="text-align: left">
+
+                  <div class="tab-desc" v-if="ida.isOwner">
+                    You can sell this IDA’s future payments as an investment here.<br/>
+                    Learn more about IDA markets and fluid balance tokens.
+                  </div>
+
+                  <div class="tab-desc" v-else>
+                    You can buy this IDA’s future payments as an investment here.<br/>
+                    Learn more about IDA markets and fluid balance tokens.
+                  </div>
+
                   <div class="md-layout md-gutter">
 
-                    <div class="md-layout-item md-size-33" style="text-align: center">
-                      <ratio-chart second-color="#01C0EF" :values="fluidBalanceChartData"></ratio-chart>
+                    <div class="md-layout-item md-size-50 tab-section" style="border-right: 1px solid black;">
 
-                      <div  style="margin-top: 10px;" v-if="ida.isOwner">
-                        You can gradually redeem your holdings along with the progress of promises validation.
+                      <div class="tab-section-title">
+                        Current investment market
                       </div>
 
-                      <div  style="margin-top: 10px;" v-else>
-                        You can gradually redeem your investment along with the progress of promises validation.
+                      <div class="tab-section-desc">
+                        <b>{{ida.distributeAmount}}</b> Payment rights for sale <br/>
+                        <span v-if="ida.isOwner">
+                          <b>{{ida.distributeDiscount}}%</b>
+                          Discount
+                        </span>
+                        <span v-else>
+                          <b>{{(100 / (100-ida.distributeDiscount) * 100 - 100).toFixed(0)}}%</b>
+                          Potential ROI
+                        </span>
+
+                        <button @click="unlockDistribution()">Unlock</button>
+
+                          <md-icon class="question-icon">help
+                            <md-tooltip md-direction="right" v-if="ida.isOwner">
+                              Applied on the unredeemed value of PR tokens (redeemable + still locked).
+                            </md-tooltip>
+                            <md-tooltip md-direction="right" v-else>
+                              ROI is conditional of IDA's promises being funded and fulfilled.
+                            </md-tooltip>
+                          </md-icon>
+
                       </div>
 
+
+                      <staked-chart v-if="ida.distributeAmount > 0" second-color="#01C0EF" :values="investingTotalChartData"></staked-chart>
+
+                      <div style="text-align: center; margin-top: 25px;">
+                        <md-button class="md-primary md-raised action-button" @click="showDistributePanel = true" v-if="ida.isOwner">
+                          {{ida.distributeAmount > 0 ? 'Update market conditions' : 'Create market'}}
+                        </md-button>
+
+                        <md-button class="md-primary md-raised action-button" @click="showInvestPanel = true" v-else>
+                          Invest
+                        </md-button>
+                      </div>
+
+                    </div>
+
+                    <div class="md-layout-item md-size-50 tab-section" >
+
+                      <div class="tab-section-title">
+                        Your holdings
+                      </div>
+
+                      <div class="tab-section-desc">
+                        Payment rights you own: <b>{{balance.invested}}</b>
+                      </div>
+
+                      <ratio-chart v-if="balance.invested>0" second-color="#01C0EF" :values="fluidBalanceChartData"></ratio-chart>
+                      <div style="text-align: center;">
                       <md-button class="md-primary md-raised action-button" v-if="balance.redeemable > 0" @click="redeem()">
-                        Redeem ${{balance.redeemable}}
+                        Redeem ${{balance.redeemable | number('0.00')}}
                       </md-button>
-                    </div>
-
-                    <div class="md-layout-item md-size-33" v-if="ida.isOwner">
-
-                    </div>
-
-                    <div class="md-layout-item md-size-33" v-else>
-                      <div class="value-big">${{balance.invested}}</div>
-                      <div class="value-subtitle">value of your investment</div>
-                    </div>
-
-                    <!--<div class="md-layout-item md-size-33">-->
-                      <!--<div class="value-big">${{balance.totalInvested}} / ${{ida.budget}}</div>-->
-                      <!--<div class="value-subtitle">total distributed / market cap</div>-->
-                    <!--</div>-->
-
-                    <div class="md-layout-item md-size-33" style="text-align: center;">
-                      <ratio-chart second-color="#01C0EF" :values="investingTotalChartData"></ratio-chart>
-
-                      <div  style="margin-top: 10px;">
-                        There are <b>${{ida.distributeAmount}}</b> payment rights for sale at a <b>{{ida.distributeDiscount}}%</b> discount.
                       </div>
-
-                      <md-button class="md-primary md-raised action-button" @click="showDistributePanel = true" v-if="ida.isOwner">
-                        Update market conditions
-                      </md-button>
-
-                      <md-button class="md-primary md-raised action-button" @click="showInvestPanel = true" v-else>
-                        Invest
-                      </md-button>
-
                     </div>
+
+
 
                   </div>
 
@@ -430,7 +475,7 @@
 
                 <md-card-content style="text-align: left">
 
-                  <div style="text-align: center" v-if="ida.data">
+                  <div class="tab-desc" v-if="ida.data">
                     {{ida.data['organisation-name']}} has fulfilled <b>{{ida.validatedNumber}}</b> promises, and <b>{{ida.pending}}</b> more are pending validation. <br/>
                     The deadline to fulfill the remaining  <b>{{ida.promisesNumber - ida.validatedNumber}}</b> promises is <b>{{ida.endTime}}</b>.
                   </div>
@@ -490,16 +535,17 @@
   import Contracts from '@/contracts'
   import State from '@/state'
   import RatioChart from './RatioChart'
+  import StakedChart from './StakedChart'
   import {validationMixin} from 'vuelidate'
   import {
     required,
-    maxValue
+    maxLength
   } from 'vuelidate/lib/validators'
 
   export default {
     name: 'Dashboard',
     mixins: [validationMixin],
-    components: {RatioChart},
+    components: {RatioChart, StakedChart},
     data() {
       return {
         ida: State.ida,
@@ -519,7 +565,9 @@
           investmentAmount: null
         },
         showClaimPanel: false,
-        claimKey: null,
+        validationForm: {
+          claimKey: null
+        },
         investingChartData: State.investingChartData,
         fundingChartData: State.fundingChartData,
         investingTotalChartData: State.investingTotalChartData,
@@ -545,13 +593,20 @@
       distributionForm: {
         distributeAmount: {
           required,
-          maxValue: (value, model) => parseFloat(value) <= parseFloat(State.investingTotalChartData.Remaining),
+          maxValue: (value, model) => parseFloat(value) <= parseFloat(State.ida.unsold),
         },
         distributeDiscount: {
           required,
           maxValue: (value, model) => value > 0 && value < 100
         }
+      },
+      validationForm: {
+        claimKey: {
+          required,
+          maxLength: maxLength(32),
+        }
       }
+
     },
     methods: {
       getDemoTokens: async function () {
@@ -626,12 +681,15 @@
         }
       },
       submitClaim: async function () {
-        this.processing = true;
-        try {
-          await Contracts.submitClaim(this.claimKey);
-          this.showClaimPanel = false;
-        } finally {
-          this.processing = false;
+        this.$v.validationForm.$touch();
+        if (!this.$v.validationForm.$invalid) {
+          this.processing = true;
+          try {
+            await Contracts.submitClaim(this.validationForm.claimKey);
+            this.showClaimPanel = false;
+          } finally {
+            this.processing = false;
+          }
         }
       },
       validateClaim: async function (claimKey) {
@@ -881,6 +939,40 @@
 
   div.button-box {
     text-align: center;
+  }
+
+  div.tab-desc {
+    text-align: center;
+    color: #898989;
+    font-style: italic;
+  }
+
+  div.tab-section-title {
+    font-weight: bolder;
+    font-size: 16px;
+  }
+
+  div.tab-section-desc {
+    margin: 20px 0 20px 0;
+    color: #898989;
+    font-size: 16px;
+  }
+
+  .tab-section {
+    margin-top: 20px;
+    padding-left: 10% !important;
+    padding-right: 10% !important;
+    margin-bottom: 20px;
+  }
+
+  .tab-section .action-button {
+    margin-bottom: 0px;
+  }
+
+  .question-icon {
+    font-size: 12px !important;
+    margin-top: -8px;
+    margin-left: -8px;
   }
 
 </style>

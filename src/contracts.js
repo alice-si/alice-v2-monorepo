@@ -1,12 +1,13 @@
 /* eslint-disable */
 const {promisify} = require("es6-promisify");
 const detectNetwork = require('web3-detect-network')
+const BN = require('bn.js');
 
 import { EventBus } from './event-bus.js';
 import state from "@/state";
 import contract from 'truffle-contract'
 import AUSD_JSON from '@contracts/AliceUSD.json'
-import IDA_JSON from '@contracts/IdaMock.json'
+import IDA_JSON from '@contracts/Ida.json'
 import IP_JSON from '@contracts/ImpactPromise.json'
 import FT_JSON from '@contracts/FluidToken.json'
 import ESCROW_JSON from '@contracts/Escrow.json'
@@ -20,8 +21,8 @@ let ethereum = window.ethereum;
 let web3 = window.web3;
 
 const START_BLOCK = 5549491;
-const AUSD_ADDRESS = "0x22d64d4A9DD6e3531BE6A93a532084f3093B388f";
-const IDA_FACTORY_ADDRESS = "0x7c70b210F63c86C667D7a9cEDd9D4Ea1A7f640Cc";
+const AUSD_ADDRESS = "0xeE863BfADb5e768Ae6bCc3927F330b22e486eE0B";
+const IDA_FACTORY_ADDRESS = "0xa380EE49B0bC006aDc240D599EFDd626e6B1e00E";
 
 
 var setup = function(json) {
@@ -45,7 +46,7 @@ const CLAIMS_REGISTRY = setup(CLAIMS_REGISTRY_JSON);
 
 
 var main, ausd, idaFactory, ida, impactPromise, paymentRights, sts, claimsRegistry, owner, box;
-
+var getBlockNumber;
 
 var connectWeb3 = async function() {
   if (typeof ethereum !== 'undefined') {
@@ -57,6 +58,8 @@ var connectWeb3 = async function() {
     throw 'NO_WEB3'
   }
   let network = await detectNetwork(web3.currentProvider);
+
+  getBlockNumber = promisify(web3.eth.getBlockNumber);
 
   if (network.id != 4) {
     throw 'WRONG_NETWORK'
@@ -90,15 +93,18 @@ async function saveDetailsIn3Box(newIda) {
 }
 
 async function updateInvestments() {
+  console.log("Updating investment...");
+
   let investingAllowance = await ausd.allowance(main, sts.address);
   state.ida.investingUnlocked = investingAllowance > 0;
-  console.log("IDA investing unlocked: " + state.ida.investingUnlocked);
 
   //Distribution
   let rawSupply = await sts.currentSupply();
   state.ida.distributeAmount = web3.fromWei(rawSupply, 'ether');
   state.ida.distributeDiscount = (await sts.currentDiscount()).toString();
   state.ida.distributePrice = web3.fromWei((await sts.getEffectivePrice(rawSupply)), 'ether');
+
+  console.log("Loaded... Distribute: " + state.ida.distributeAmount + " with discount: " + state.ida.distributeDiscount);
 
   state.balance.invested = web3.fromWei((await paymentRights.balanceOf(main)), 'ether');
   console.log("Invested by you: " + state.balance.invested);
@@ -107,18 +113,19 @@ async function updateInvestments() {
   state.ida.maxInvestment = state.ida.budget - state.balance.totalInvested;
   console.log("Invested by others");
   state.balance.redeemable = web3.fromWei((await paymentRights.getAvailableToRedeem({from: main})), 'ether');
-  console.log("Reedemable: " + state.balance.redeemable);
+  console.log("Redeemable: " + state.balance.redeemable);
 
   state.investingChartData.You = state.balance.invested;
   state.investingChartData.Others = state.balance.totalInvested - state.balance.invested;
 
-  state.investingTotalChartData.Invested = state.balance.totalInvested;
-  state.investingTotalChartData['For sale'] = state.ida.distributeAmount;
-  state.investingTotalChartData.Remaining = state.ida.budget - state.ida.distributeAmount -state.balance.totalInvested;
+  state.investingTotalChartData.Sold = state.balance.totalInvested;
+  state.investingTotalChartData.Available = state.ida.distributeAmount;
+  //state.investingTotalChartData.Remaining = state.ida.budget - state.ida.distributeAmount -state.balance.totalInvested;
+  state.ida.unsold = state.ida.budget - state.balance.totalInvested;
 
-  state.fluidBalanceChartData.Redeemed = web3.fromWei((await paymentRights.getRedeemed(main, {from: main})), 'ether');
-  state.fluidBalanceChartData.Validated = state.balance.redeemable;
-  state.fluidBalanceChartData.Potential = state.balance.invested - state.balance.redeemable - state.fluidBalanceChartData.Redeemed;
+  state.fluidBalanceChartData.Redeemed = web3.fromWei((await paymentRights.getRedeemed(main, {from: main})), 'ether').toLocaleString('en-GB', { maximumFractionDigits: 2 });
+  state.fluidBalanceChartData.Redeemable = parseFloat(state.balance.redeemable).toLocaleString('en-GB', { maximumFractionDigits: 2 });
+  state.fluidBalanceChartData['Still locked'] = (state.balance.invested - state.balance.redeemable - state.fluidBalanceChartData.Redeemed).toLocaleString('en-GB', { maximumFractionDigits: 2 });
 
 }
 
@@ -260,8 +267,8 @@ const Contracts = {
   },
 
   unlockDistribution: async() => {
-    let amount = await paymentRights.totalSupply();
-    console.log("Unlocking distribution: " + amount);
+    console.log("Unlocking max amount");
+    let amount = (new BN("2").pow(new BN("255")));
     await paymentRights.approve(sts.address, amount, {from: main});
 
     state.ida.distributionUnlocked = true;
@@ -272,7 +279,7 @@ const Contracts = {
     let wei = web3.toWei(amount, 'ether');
     await ida.fund(wei, {from: main, gas: 1000000});
 
-    await updateFunding();
+    setTimeout(updateFunding, 1000);
     await updateHoldings();
   },
 
@@ -280,15 +287,17 @@ const Contracts = {
     console.log("Distribute: " + distributeAmount + " with discount: " + distributeDiscount);
     await sts.updateConditions(web3.toWei(distributeAmount, 'ether'), distributeDiscount, {from: main, gas: 1000000});
 
-    state.ida.distributeAmount = distributeAmount;
-    state.ida.distributeDiscount = distributeDiscount;
+    //state.ida.distributeAmount = distributeAmount;
+    //state.ida.distributeDiscount = distributeDiscount;
+
+    setTimeout(updateInvestments, 1000);
   },
 
   invest: async (amount) => {
     console.log("Investing: " + amount);
     await sts.buy(web3.toWei(amount, 'ether'), {from: main, gas: 1000000});
 
-    await updateInvestments();
+    setTimeout(updateInvestments, 1000);
     await updateHoldings();
   },
 

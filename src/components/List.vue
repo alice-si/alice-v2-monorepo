@@ -30,8 +30,8 @@
 
         <md-table-row v-for="(ida, index) in allIdas" :key="ida.address" @click="navigate(ida)">
           <md-table-cell>{{ida.name}}</md-table-cell>
-          <md-table-cell>{{ida.creator}}</md-table-cell>
-          <md-table-cell>{{ida.promise}}</md-table-cell>
+          <md-table-cell style="max-width: 300px;">{{ida.creator}}</md-table-cell>
+          <md-table-cell style="max-width: 300px;">{{ida.promise}}</md-table-cell>
           <md-table-cell>{{ida.promisesNumber}} x ${{ida.promisePrice}}</md-table-cell>
         </md-table-row>
 

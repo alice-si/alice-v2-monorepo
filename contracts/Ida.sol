@@ -98,11 +98,6 @@ contract Ida {
     }
 
 
-    function checkPrice(bytes32 val) public view returns(bool) {
-      return val == bytes32(promisePrice);
-    }
-
-
     function hasEnded() public view returns(bool) {
       return now > endTime;
     }

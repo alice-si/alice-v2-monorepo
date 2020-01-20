@@ -1,6 +1,6 @@
 <template>
   <div>
-    <reactive-doughnut :chart-data="datacollection"></reactive-doughnut>
+    <reactive-doughnut :chart-data="datacollection" :options="options" style="height: 150px;"></reactive-doughnut>
   </div>
 </template>
 
@@ -15,7 +15,14 @@
     },
     data () {
       return {
-        datacollection: {}
+        datacollection: {},
+        options: {
+          legend: {
+            position: 'right'
+          },
+          responsive: true,
+          maintainAspectRatio: false,
+        }
       }
     },
     mounted () {
@@ -35,7 +42,7 @@
           labels: Object.keys(this.values),
           datasets: [
             {
-              backgroundColor: ['#8A48DB', this.secondColor, '#00C0D1'],
+              backgroundColor: ['#f7b944ff', this.secondColor, '#00C0D1'],
               data: Object.values(this.values)
             }
           ]

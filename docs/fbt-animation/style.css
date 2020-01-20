@@ -1,0 +1,245 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  outline: none;
+}
+
+body {
+  align-items: center;
+  background-color: #d5f7ff;
+  display: flex;
+  font: 1rem 'Open Sans', helvetica, sans-serif;
+  height: 100vh;
+  justify-content: center;
+  margin: 0;
+}
+
+button {
+  background-color: #05d1fd;
+  border: 1px solid grey;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  display: block;
+  font-size: 1rem;
+  padding: 0.5rem 1.5rem;
+  position: absolute;
+  top: 0;
+  transition: .3s ease-out;
+}
+
+button:focus, button:hover {
+  background-color: #83e8fe;
+  box-shadow: 0 3px 3px 0 rgba(0, 0, 0, 0.14), 0 1px 7px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -1px rgba(0, 0, 0, 0.2);
+}
+
+.counter {
+  display: none;
+  align-items: center;
+  color: #7d7d7d;
+  font-size: 4rem;
+  height: 100%;
+  justify-content: center;
+  mix-blend-mode: difference;
+  pointer-events: none;
+  position: absolute;
+  width: 100%;
+  z-index: 4;
+}
+
+.glass {
+  margin-top: 50px;
+  background-color: rgba(255, 255, 255, 0.95);
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem 0.5rem 3rem 3rem;
+  height: 30rem;
+  /*padding: 3rem 0.75rem 1rem;*/
+  width: 15rem;
+  z-index: 1;
+  transition: margin 1000ms;
+}
+
+.glass.merged-left {
+  border-right: 0;
+}
+
+.glass.merged-right {
+  border-left: 0;
+}
+
+.glass.left {
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  margin: 50px 50px 0 0;
+}
+
+.glass.right {
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  margin: 50px 0 0 50px;
+}
+
+
+
+
+.glass__inner {
+  border-radius: 0 0 3rem 3rem;
+  overflow: hidden;
+  position: relative;
+  height: 100%;
+  width: 100%;
+  z-index: 2;
+}
+
+.glass__inner::after, .glass__inner::before {
+  background-color: rgba(255, 255, 255, 0.95);
+  content: '';
+  mix-blend-mode: soft-light;
+  position: absolute;
+  z-index: 3;
+}
+
+.glass__inner::after {
+  bottom: 0;
+  border-radius: 0 0 3rem 0;
+  content: '';
+  height: 28rem;
+  right: 0;
+  width: 3.75rem;
+}
+
+.glass__inner::before {
+  animation: sparkle-action 3s infinite linear;
+  border-radius: 100%;
+  bottom: 3rem;
+  height: 1rem;
+  left: 2rem;
+  width: 1rem;
+}
+
+.liquid {
+  background-color: #83e8fe;
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  transform: translate(0, 100%);
+  width: 100%;
+  z-index: 2;
+}
+
+.liquid--hidden {
+  display: none;
+}
+
+.liquid__wave {
+  bottom: 100%;
+  position: absolute;
+  width: 200%;
+}
+
+.liquid__wave--back {
+  animation: wave-back-action 1.4s infinite linear;
+  fill: #05d1fd;
+  right: 0;
+}
+
+.liquid__wave--front {
+  animation: wave-front-action 0.7s infinite linear;
+  fill: #83e8fe;
+  left: 0;
+  margin-bottom: -0.0625rem;
+}
+
+.pour {
+  animation: pour-action 0.25s linear;
+  background: #05d1fd;
+  border-radius: 2rem;
+  bottom: calc(50vh - (30rem / 2) + 1.25rem);
+  left: 50%;
+  margin-left: -1rem;
+  mix-blend-mode: multiply;
+  position: absolute;
+  top: -2rem;
+  transition: top 1s linear;
+  transform: scale(1);
+  transform-origin: bottom;
+  transition: transform 0.5s ease-out;
+  width: 2rem;
+}
+
+.pour--end {
+  transform: scaleY(0);
+}
+
+.pour--hidden {
+  display: none;
+}
+
+
+
+.counter.left {
+  padding-right: 300px;
+}
+
+.counter.right {
+  padding-left: 350px;
+}
+
+.pour.left {
+  margin-left: -185px;
+}
+
+.pour.right {
+  margin-left: 150px;
+}
+
+@keyframes pour-action {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes sparkle-action {
+  0% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(0, -30rem);
+  }
+  26% {
+    transform: translate(calc((15rem - 1.5rem) / 12 * 1), 0);
+  }
+  50% {
+    transform: translate(calc((15rem - 1.5rem) / 12 * 1), -30rem);
+  }
+  51% {
+    transform: translate(calc((15rem - 1.5rem) / 12 * 8), 0);
+  }
+  75% {
+    transform: translate(calc((15rem - 1.5rem) / 12 * 8), -30rem);
+  }
+  76% {
+    transform: translate(calc((15rem - 1.5rem) / 12 * 6), 0);
+  }
+  99% {
+    transform: translate(calc((15rem - 1.5rem) / 12 * 6), -30rem);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+@keyframes wave-front-action {
+  100% {
+    transform: translate(-50%, 0);
+  }
+}
+
+@keyframes wave-back-action {
+  100% {
+    transform: translate(50%, 0);
+  }
+}
