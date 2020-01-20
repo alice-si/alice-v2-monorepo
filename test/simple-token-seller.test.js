@@ -35,8 +35,8 @@ contract('Simple Token Seller', function ([owner, investor, unauthorised]) {
 
 
   it("should create first condition", async function () {
-    fbt.approve(sts.address, 1000);
-    sts.updateConditions(100, 20);
+    await fbt.approve(sts.address, 1000);
+    await sts.updateConditions(100, 20);
     (await sts.getEffectivePrice(100)).should.be.bignumber.equal('80');
 
     (await fbt.balanceOf(sts.address)).should.be.bignumber.equal('100');
@@ -44,8 +44,8 @@ contract('Simple Token Seller', function ([owner, investor, unauthorised]) {
 
 
   it("should buy distributed tokens", async function () {
-    usd.approve(sts.address, 1000, {from: investor});
-    sts.buy(100, {from: investor});
+    await usd.approve(sts.address, 1000, {from: investor});
+    await sts.buy(100, {from: investor});
 
     (await usd.balanceOf(investor)).should.be.bignumber.equal('920');
     (await fbt.balanceOf(investor)).should.be.bignumber.equal('100');
@@ -75,7 +75,7 @@ contract('Simple Token Seller', function ([owner, investor, unauthorised]) {
 
 
   it("should buy for the second time", async function () {
-    sts.buy(100, {from: investor});
+    await sts.buy(100, {from: investor});
 
     (await usd.balanceOf(investor)).should.be.bignumber.equal('880');
     (await fbt.balanceOf(investor)).should.be.bignumber.equal('200');
