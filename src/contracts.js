@@ -226,14 +226,14 @@ const Contracts = {
 
   deployIda: async(newIda) => {
     console.log(newIda);
-    console.log("Deploying IDA for: " + newIda.outcomesNumber + " of outcomes with price: " + newIda.outcomesPrice);
+    console.log("Deploying IDA for: " + newIda.promiseNumber + " of outcomes with price: " + newIda.outcomesPrice);
 
     await saveDetailsIn3Box(newIda);
 
     let tx = await idaFactory.createIda(
       newIda.paymentToken,
       newIda.name,
-      newIda.outcomesNumber,
+      newIda.promiseNumber,
       web3.toWei(newIda.outcomesPrice, 'ether'),
       newIda.validator,
       newIda.endTime.getTime()/1000,
@@ -313,7 +313,7 @@ const Contracts = {
   validateClaim: async (claimKey) => {
     console.log("Validating claim: " + claimKey);
     let key = web3.fromAscii(claimKey);
-    await ida.validateOutcome(key, {from: main, gas: 1000000});
+    await ida.validatePromise(key, {from: main, gas: 1000000});
     await getAllClaims();
     state.ida.validatedNumber = (await ida.validatedNumber()).toString();
   },
@@ -418,9 +418,9 @@ const Contracts = {
 
       state.ida.name = (await ida.name());
       state.ida.address = idaAddress;
-      state.ida.promisesNumber = (await ida.outcomesNumber()).toString();
+      state.ida.promisesNumber = (await ida.promiseNumber()).toString();
       state.ida.validatedNumber = (await ida.validatedNumber()).toString();
-      state.ida.promisePrice = web3.fromWei((await ida.outcomePrice()), 'ether');
+      state.ida.promisePrice = web3.fromWei((await ida.promisePrice()), 'ether');
       state.ida.validator = await ida.validator();
       state.ida.endTime = new Date(await ida.endTime()*1000).toLocaleDateString("en-GB");
       state.ida.budget = state.ida.promisesNumber * state.ida.promisePrice;

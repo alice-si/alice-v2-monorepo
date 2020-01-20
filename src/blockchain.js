@@ -162,12 +162,12 @@ const Blockchain = {
   },
   validate: async () => {
     console.log("Validating...");
-    let tx = await ida.validateOutcome({from: validator});
+    let tx = await ida.validatePromise({from: validator});
 
     state.logs.list.push({
       message: 'Validated outcome',
       icon: 'check_circle_outline',
-      code: 'ida.validateOutcome()',
+      code: 'ida.validatePromise()',
       tx: tx.tx,
       gas: tx.receipt.cumulativeGasUsed
     });
@@ -213,8 +213,8 @@ const Blockchain = {
 
   updateImpact: async () => {
     if (ida) {
-      state.impact.price = (await ida.outcomePrice()).toString();
-      state.impact.all = (await ida.outcomesNumber()).toString();
+      state.impact.price = (await ida.promisePrice()).toString();
+      state.impact.all = (await ida.promiseNumber()).toString();
       state.impact.validated = (await ida.validatedNumber()).toString();
       console.log("Validated: " + state.impact.validated);
       let promises = (await impactPromises.totalSupply()).toString();
