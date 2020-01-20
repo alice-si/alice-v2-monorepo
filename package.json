@@ -32,7 +32,7 @@
     "web3-detect-network": "0.0.18"
   },
   "devDependencies": {
-    "@nomiclabs/buidler": "^1.0.1",
+    "@nomiclabs/buidler": "^1.0.2",
     "@nomiclabs/buidler-truffle5": "^1.0.1",
     "@nomiclabs/buidler-web3": "^1.0.1",
     "autoprefixer": "^7.1.2",
