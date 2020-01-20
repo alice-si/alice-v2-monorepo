@@ -74,7 +74,7 @@
             <div class="creator">
               <md-field>
                 <label>Number of promises</label>
-                <md-input v-model="outcomesNumber"></md-input>
+                <md-input v-model="promiseNumber"></md-input>
               </md-field>
               <md-field>
                 <label>Price per promise</label>
@@ -233,7 +233,7 @@
         logs: State.logs,
         impact: State.impact,
         discount: 50,
-        outcomesNumber: null,
+        promiseNumber: null,
         outcomesPrice: null,
         claims: State.claims
       }
@@ -270,7 +270,7 @@
         await Blockchain.finalize();
       },
       deployIF: async function () {
-        await Blockchain.deployIF(this.outcomesNumber, this.outcomesPrice);
+        await Blockchain.deployIF(this.promiseNumber, this.outcomesPrice);
       },
       changeDiscount: async function (change) {
         this.discount += change;

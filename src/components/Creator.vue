@@ -78,11 +78,11 @@
               </div>
 
               <div class="md-layout-item md-size-50">
-                <md-field :class="getValidationClass('idaForm', 'outcomesNumber')">
+                <md-field :class="getValidationClass('idaForm', 'promiseNumber')">
                   <label>Number of promises</label>
-                  <md-input v-model="idaForm.outcomesNumber"></md-input>
-                  <span class="md-error" v-if="!$v.idaForm.outcomesNumber.required">Please provide the number of promises</span>
-                  <span class="md-error" v-if="!$v.idaForm.outcomesNumber.numeric">Please provide a valid number</span>
+                  <md-input v-model="idaForm.promiseNumber"></md-input>
+                  <span class="md-error" v-if="!$v.idaForm.promiseNumber.required">Please provide the number of promises</span>
+                  <span class="md-error" v-if="!$v.idaForm.promiseNumber.numeric">Please provide a valid number</span>
                 </md-field>
               </div>
 
@@ -239,7 +239,7 @@
           required,
           maxLength: maxLength(256),
         },
-        outcomesNumber: {required, numeric},
+        promiseNumber: {required, numeric},
         promiseDescription: {
           required,
           maxLength: maxLength(256),
