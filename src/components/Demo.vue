@@ -78,7 +78,7 @@
               </md-field>
               <md-field>
                 <label>Price per promise</label>
-                <md-input v-model="outcomesPrice"></md-input>
+                <md-input v-model="promisePrice"></md-input>
               </md-field>
             </div>
           </md-card-content>
@@ -234,7 +234,7 @@
         impact: State.impact,
         discount: 50,
         promiseNumber: null,
-        outcomesPrice: null,
+        promisePrice: null,
         claims: State.claims
       }
     },
@@ -263,14 +263,14 @@
         State.claims.splice(State.claims.indexOf(claim), 1);
       },
       claimOutcome: async function() {
-        console.log("Claiming outcome");
+        console.log("Claiming price");
         State.claims.push("Impact promise " + this.impact.claimsCounter++);
       },
       finalize: async function () {
         await Blockchain.finalize();
       },
       deployIF: async function () {
-        await Blockchain.deployIF(this.promiseNumber, this.outcomesPrice);
+        await Blockchain.deployIF(this.promiseNumber, this.promisePrice);
       },
       changeDiscount: async function (change) {
         this.discount += change;

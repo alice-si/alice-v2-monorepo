@@ -405,16 +405,14 @@
                           Potential ROI
                         </span>
 
-                        <button @click="unlockDistribution()">Unlock</button>
-
-                          <md-icon class="question-icon">help
-                            <md-tooltip md-direction="right" v-if="ida.isOwner">
-                              Applied on the unredeemed value of PR tokens (redeemable + still locked).
-                            </md-tooltip>
-                            <md-tooltip md-direction="right" v-else>
-                              ROI is conditional of IDA's promises being funded and fulfilled.
-                            </md-tooltip>
-                          </md-icon>
+                        <md-icon class="question-icon">help
+                          <md-tooltip md-direction="right" v-if="ida.isOwner">
+                            Applied on the unredeemed value of PR tokens (redeemable + still locked).
+                          </md-tooltip>
+                          <md-tooltip md-direction="right" v-else>
+                            ROI is conditional of IDA's promises being funded and fulfilled.
+                          </md-tooltip>
+                        </md-icon>
 
                       </div>
 

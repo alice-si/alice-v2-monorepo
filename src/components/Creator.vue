@@ -98,11 +98,11 @@
 
 
               <div class="md-layout-item md-size-50">
-                <md-field :class="getValidationClass('idaForm', 'outcomesPrice')">
+                <md-field :class="getValidationClass('idaForm', 'promisePrice')">
                   <label>Price per promise</label>
-                  <md-input v-model="idaForm.outcomesPrice"></md-input>
-                  <span class="md-error" v-if="!$v.idaForm.outcomesPrice.required">Please provide the price per promise</span>
-                  <span class="md-error" v-if="$v.idaForm.outcomesPrice.required && !$v.idaForm.outcomesPrice.numeric">
+                  <md-input v-model="idaForm.promisePrice"></md-input>
+                  <span class="md-error" v-if="!$v.idaForm.promisePrice.required">Please provide the price per promise</span>
+                  <span class="md-error" v-if="$v.idaForm.promisePrice.required && !$v.idaForm.promisePrice.numeric">
                     Please provide a valid number
                   </span>
                 </md-field>
@@ -244,7 +244,7 @@
           required,
           maxLength: maxLength(256),
         },
-        outcomesPrice: {required, numeric},
+        promisePrice: {required, numeric},
         paymentToken: {required},
         validatorName: {
           required,

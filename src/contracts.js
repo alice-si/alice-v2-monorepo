@@ -20,9 +20,9 @@ import CLAIMS_REGISTRY_JSON from '@contracts/ClaimsRegistry.json'
 let ethereum = window.ethereum;
 let web3 = window.web3;
 
-const START_BLOCK = 5549491;
-const AUSD_ADDRESS = "0xeE863BfADb5e768Ae6bCc3927F330b22e486eE0B";
-const IDA_FACTORY_ADDRESS = "0xa380EE49B0bC006aDc240D599EFDd626e6B1e00E";
+const START_BLOCK = 5833382;
+const AUSD_ADDRESS = "0x5E2132F6e537CCbC270932242dcdB8F64efb544c";
+const IDA_FACTORY_ADDRESS = "0x76F1Ddf37BbB16235f29f39E7e71AB0b89549AED";
 
 
 var setup = function(json) {
@@ -213,14 +213,14 @@ const Contracts = {
 
   deployIdaFactory: async() => {
     console.log("Deploying IDA factory...");
-    let stsFactory = await STS_FACTORY.new({from: main, gas: 6000000});
+    let stsFactory = await STS_FACTORY.new({from: main, gas: 8000000});
     console.log("STS deployed: " + stsFactory.address);
-    let impactPromiseFactory = await IP_FACTORY.new({from: main, gas: 6000000});
+    let impactPromiseFactory = await IP_FACTORY.new({from: main, gas: 8000000});
     console.log("IP factory deployed: " + impactPromiseFactory.address);
-    let claimsRegistry = await CLAIMS_REGISTRY.new({from: main, gas: 6000000});
+    let claimsRegistry = await CLAIMS_REGISTRY.new({from: main, gas: 8000000});
     console.log("Claims registry deployed: " + impactPromiseFactory.address);
 
-    idaFactory = await IDA_FACTORY.new(stsFactory.address, impactPromiseFactory.address, claimsRegistry.address, {from: main, gas: 6000000});
+    idaFactory = await IDA_FACTORY.new(stsFactory.address, impactPromiseFactory.address, claimsRegistry.address, {from: main, gas: 8000000});
     console.log("IDA factory address: " + idaFactory.address);
   },
 
@@ -279,16 +279,13 @@ const Contracts = {
     let wei = web3.toWei(amount, 'ether');
     await ida.fund(wei, {from: main, gas: 1000000});
 
-    setTimeout(updateFunding, 1000);
-    await updateHoldings();
+    setTimeout(updateFunding, 2000);
+    setTimeout(updateHoldings, 2000);
   },
 
   updateConditions: async(distributeAmount, distributeDiscount) => {
     console.log("Distribute: " + distributeAmount + " with discount: " + distributeDiscount);
     await sts.updateConditions(web3.toWei(distributeAmount, 'ether'), distributeDiscount, {from: main, gas: 1000000});
-
-    //state.ida.distributeAmount = distributeAmount;
-    //state.ida.distributeDiscount = distributeDiscount;
 
     setTimeout(updateInvestments, 1000);
   },
@@ -297,8 +294,8 @@ const Contracts = {
     console.log("Investing: " + amount);
     await sts.buy(web3.toWei(amount, 'ether'), {from: main, gas: 1000000});
 
-    setTimeout(updateInvestments, 1000);
-    await updateHoldings();
+    setTimeout(updateInvestments, 2000);
+    setTimeout(updateHoldings, 2000);
   },
 
   submitClaim: async (claimKey) => {
@@ -307,15 +304,15 @@ const Contracts = {
     console.log("Submitting claim: " + claimKey + " key: " + key + " value: " + val);
 
     await claimsRegistry.setClaim(ida.address, key, val, {from: main, gas: 1000000});
-    await getAllClaims();
+    setTimeout(getAllClaims, 2000);
   },
 
   validateClaim: async (claimKey) => {
     console.log("Validating claim: " + claimKey);
     let key = web3.fromAscii(claimKey);
     await ida.validatePromise(key, {from: main, gas: 1000000});
-    await getAllClaims();
     state.ida.validatedNumber = (await ida.validatedNumber()).toString();
+    setTimeout(getAllClaims, 2000);
   },
 
   redeem: async () => {

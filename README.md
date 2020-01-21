@@ -7,7 +7,22 @@ This can be helpful in many different use cases, such as allowing service provid
 
 # Building
 
-[To be added]
+To build the application please install first all of the dependencies by running:
+
+    npm install
+
+All of the smart-contracts tests are executed on the buidler-evm environment and can be started by typing:
+
+    npm run test
+
+Make sure that all of the smart-contracts are compiled before trying to deploy the dApp:
+
+    npx truffle compile
+
+To deploy the front-end on your local machine please type in your command line:
+
+    npm run dev
+
 
 # Protocol description
 
@@ -40,7 +55,7 @@ This can be helpful in many different use cases, such as allowing service provid
 When an IDA is first created, its initial state is the following:
 
 ![IDA initial state](https://github.com/alice-si/ida/blob/RM-readme/images/Initial%20state.png)
-  
+
 <br/>
 At this point, funders can send money to the escrow account, and the service provider can sell her payment rights tokens to investors:
 
