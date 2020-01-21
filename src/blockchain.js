@@ -61,7 +61,7 @@ const Blockchain = {
     await this.a.updateBalances()
   },
   deployIF: async(number, price) => {
-    console.log("Deploying Ida for: " + number + " of outcomes with price: " + price);
+    console.log("Deploying IDA for: " + number + " of promises with price: " + price);
     ida = await Ida.new(gbp.address, number, price, validator, 1, {from: main, gas: 6700000});
     impactPromises = await ImpactPromise.at(await ida.impactPromise());
     paymentRights = await FluidToken.at(await ida.paymentRights());
@@ -71,7 +71,7 @@ const Blockchain = {
     console.log("ESCROW: " + escrow.address);
 
     state.logs.list.push({
-      message: 'Deployed Ida contract to address: ' + ida.address,
+      message: 'Deployed IDA contract to address: ' + ida.address,
       icon: 'all_inclusive',
       code: 'Ida.new(' + gbp.address + ', 10, 100, ' + validator + ', ' + main  +')',
       tx: ida.transactionHash,
@@ -92,7 +92,7 @@ const Blockchain = {
     let tx = await ida.fund(amount, {from: funder, gas: 5000000});
 
     state.logs.list.push({
-      message: 'IDA funded with $' + amount + ' donation',
+      message: 'IDA funded with $' + amount,
       icon: 'people_outline',
       code: 'ida.fund(' + amount +')',
       tx: tx.tx,
@@ -117,12 +117,12 @@ const Blockchain = {
     await this.a.updateBalances()
   },
   deposit: async (account, label) => {
-    let tx = await gbp.mint(account.address, 100, {from: main});
+    let tx = await gbp.mint(account.address, 1000, {from: main});
     console.log(tx);
     state.logs.list.push({
-      message: 'Deposited $100 to the ' + label + ' account',
+      message: 'Deposited $1000 to the ' + label + ' account',
       icon: 'add_circle_outline',
-      code: 'stableToken.mint(' + account.address + ', 100)',
+      code: 'stableToken.mint(' + account.address + ', 1000)',
       tx: tx.tx,
       gas: tx.receipt.cumulativeGasUsed
     });
@@ -165,7 +165,7 @@ const Blockchain = {
     let tx = await ida.validatePromise({from: validator});
 
     state.logs.list.push({
-      message: 'Validated outcome',
+      message: 'Validated promise',
       icon: 'check_circle_outline',
       code: 'ida.validatePromise()',
       tx: tx.tx,

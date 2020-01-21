@@ -107,7 +107,7 @@ async function updateInvestments() {
   console.log("Loaded... Distribute: " + state.ida.distributeAmount + " with discount: " + state.ida.distributeDiscount);
 
   state.balance.invested = web3.fromWei((await paymentRights.balanceOf(main)), 'ether');
-  console.log("Invested by You: " + state.balance.invested);
+  console.log("Invested by you: " + state.balance.invested);
   let left = web3.fromWei((await paymentRights.balanceOf(owner)), 'ether');
   state.balance.totalInvested = state.ida.budget - left - state.ida.distributeAmount;
   state.ida.maxInvestment = state.ida.budget - state.balance.totalInvested;
@@ -212,21 +212,21 @@ const Contracts = {
   },
 
   deployIdaFactory: async() => {
-    console.log("Deploying ida factory...");
+    console.log("Deploying IDA factory...");
     let stsFactory = await STS_FACTORY.new({from: main, gas: 6000000});
-    console.log("STS deplyed: " + stsFactory.address);
+    console.log("STS deployed: " + stsFactory.address);
     let impactPromiseFactory = await IP_FACTORY.new({from: main, gas: 6000000});
-    console.log("IP factory deplyed: " + impactPromiseFactory.address);
+    console.log("IP factory deployed: " + impactPromiseFactory.address);
     let claimsRegistry = await CLAIMS_REGISTRY.new({from: main, gas: 6000000});
-    console.log("Claims registry deplyed: " + impactPromiseFactory.address);
+    console.log("Claims registry deployed: " + impactPromiseFactory.address);
 
     idaFactory = await IDA_FACTORY.new(stsFactory.address, impactPromiseFactory.address, claimsRegistry.address, {from: main, gas: 6000000});
-    console.log("Ida factory address: " + idaFactory.address);
+    console.log("IDA factory address: " + idaFactory.address);
   },
 
   deployIda: async(newIda) => {
     console.log(newIda);
-    console.log("Deploying IDA for: " + newIda.promiseNumber + " of outcomes with price: " + newIda.outcomesPrice);
+    console.log("Deploying IDA for: " + newIda.promiseNumber + " of promises with price: " + newIda.promisePrice);
 
     await saveDetailsIn3Box(newIda);
 
@@ -234,14 +234,14 @@ const Contracts = {
       newIda.paymentToken,
       newIda.name,
       newIda.promiseNumber,
-      web3.toWei(newIda.outcomesPrice, 'ether'),
+      web3.toWei(newIda.promisePrice, 'ether'),
       newIda.validator,
       newIda.endTime.getTime()/1000,
       {from: main, gas: 7000000}
     );
     console.log(tx);
     let idaAddress = tx.logs[0].args.ida;
-    console.log("New Ida deployed to: " + idaAddress);
+    console.log("New IDA deployed to: " + idaAddress);
     return idaAddress;
   },
 
@@ -332,12 +332,12 @@ const Contracts = {
     if (ida) {
       let fundingAllowance = await ausd.allowance(main, ida.address);
       state.ida.fundingUnlocked = fundingAllowance > 0;
-      console.log("Is funding unlocked: " + state.ida.fundingUnlocked);
+      console.log("IDA funding unlocked: " + state.ida.fundingUnlocked);
     }
   },
 
   getAllIdas: async () => {
-    console.log("Loading all idas...");
+    console.log("Loading all IDAs...");
     state.allIdas = [];
     let filter = web3.eth.filter({
       fromBlock: START_BLOCK,
@@ -398,7 +398,7 @@ const Contracts = {
     console.log("Linked AUSD token: " + ausd.address);
 
     idaFactory = await IDA_FACTORY.at(IDA_FACTORY_ADDRESS);
-    console.log("Linked Ida factory: " + idaFactory.address);
+    console.log("Linked IDA factory: " + idaFactory.address);
 
     if (idaAddress) {
       console.log("Fetching IDA: " + idaAddress);
