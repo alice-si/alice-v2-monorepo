@@ -16,9 +16,16 @@ contract AliceUSD is ERC20Mintable, ERC20Burnable {
   string public symbol = "AliceUSD";
   string public version = 'AUSD 1.0';
 
-  //A minimum amount that is minted every time someone request funds
+  //A default amount that is minted every time someone request funds
+  //Implemented to impede easy attempts to publicly mint a large value of tokens
+  //and try to corrupt the system
   uint256 constant public MINT_DEFAULT = 1000 ether;
 
+
+  /**
+   * @dev A function open for everyone to mint a small amount of test tokens
+   * to experiment with the IDA platform
+   */
   function publicMint() public returns (bool) {
     _mint(msg.sender, MINT_DEFAULT);
     return true;

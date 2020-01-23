@@ -6,6 +6,8 @@ import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
 /**
  * @title Escrow
  * @dev Contract dedicated to holding funds that can be gradually unlocked by claim validations.
+ * It is funded by directly sending ERC20 tokens to contract's address
+ * It has a cap of how many tokens could be unlocked in total.
  *
  */
 contract Escrow {
@@ -49,6 +51,10 @@ contract Escrow {
     }
 
 
+    /**
+     * @dev Makes part of the tokens available to the beneficiary
+     * @param _amount The amount of funds intended to be taken out
+     */
     function unlock(uint256 _amount) public onlyOperator {
         unlocked = unlocked.add(_amount);
         require(unlocked <= capacity, "Cannot unlock more than the max capacity of the escrow");
