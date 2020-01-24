@@ -22,7 +22,7 @@ contract('Impact Delivery Agreement', function ([owner, validator, funder, inves
 
   before("deploy escrow and token contracts", async function () {
     gbp = await GBP.new();
-    let end = await time.latest() + time.duration.years(1);
+    let end = (await time.latest()).add(time.duration.years(1));
 
     let impactPromiseFactory = await ImpactPromiseFactory.new();
     let stsFactory = await StsFactory.new();
@@ -95,7 +95,7 @@ contract('Impact Delivery Agreement', function ([owner, validator, funder, inves
   });
 
 
-  it("should withdraw from escrow", async function () {
+  it("should withdraw from escrow by investor", async function () {
     await paymentRights.redeem(10, {from: investor});
 
     (await gbp.balanceOf(investor)).should.be.bignumber.equal('60');
@@ -103,19 +103,51 @@ contract('Impact Delivery Agreement', function ([owner, validator, funder, inves
     (await gbp.balanceOf(escrow.address)).should.be.bignumber.equal('190');
   });
 
-  // it("should return remaining funds", async function () {
-  //   await ida.setEnd();
-  //   (await ida.hasEnded()).should.be.true;
-  //
-  //   (await impactPromise.balanceOf(funder)).should.be.bignumber.equal('200');
-  //   (await gbp.balanceOf(escrow.address)).should.be.bignumber.equal('190');
-  //
-  //   await ida.refund({from: funder});
-  //
-  //   (await gbp.balanceOf(escrow.address)).should.be.bignumber.equal('90');
-  //   (await gbp.balanceOf(funder)).should.be.bignumber.equal('100');
-  //   (await impactPromise.balanceOf(funder)).should.be.bignumber.equal('0');
-  // });
+
+  it("should withdraw part of funds from escrow by ida creator", async function () {
+    await paymentRights.redeem(50, {from: owner});
+
+    (await gbp.balanceOf(owner)).should.be.bignumber.equal('100');
+    (await paymentRights.getAvailableToRedeem({from: owner})).should.be.bignumber.equal('40');
+    (await gbp.balanceOf(escrow.address)).should.be.bignumber.equal('140');
+  });
+
+
+  it("should not be refund the money before", async function () {
+    (await ida.hasEnded()).should.be.false;
+    await ida.refund({from: funder}).shouldBeReverted("Refund is only available after the project has ended");
+  });
+
+
+  it("should return remaining funds", async function () {
+    await time.increase(time.duration.years(1));
+    (await ida.hasEnded()).should.be.true;
+
+    (await impactPromise.balanceOf(funder)).should.be.bignumber.equal('200');
+    (await gbp.balanceOf(funder)).should.be.bignumber.equal('0');
+    (await gbp.balanceOf(escrow.address)).should.be.bignumber.equal('140');
+
+    await ida.refund({from: funder});
+
+    (await impactPromise.balanceOf(funder)).should.be.bignumber.equal('0');
+    (await gbp.balanceOf(escrow.address)).should.be.bignumber.equal('40');
+    (await gbp.balanceOf(funder)).should.be.bignumber.equal('100');
+
+  });
+
+  it("should not allow validating promises after project is ended", async function () {
+    let key = web3.utils.fromAscii("TEST2");
+    await claimsRegistry.setClaim(ida.address, key, web3.utils.padLeft(web3.utils.numberToHex(100), 64));
+    await ida.validatePromise(web3.utils.fromAscii("TEST2"), {from: validator}).shouldBeReverted("Cannot validate after project end");
+  });
+
+  it("should withdraw rest of funds from escrow by ida creator", async function () {
+    await paymentRights.redeem(40, {from: owner});
+
+    (await gbp.balanceOf(owner)).should.be.bignumber.equal('140');
+    (await paymentRights.getAvailableToRedeem({from: owner})).should.be.bignumber.equal('0');
+    (await gbp.balanceOf(escrow.address)).should.be.bignumber.equal('0');
+  });
 
 });
 

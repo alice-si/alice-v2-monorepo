@@ -87,6 +87,7 @@ contract Ida {
 
 
     function validatePromise(bytes32 key) public onlyValidator {
+        require(!hasEnded(), "Cannot validate after project end");
         require(validatedNumber < promiseNumber, "All the promises have already been validated");
         require(claimsRegistry.getClaim(serviceProvider, address(this), key) == bytes32(promisePrice), "A claim must be registered before validation");
         require(!claimsRegistry.isApproved(validator, serviceProvider, address(this), key), "This promise has already been validated");
@@ -104,7 +105,7 @@ contract Ida {
 
 
     function refund() public {
-      require(hasEnded());
+      require(hasEnded(), "Refund is only available after the project has ended");
       uint256 remaining = escrow.funded().sub(escrow.unlocked());
       uint256 balance = impactPromise.balanceOf(msg.sender);
 
