@@ -297,8 +297,8 @@ const Contracts = {
     console.log("Investing: " + amount);
     await sts.buy(web3.toWei(amount, 'ether'), {from: main, gas: 1000000});
 
-    setTimeout(updateInvestments, 2000);
-    setTimeout(updateHoldings, 2000);
+    setTimeout(updateInvestments, 3000);
+    setTimeout(updateHoldings, 3000);
   },
 
   submitClaim: async (claimKey) => {

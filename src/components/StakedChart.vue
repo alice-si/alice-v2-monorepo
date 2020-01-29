@@ -20,7 +20,12 @@
           responsive: true,
           maintainAspectRatio: false,
           tooltips: {
-            enabled: false
+            enabled: true,
+            titleFontSize: 0,
+            filter: function(item) {
+              console.log(item);
+              return item.datasetIndex !== 1;
+            },
           },
           scales: {
             xAxes: [{
