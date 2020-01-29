@@ -3,7 +3,7 @@ pragma solidity ^0.5.2;
 import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
 import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
 import './Ida.sol';
-import './FluidToken.sol';
+import './PaymentRights.sol';
 
 /**
  * @title SimpleSeller - a contract designed to orchestrate IDA creation
@@ -19,11 +19,11 @@ contract SimpleTokenSeller is Ownable {
   uint256 public constant FULL_PERCENTAGE = 100;
 
   ERC20 public paymentToken;
-  FluidToken public offeredToken;
+  PaymentRights public offeredToken;
   uint256 public currentSupply;
   uint256 public currentDiscount;
 
-  constructor(ERC20 _paymentToken, FluidToken _offeredToken, address owner) public {
+  constructor(ERC20 _paymentToken, PaymentRights _offeredToken, address owner) public {
     paymentToken = _paymentToken;
     offeredToken = _offeredToken;
     _transferOwnership(owner);
@@ -72,7 +72,7 @@ contract SimpleTokenSeller is Ownable {
 
 contract SimpleTokenSellerFactory {
 
-  function createSimpleTokenSeller(ERC20 _paymentToken, FluidToken _offeredToken, address owner) public returns (SimpleTokenSeller) {
+  function createSimpleTokenSeller(ERC20 _paymentToken, PaymentRights _offeredToken, address owner) public returns (SimpleTokenSeller) {
     return new SimpleTokenSeller(_paymentToken, _offeredToken, owner);
   }
 

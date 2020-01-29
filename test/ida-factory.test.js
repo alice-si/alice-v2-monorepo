@@ -24,8 +24,8 @@ contract('Ida Factory', function ([owner, validator, investor, unauthorised]) {
   var end;
 
   before("deploy Ida factory & usd", async function () {
-    end = await time.latest() + time.duration.years(1);
     usd = await AUSD.new();
+    end = (await time.latest()).add(time.duration.years(1));
     let impactPromiseFactory = await ImpactPromiseFactory.new();
     let stsFactory = await StsFactory.new();
     claimsRegistry = await ClaimsRegistry.new();
@@ -34,7 +34,7 @@ contract('Ida Factory', function ([owner, validator, investor, unauthorised]) {
 
   it("should create a new Ida", async function () {
 
-    let tx = await factory.createIda(usd.address, "TEST", 10, 100, validator, end, {gas: 6700000});
+    let tx = await factory.createIda(usd.address, "TEST", 10, 100, validator, end);
     console.log("Gas used: " + tx.receipt.gasUsed);
 
     let idaAddress = tx.receipt.logs[0].args.ida;

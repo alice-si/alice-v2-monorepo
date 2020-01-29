@@ -1,7 +1,7 @@
 pragma solidity ^0.5.2;
 
 import './Escrow.sol';
-import './FluidToken.sol';
+import './PaymentRights.sol';
 
 /**
  * @title Fluid Escrow
@@ -11,7 +11,7 @@ import './FluidToken.sol';
  */
 contract FluidEscrow is Escrow {
 
-    FluidToken public paymentRights;
+    PaymentRights public paymentRights;
 
    /**
    * @dev The constructor automatically creates a dedicated payment rights token,
@@ -19,8 +19,8 @@ contract FluidEscrow is Escrow {
    *
    */
     constructor(ERC20 _paymentToken, uint256 _capacity, address _operator) public
-        Escrow(_paymentToken, _capacity, _operator, address(new FluidToken(_capacity))) {
-        paymentRights = FluidToken(recipient);
+        Escrow(_paymentToken, _capacity, _operator, address(new PaymentRights(_capacity))) {
+        paymentRights = PaymentRights(recipient);
         paymentRights.transfer(msg.sender, _capacity);
     }
 

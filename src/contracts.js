@@ -21,8 +21,8 @@ let ethereum = window.ethereum;
 let web3 = window.web3;
 
 const START_BLOCK = 5833382;
-const AUSD_ADDRESS = "0x5E2132F6e537CCbC270932242dcdB8F64efb544c";
-const IDA_FACTORY_ADDRESS = "0x76F1Ddf37BbB16235f29f39E7e71AB0b89549AED";
+const AUSD_ADDRESS = "0xfad3A03d9d17A990fF68CcF6a1BDEead049c3fFF";
+const IDA_FACTORY_ADDRESS = "0xf7e706d53CeaC925D52a8CA6086C7d50233B7B8c";
 
 
 var setup = function(json) {
@@ -216,14 +216,14 @@ const Contracts = {
 
   deployIdaFactory: async() => {
     console.log("Deploying IDA factory...");
-    let stsFactory = await STS_FACTORY.new({from: main, gas: 8000000});
+    let stsFactory = await STS_FACTORY.new({from: main, gas: 8500000});
     console.log("STS deployed: " + stsFactory.address);
-    let impactPromiseFactory = await IP_FACTORY.new({from: main, gas: 8000000});
+    let impactPromiseFactory = await IP_FACTORY.new({from: main, gas: 8500000});
     console.log("IP factory deployed: " + impactPromiseFactory.address);
-    let claimsRegistry = await CLAIMS_REGISTRY.new({from: main, gas: 8000000});
+    let claimsRegistry = await CLAIMS_REGISTRY.new({from: main, gas: 8500000});
     console.log("Claims registry deployed: " + impactPromiseFactory.address);
 
-    idaFactory = await IDA_FACTORY.new(stsFactory.address, impactPromiseFactory.address, claimsRegistry.address, {from: main, gas: 8000000});
+    idaFactory = await IDA_FACTORY.new(stsFactory.address, impactPromiseFactory.address, claimsRegistry.address, {from: main, gas: 8500000});
     console.log("IDA factory address: " + idaFactory.address);
   },
 

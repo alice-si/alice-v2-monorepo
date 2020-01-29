@@ -1,7 +1,7 @@
 var Escrow = artifacts.require("Escrow");
 var ImpactPromise = artifacts.require("ImpactPromise");
 var FluidToken = artifacts.require("FluidToken");
-var GBP = artifacts.require("AliceUSD");
+var AUSD = artifacts.require("AliceUSD");
 var Ida = artifacts.require("Ida");
 var StsFactory = artifacts.require("SimpleTokenSellerFactory");
 var ImpactPromiseFactory = artifacts.require("ImpactPromiseFactory");
@@ -14,14 +14,14 @@ const { time } = require('openzeppelin-test-helpers');
 
 contract('Impact Delivery Agreement', function ([owner, validator, funder, investor, unauthorised]) {
   var escrow;
-  var gbp;
+  var ausd;
   var ida, sts;
   var paymentRights;
   var impactPromise;
   var claimsRegistry;
 
   before("deploy escrow and token contracts", async function () {
-    gbp = await GBP.new();
+    ausd = await AUSD.new();
     let end = (await time.latest()).add(time.duration.years(1));
 
     let impactPromiseFactory = await ImpactPromiseFactory.new();
@@ -29,7 +29,7 @@ contract('Impact Delivery Agreement', function ([owner, validator, funder, inves
     claimsRegistry = await ClaimsRegistry.new();
     let factory = await IdaFactory.new(stsFactory.address, impactPromiseFactory.address, claimsRegistry.address, {gas: 6500000});
 
-    let tx = await factory.createIda(gbp.address, "TEST", 10, 100, validator, end);
+    let tx = await factory.createIda(ausd.address, "TEST", 10, 100, validator, end);
     let idaAddress = tx.receipt.logs[0].args.ida;
     ida = await Ida.at(idaAddress);
 
@@ -46,7 +46,7 @@ contract('Impact Delivery Agreement', function ([owner, validator, funder, inves
 
     escrow = await Escrow.at(await ida.escrow());
     (await escrow.capacity()).should.be.bignumber.equal('1000');
-    (await gbp.balanceOf(escrow.address)).should.be.bignumber.equal('0');
+    (await ausd.balanceOf(escrow.address)).should.be.bignumber.equal('0');
   });
 
 
@@ -55,28 +55,28 @@ contract('Impact Delivery Agreement', function ([owner, validator, funder, inves
     await sts.updateConditions(100, 50);
     (await paymentRights.balanceOf(sts.address)).should.be.bignumber.equal('100');
 
-    await gbp.mint(investor, 100);
-    await gbp.approve(sts.address, 100, {from: investor});
+    await ausd.mint(investor, 100);
+    await ausd.approve(sts.address, 100, {from: investor});
 
-    (await gbp.balanceOf(owner)).should.be.bignumber.equal('0');
-    (await gbp.balanceOf(investor)).should.be.bignumber.equal('100');
+    (await ausd.balanceOf(owner)).should.be.bignumber.equal('0');
+    (await ausd.balanceOf(investor)).should.be.bignumber.equal('100');
     (await paymentRights.balanceOf(investor)).should.be.bignumber.equal('0');
 
     await sts.buy(100, {from: investor});
 
-    (await gbp.balanceOf(owner)).should.be.bignumber.equal('50');
-    (await gbp.balanceOf(investor)).should.be.bignumber.equal('50');
+    (await ausd.balanceOf(owner)).should.be.bignumber.equal('50');
+    (await ausd.balanceOf(investor)).should.be.bignumber.equal('50');
     (await paymentRights.balanceOf(investor)).should.be.bignumber.equal('100');
   });
 
 
   it("should fund", async function () {
-    await gbp.mint(funder, 200);
-    await gbp.approve(ida.address, 200, {from: funder});
+    await ausd.mint(funder, 200);
+    await ausd.approve(ida.address, 200, {from: funder});
     await ida.fund(200, {from: funder});
 
     (await impactPromise.balanceOf(funder)).should.be.bignumber.equal('200');
-    (await gbp.balanceOf(escrow.address)).should.be.bignumber.equal('200');
+    (await ausd.balanceOf(escrow.address)).should.be.bignumber.equal('200');
   });
 
 
@@ -98,18 +98,18 @@ contract('Impact Delivery Agreement', function ([owner, validator, funder, inves
   it("should withdraw from escrow by investor", async function () {
     await paymentRights.redeem(10, {from: investor});
 
-    (await gbp.balanceOf(investor)).should.be.bignumber.equal('60');
+    (await ausd.balanceOf(investor)).should.be.bignumber.equal('60');
     (await paymentRights.getAvailableToRedeem({from: investor})).should.be.bignumber.equal('0');
-    (await gbp.balanceOf(escrow.address)).should.be.bignumber.equal('190');
+    (await ausd.balanceOf(escrow.address)).should.be.bignumber.equal('190');
   });
 
 
   it("should withdraw part of funds from escrow by ida creator", async function () {
     await paymentRights.redeem(50, {from: owner});
 
-    (await gbp.balanceOf(owner)).should.be.bignumber.equal('100');
+    (await ausd.balanceOf(owner)).should.be.bignumber.equal('100');
     (await paymentRights.getAvailableToRedeem({from: owner})).should.be.bignumber.equal('40');
-    (await gbp.balanceOf(escrow.address)).should.be.bignumber.equal('140');
+    (await ausd.balanceOf(escrow.address)).should.be.bignumber.equal('140');
   });
 
 
@@ -124,14 +124,14 @@ contract('Impact Delivery Agreement', function ([owner, validator, funder, inves
     (await ida.hasEnded()).should.be.true;
 
     (await impactPromise.balanceOf(funder)).should.be.bignumber.equal('200');
-    (await gbp.balanceOf(funder)).should.be.bignumber.equal('0');
-    (await gbp.balanceOf(escrow.address)).should.be.bignumber.equal('140');
+    (await ausd.balanceOf(funder)).should.be.bignumber.equal('0');
+    (await ausd.balanceOf(escrow.address)).should.be.bignumber.equal('140');
 
     await ida.refund({from: funder});
 
     (await impactPromise.balanceOf(funder)).should.be.bignumber.equal('0');
-    (await gbp.balanceOf(escrow.address)).should.be.bignumber.equal('40');
-    (await gbp.balanceOf(funder)).should.be.bignumber.equal('100');
+    (await ausd.balanceOf(escrow.address)).should.be.bignumber.equal('40');
+    (await ausd.balanceOf(funder)).should.be.bignumber.equal('100');
 
   });
 
@@ -144,9 +144,9 @@ contract('Impact Delivery Agreement', function ([owner, validator, funder, inves
   it("should withdraw rest of funds from escrow by ida creator", async function () {
     await paymentRights.redeem(40, {from: owner});
 
-    (await gbp.balanceOf(owner)).should.be.bignumber.equal('140');
+    (await ausd.balanceOf(owner)).should.be.bignumber.equal('140');
     (await paymentRights.getAvailableToRedeem({from: owner})).should.be.bignumber.equal('0');
-    (await gbp.balanceOf(escrow.address)).should.be.bignumber.equal('0');
+    (await ausd.balanceOf(escrow.address)).should.be.bignumber.equal('0');
   });
 
 });
