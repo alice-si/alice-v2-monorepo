@@ -79,6 +79,10 @@ var getBox = async function() {
   return box;
 }
 
+var rount2digits = function(original) {
+  return Math.round(original*100)/100;
+}
+
 
 
 
@@ -123,10 +127,9 @@ async function updateInvestments() {
   //state.investingTotalChartData.Remaining = state.ida.budget - state.ida.distributeAmount -state.balance.totalInvested;
   state.ida.unsold = state.ida.budget - state.balance.totalInvested;
 
-  state.fluidBalanceChartData.Redeemed = web3.fromWei((await paymentRights.getRedeemed(main, {from: main})), 'ether').toLocaleString('en-GB', { maximumFractionDigits: 2 });
-  state.fluidBalanceChartData.Redeemable = parseFloat(state.balance.redeemable).toLocaleString('en-GB', { maximumFractionDigits: 2 });
-  state.fluidBalanceChartData['Still locked'] = (state.balance.invested - state.balance.redeemable - state.fluidBalanceChartData.Redeemed).toLocaleString('en-GB', { maximumFractionDigits: 2 });
-
+  state.fluidBalanceChartData.Redeemed = rount2digits(web3.fromWei((await paymentRights.getRedeemed(main, {from: main})), 'ether'));
+  state.fluidBalanceChartData.Redeemable = rount2digits(parseFloat(state.balance.redeemable).toLocaleString('en-GB', { maximumFractionDigits: 2 }));
+  state.fluidBalanceChartData.Potential = rount2digits((state.balance.invested - state.balance.redeemable - state.fluidBalanceChartData.Redeemed));
 }
 
 async function updateFunding() {
