@@ -435,6 +435,11 @@
 
                       <div class="tab-section-title">
                         Your holdings
+                        <md-icon class="question-icon">help
+                          <md-tooltip md-direction="top">
+                            PR tokens have a "fluid balance" of how much they can redeem from the IDA's escrowed funds.
+                          </md-tooltip>
+                        </md-icon>
                       </div>
 
                       <div class="tab-section-desc">
@@ -971,6 +976,8 @@
     font-size: 12px !important;
     margin-top: -8px;
     margin-left: -8px;
+    color: #898989;
+    font-weight: normal;
   }
 
 </style>
