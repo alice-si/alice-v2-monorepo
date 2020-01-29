@@ -136,7 +136,7 @@
 
       <div class="text" v-if="ida.data && ida.distributeAmount > 0">
 
-        <b>{{ida.data['organisation-name']}}</b> is selling <b>{{ida.distributeAmount}}</b> tokens for <b>${{ida.distributePrice}}</b>
+        <b>{{ida.data['organisation-name']}}</b> is selling <b>{{ida.distributeAmount}}</b> payment rights tokens for <b>${{ida.distributePrice}}</b>
         which could be redeemed for <b>${{(ida.distributePrice * (100 / (100-ida.distributeDiscount))).toFixed(0)}}</b> if all of this IDA's promises are fulfilled. <br/><br/>
 
         This means that your maximum return on this investment is <b>{{(100 / (100-ida.distributeDiscount) * 100 - 100).toFixed(0)}}%</b>.
@@ -211,11 +211,11 @@
           <md-card-header>
             <md-card-header-text>
               <div class="md-title" v-if="balance.tokens == 0">
-                You currently don't have any tokens to invest or fund
+                You currently don't have any tokens to fund or invest with
                 <md-button class="funds-button" @click="getDemoTokens()">Get $1000 demo tokens</md-button>
               </div>
               <div class="md-title" v-else>
-                You currently have <b>${{balance.tokens}}</b> to invest or fund
+                You currently have <b>${{balance.tokens}}</b> to fund or invest with
                 <md-button class="funds-button" @click="getDemoTokens()">Get $1000 more tokens</md-button>
               </div>
 
@@ -410,7 +410,7 @@
                             Applied on the unredeemed value of PR tokens (redeemable + still locked).
                           </md-tooltip>
                           <md-tooltip md-direction="right" v-else>
-                            ROI is conditional of IDA's promises being funded and fulfilled.
+                            ROI is conditional on IDA's promises being funded and fulfilled.
                           </md-tooltip>
                         </md-icon>
 
