@@ -22,6 +22,14 @@
           },
           responsive: true,
           maintainAspectRatio: false,
+          tooltips: {
+            enabled: true,
+            callbacks: {
+              label: ((tooltipItems, data) => {
+                return "$"+data.datasets[tooltipItems.datasetIndex].data[tooltipItems.index].toLocaleString('en-GB');
+              })
+            }
+          }
         }
       }
     },
