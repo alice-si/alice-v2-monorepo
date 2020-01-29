@@ -54,22 +54,22 @@ To deploy the front-end on your local machine please type in your command line:
 
 When an IDA is first created, its initial state is the following:
 
-![IDA initial state](https://github.com/alice-si/ida/blob/RM-readme/images/Initial%20state.png)
+![IDA initial state](https://github.com/alice-si/ida/blob/master/images/Initial%20state.png)
 
 <br/>
 At this point, funders can send money to the escrow account, and the service provider can sell her payment rights tokens to investors:
 
-![IDA funding and investment](https://github.com/alice-si/ida/blob/RM-readme/images/Funding%20and%20investment.png)
+![IDA funding and investment](https://github.com/alice-si/ida/blob/master/images/Funding%20and%20investment.png)
 
 <br/>
 It's now time for the service provider to make a promise fulfilment claim. If the claim is validated, payment rights holders can redeem the unlocked funds from escrow.
 
-![IDA claims and redemptions](https://github.com/alice-si/ida/blob/RM-readme/images/Claims%20and%20redemptions.png)
+![IDA claims and redemptions](https://github.com/alice-si/ida/blob/master/images/Claims%20and%20redemptions.png)
 
 <br/>
 If no new promises are fulfilled, funders can use their promise tokens to obtain a refund for whatever is left in escrow after the IDA's end date.
 
-![IDA refunds](https://github.com/alice-si/ida/blob/RM-readme/images/Refund.png)
+![IDA refunds](https://github.com/alice-si/ida/blob/master/images/Refund.png)
 
 <br/>
 
@@ -79,7 +79,7 @@ Fluid balance tokens (FBTs) are a new type of token that manage the rights to fu
 
 We call the balances of these tokens “fluid” because they are automatically combined when transferred, making them easy to trade. FBTs are therefore “semi-fungible”, and offer significant advantages to both fungible and non-fungible tokens.
 
-![FBT animation](https://github.com/alice-si/ida/blob/RM-readme/images/Fluid%20balance%20tokens%20animation.gif)
+![FBT animation](https://github.com/alice-si/ida/blob/master/images/Fluid%20balance%20tokens%20animation.gif)
 
 ### Basic example: combining balances
 
