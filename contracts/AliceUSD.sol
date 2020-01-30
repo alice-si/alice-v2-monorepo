@@ -12,7 +12,7 @@ import 'openzeppelin-solidity/contracts/token/ERC20/ERC20Burnable.sol';
 contract AliceUSD is ERC20Mintable, ERC20Burnable {
 
   string public name = "Alice Demo USD";
-  uint8 public decimals = 2;
+  uint8 public decimals = 18;
   string public symbol = "AliceUSD";
   string public version = 'AUSD 1.0';
 
