@@ -127,7 +127,11 @@ contract('Impact Delivery Agreement', function ([owner, validator, funder, inves
     (await ausd.balanceOf(funder)).should.be.bignumber.equal('0');
     (await ausd.balanceOf(escrow.address)).should.be.bignumber.equal('140');
 
+    (await ida.getAvailableToRefund({from: funder})).should.be.bignumber.equal('100');
+
     await ida.refund({from: funder});
+
+    (await ida.getAvailableToRefund({from: funder})).should.be.bignumber.equal('0');
 
     (await impactPromise.balanceOf(funder)).should.be.bignumber.equal('0');
     (await ausd.balanceOf(escrow.address)).should.be.bignumber.equal('40');

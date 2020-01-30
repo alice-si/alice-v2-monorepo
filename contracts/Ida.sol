@@ -104,15 +104,20 @@ contract Ida {
     }
 
 
-    function refund() public {
-      require(hasEnded(), "Refund is only available after the project has ended");
+    function getAvailableToRefund() public view returns(uint256) {
       uint256 remaining = escrow.funded().sub(escrow.unlocked());
       uint256 balance = impactPromise.balanceOf(msg.sender);
+      return balance == 0 ? 0 : remaining.mul(balance).div(impactPromise.totalSupply());
+    }
 
-      uint256 val = remaining.mul(balance).div(impactPromise.totalSupply());
 
-      impactPromise.burnAll(msg.sender);
-      escrow.refund(msg.sender, val);
+    function refund() public {
+      require(hasEnded(), "Refund is only available after the project has ended");
+      uint256 refundable = getAvailableToRefund();
+      if (refundable > 0) {
+        impactPromise.burnAll(msg.sender);
+        escrow.refund(msg.sender, refundable);
+      }
     }
 
 }

@@ -4,6 +4,7 @@ let state = {
   balance: {
     tokens: 0,
     funded: 0,
+    refundable: 0,
     totalFunded: 0,
     invested: 0,
     redeemable: 0,

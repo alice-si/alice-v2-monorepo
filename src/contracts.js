@@ -21,8 +21,8 @@ let ethereum = window.ethereum;
 let web3 = window.web3;
 
 const START_BLOCK = 5833382;
-const AUSD_ADDRESS = "0xfad3A03d9d17A990fF68CcF6a1BDEead049c3fFF";
-const IDA_FACTORY_ADDRESS = "0xf7e706d53CeaC925D52a8CA6086C7d50233B7B8c";
+const AUSD_ADDRESS = "0xb9Cbf7381Baa11FF0287648a82904BbB4118586B";
+const IDA_FACTORY_ADDRESS = "0x53C9f8df4B7d3A5016e5D4e5B050Fe4072bE479C";
 
 
 var setup = function(json) {
@@ -136,6 +136,10 @@ async function updateFunding() {
   console.log('Updating funding...');
 
   state.balance.funded = parseInt(web3.fromWei(await impactPromise.balanceOf(main), 'ether'));
+  if (ida.hasEnded) {
+    state.balance.refundable = web3.fromWei((await ida.getAvailableToRefund({from:main})), 'ether');
+    console.log("Refundable: " + state.balance.refundable);
+  }
 
   state.balance.totalFunded = parseInt(web3.fromWei(await impactPromise.totalSupply()), 'ether');
   state.ida.maxFunding = state.ida.budget - state.balance.totalFunded;
@@ -240,6 +244,8 @@ const Contracts = {
       web3.toWei(newIda.promisePrice, 'ether'),
       newIda.validator,
       newIda.endTime.getTime()/1000,
+      //To test refunds:
+      //Math.round(new Date().getTime()/1000) + 300,
       {from: main, gas: 7000000}
     );
     console.log(tx);
@@ -299,6 +305,14 @@ const Contracts = {
 
     setTimeout(updateInvestments, 3000);
     setTimeout(updateHoldings, 3000);
+  },
+
+  refund: async () => {
+    console.log("Refunding not validated");
+    await ida.refund({from: main, gas: 1000000});
+
+    setTimeout(updateHoldings, 3000);
+    setTimeout(updateFunding, 3000);
   },
 
   submitClaim: async (claimKey) => {
@@ -428,7 +442,9 @@ const Contracts = {
       state.ida.paymentRightsToken = paymentRightsAddress;
       state.ida.promiseToken = impactPromiseAddress;
       let endTime = (await ida.endTime());
-      state.ida.hasEnded = new Date().getTime() > endTime * 1000;
+      if (new Date().getTime() > endTime * 1000) {
+        state.ida.hasEnded = true;
+      };
 
       //Get description from 3Box
       state.ida.data = await Box.getSpace(state.ida.serviceProvider, state.ida.name);
