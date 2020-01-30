@@ -355,6 +355,8 @@
 
                 <div class="button-box" >
                   <md-button v-if="!ida.isOwner && !ida.hasEnded" class="md-primary action-button md-raised" @click="showFundPanel = true">Fund</md-button>
+                  <md-button v-if="ida.hasEnded && balance.refundable > 0" class="md-primary action-button md-raised" @click="refund()">Refund ${{balance.refundable}}</md-button>
+
                 </div>
 
               </md-ripple>
@@ -697,6 +699,14 @@
             this.processing = false;
           }
         }
+      },
+      refund: async function () {
+          this.processing = true;
+          try {
+            await Contracts.refund();
+          } finally {
+            this.processing = false;
+          }
       },
       submitClaim: async function () {
         this.$v.validationForm.$touch();
