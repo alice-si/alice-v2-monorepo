@@ -184,6 +184,18 @@
 
       <div class="md-layout-item md-size-100">
 
+        <md-card class="md-primary md-accent tokens-notification" v-if="ida.hasEnded">
+          <md-card-header>
+            <md-card-header-text>
+              <div class="md-title">
+                Funding and investment is closed as the project has already ended.
+              </div>
+            </md-card-header-text>
+          </md-card-header>
+        </md-card>
+
+        <div v-else>
+
         <md-card class="md-primary md-accent tokens-notification" v-if="ida.isOwner">
           <md-card-header>
             <md-card-header-text>
@@ -222,6 +234,7 @@
             </md-card-header-text>
           </md-card-header>
         </md-card>
+        </div>
       </div>
 
       <div class="md-layout-item md-size-33">
@@ -341,7 +354,7 @@
                 </md-card-content>
 
                 <div class="button-box" >
-                  <md-button v-if="!ida.isOwner" class="md-primary action-button md-raised" @click="showFundPanel = true">Fund</md-button>
+                  <md-button v-if="!ida.isOwner && !ida.hasEnded" class="md-primary action-button md-raised" @click="showFundPanel = true">Fund</md-button>
                 </div>
 
               </md-ripple>
@@ -419,14 +432,16 @@
 
                       <staked-chart v-if="ida.distributeAmount > 0" second-color="#01C0EF" :values="investingTotalChartData"></staked-chart>
 
-                      <div style="text-align: center; margin-top: 25px;">
-                        <md-button class="md-primary md-raised action-button" @click="showDistributePanel = true" v-if="ida.isOwner">
-                          {{ida.distributeAmount > 0 ? 'Update market conditions' : 'Create market'}}
-                        </md-button>
+                      <div v-if="!ida.hasEnded">
+                        <div style="text-align: center; margin-top: 25px;">
+                          <md-button class="md-primary md-raised action-button" @click="showDistributePanel = true" v-if="ida.isOwner">
+                            {{ida.distributeAmount > 0 ? 'Update market conditions' : 'Create market'}}
+                          </md-button>
 
-                        <md-button class="md-primary md-raised action-button" @click="showInvestPanel = true" v-else>
-                          Invest
-                        </md-button>
+                          <md-button class="md-primary md-raised action-button" @click="showInvestPanel = true" v-else>
+                            Invest
+                          </md-button>
+                        </div>
                       </div>
 
                     </div>
@@ -509,7 +524,7 @@
                       <md-table-cell>
                         <md-button @click="validateClaim(claim.code)"
                                    class="md-icon-button md-raised md-dense md-accent"
-                                   :disabled="!ida.isValidator || claim.isValidated">
+                                   :disabled="!ida.isValidator || claim.isValidated || ida.hasEnded">
                           <md-icon v-if="claim.isValidated || ida.isValidator">done</md-icon>
                           <md-icon v-if="!claim.isValidated && !ida.isValidator">hourglass_empty</md-icon>
                           <md-tooltip md-direction="right">Validate claim</md-tooltip>
@@ -518,7 +533,7 @@
                     </md-table-row>
                   </md-table>
 
-                  <div class="button-box" v-if="ida.isOwner">
+                  <div class="button-box" v-if="ida.isOwner && !ida.hasEnded">
                     <md-button class="md-primary action-button md-raised" @click="showClaimPanel = true">Submit Claim
                     </md-button>
                   </div>

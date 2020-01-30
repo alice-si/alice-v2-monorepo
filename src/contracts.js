@@ -427,6 +427,8 @@ const Contracts = {
       state.ida.serviceProvider = (await ida.serviceProvider());
       state.ida.paymentRightsToken = paymentRightsAddress;
       state.ida.promiseToken = impactPromiseAddress;
+      let endTime = (await ida.endTime());
+      state.ida.hasEnded = new Date().getTime() > endTime * 1000;
 
       //Get description from 3Box
       state.ida.data = await Box.getSpace(state.ida.serviceProvider, state.ida.name);
