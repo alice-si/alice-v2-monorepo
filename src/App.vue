@@ -29,6 +29,9 @@
 
           </md-tab>
         </md-tabs>
+        <a href="https://github.com/alice-si/ida" target="_blank" style="color: white;">
+          <i class="fa fa-github" style="font-size:32px"></i>
+        </a>
 
       </div>
      </md-app-toolbar>
@@ -75,7 +78,7 @@
             <br/><br/>
 
             This dApp is built on the Alice protocol (www.alice.si), and is still in test mode. Please connect to
-            Rinkeby or Skale and send feedback to IDA@alice.si or @alice_si_.
+            Rinkeby and send feedback to IDA@alice.si or @alice_si_.
           </md-dialog-content>
 
         </md-dialog>

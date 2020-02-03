@@ -319,13 +319,13 @@
 
                   <div class="tab-desc" v-if="ida.isOwner">
                     Keep track of how much funding you have raised to deliver your impact here. <br/>
-                    Learn more [link to blog post] about IDAs and conditional impact payments.
+                    <a href="https://medium.com/@Raphalice/a-new-alice-is-coming-15dca7992469">Learn more</a> about IDAs and conditional impact payments.
                   </div>
 
                   <div class="tab-desc" v-else>
                     If you want to see this IDA’s impact happen, fund it here! <br/>
                     Your money will only be paid out if promises are fulfilled. <br/>
-                    Learn more about IDAs and conditional impact payments.
+                    <a href="https://medium.com/@Raphalice/a-new-alice-is-coming-15dca7992469">Learn more</a>  about IDAs and conditional impact payments.
                   </div>
 
 
@@ -393,12 +393,12 @@
 
                   <div class="tab-desc" v-if="ida.isOwner">
                     You can sell this IDA’s future payments as an investment here.<br/>
-                    Learn more about IDA markets and fluid balance tokens.
+                    <a href="https://medium.com/@Raphalice/a-new-alice-is-coming-15dca7992469">Learn more</a>  about IDA markets and fluid balance tokens.
                   </div>
 
                   <div class="tab-desc" v-else>
                     You can buy this IDA’s future payments as an investment here.<br/>
-                    Learn more about IDA markets and fluid balance tokens.
+                    <a href="https://medium.com/@Raphalice/a-new-alice-is-coming-15dca7992469">Learn more</a>  about IDA markets and fluid balance tokens.
                   </div>
 
                   <div class="md-layout md-gutter">
@@ -422,7 +422,7 @@
 
                         <md-icon class="question-icon">help
                           <md-tooltip md-direction="right" v-if="ida.isOwner">
-                            Applied on the unredeemed value of PR tokens (redeemable + still locked).
+                            Applied on the unredeemed value of PR tokens (redeemable + potential).
                           </md-tooltip>
                           <md-tooltip md-direction="right" v-else>
                             ROI is conditional on IDA's promises being funded and fulfilled.
