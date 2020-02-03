@@ -442,9 +442,8 @@ const Contracts = {
       state.ida.paymentRightsToken = paymentRightsAddress;
       state.ida.promiseToken = impactPromiseAddress;
       let endTime = (await ida.endTime());
-      if (new Date().getTime() > endTime * 1000) {
-        state.ida.hasEnded = true;
-      };
+      state.ida.hasEnded =  (new Date().getTime()) > endTime * 1000;
+      console.log("Has Ida ended: " + state.ida.hasEnded);
 
       //Get description from 3Box
       state.ida.data = await Box.getSpace(state.ida.serviceProvider, state.ida.name);

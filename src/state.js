@@ -43,7 +43,8 @@ let state = {
     claims: [],
     paymentRightsToken: null,
     promiseToken: null,
-    unsold: 0
+    unsold: 0,
+    hasEnded: false
   },
   allIdas: [],
   investingChartData: {You: 0, Others: 0},
