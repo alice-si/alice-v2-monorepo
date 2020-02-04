@@ -35,7 +35,7 @@ To deploy the front-end on your local machine please type in your command line:
 
 ### Helper contracts
 
-  - IdaMarketCreator.sol: allows a service provider to easily create an IDA investment market, such as that used in the [reference dApp](https://ida.alice.si/)
+  - SimpleTokenSeller.sol: allows a service provider to easily create an IDA investment market, such as that used in the [reference dApp](https://ida.alice.si/)
   - IdaFactory.sol: helper contract for creating IDAs, with the creator set as default service provider, and linking to IdaMarketCreator.sol
   - ImpactPromiseFactory: helper contract allowing each new IDA to create their own impact promise tokens
 
