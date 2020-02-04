@@ -20,7 +20,7 @@ import CLAIMS_REGISTRY_JSON from '@contracts/ClaimsRegistry.json'
 let ethereum = window.ethereum;
 let web3 = window.web3;
 
-const START_BLOCK = 5833382;
+const START_BLOCK = 5912191;
 const AUSD_ADDRESS = "0xb9Cbf7381Baa11FF0287648a82904BbB4118586B";
 const IDA_FACTORY_ADDRESS = "0x53C9f8df4B7d3A5016e5D4e5B050Fe4072bE479C";
 
