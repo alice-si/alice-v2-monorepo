@@ -36,7 +36,7 @@ To deploy the front-end on your local machine please type in your command line:
 ### Helper contracts
 
   - SimpleTokenSeller.sol: allows a service provider to easily create an IDA investment market, such as that used in the [reference dApp](https://ida.alice.si/)
-  - IdaFactory.sol: helper contract for creating IDAs, with the creator set as default service provider, and linking to IdaMarketCreator.sol
+  - IdaFactory.sol: helper contract for creating IDAs, with the creator set as default service provider, and linking to SimpleTokenSeller.sol
   - ImpactPromiseFactory: helper contract allowing each new IDA to create their own impact promise tokens
 
 ### Definitions
@@ -95,7 +95,7 @@ It turns out that Bob isn’t just too lazy to redeem his funds, he’s also hel
 
 ### Reference dApp example: creating investment markets
 
-In the reference IDA dApp, the same logic is applied for the creation of investment markets, when a service provider sells their payment rights tokens at a discount using IdaMarketCreator.sol.
+In the reference IDA dApp, the same logic is applied for the creation of investment markets, when a service provider sells their payment rights tokens at a discount using SimpleTokenSeller.sol.
 
 As an example, let’s take the same conditions as above. Alice has 200 payment rights token, and decides to create an investment market where she sells half her payment rights at a 50% discount to reflect the high risk that she might not fulfill her promises. Bob thinks that this is an excellent investment opportunity and buys half the available tokens for 25 Dai. We now have:
   - Alice: redeemed: 0, available: 0, potential: 100
