@@ -1159,7 +1159,7 @@ var BN = __webpack_require__("geuY");
 var ethereum = window.ethereum;
 var web3 = window.web3;
 
-var START_BLOCK = 5833382;
+var START_BLOCK = 5912191;
 var AUSD_ADDRESS = "0xb9Cbf7381Baa11FF0287648a82904BbB4118586B";
 var IDA_FACTORY_ADDRESS = "0x53C9f8df4B7d3A5016e5D4e5B050Fe4072bE479C";
 
@@ -5860,4 +5860,4 @@ var esExports = { render: render, staticRenderFns: staticRenderFns }
 /***/ })
 
 },["NHnr"]);
-//# sourceMappingURL=app.ee1dd323999a5358d467.js.map
+//# sourceMappingURL=app.5050b2f7a97a8ce4fc8d.js.map
