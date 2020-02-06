@@ -1932,7 +1932,13 @@ var Contracts = {
 
               if (__WEBPACK_IMPORTED_MODULE_3__state__["a" /* default */].paymentTokens.length == 0) {
                 __WEBPACK_IMPORTED_MODULE_3__state__["a" /* default */].paymentTokens.push({
-                  name: "Test tokens",
+                  name: "USD test tokens",
+                  address: ausd.address
+                }, {
+                  name: "Tokenised Land test tokens",
+                  address: ausd.address
+                }, {
+                  name: "Tokenised Property test tokens",
                   address: ausd.address
                 });
               }
@@ -5860,4 +5866,4 @@ var esExports = { render: render, staticRenderFns: staticRenderFns }
 /***/ })
 
 },["NHnr"]);
-//# sourceMappingURL=app.5050b2f7a97a8ce4fc8d.js.map
+//# sourceMappingURL=app.80e5ea2e04c42b796da3.js.map
