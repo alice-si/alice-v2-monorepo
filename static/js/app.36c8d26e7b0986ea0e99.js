@@ -1,16 +1,5 @@
 webpackJsonp([1],{
 
-/***/ "/6hf":
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"page"},[_c('md-dialog',{attrs:{"md-active":_vm.deploying,"md-click-outside-to-close":false},on:{"update:mdActive":function($event){_vm.deploying=$event},"update:md-active":function($event){_vm.deploying=$event}}},[_c('md-dialog-title',[_vm._v("Deploying the contract")]),_vm._v(" "),_c('md-dialog-content',{staticStyle:{"text-align":"center"}},[_c('md-progress-spinner',{attrs:{"md-mode":"indeterminate"}}),_vm._v(" "),_c('div',[_vm._v("\n        Please wait....\n      ")])],1)],1),_vm._v(" "),_c('md-card',{staticClass:"card-center creator"},[_c('md-ripple',[_c('md-card-header',{staticClass:"md-layout-item md-size-100"},[_c('md-card-header-text',[_c('div',{staticClass:"md-title"},[_vm._v("Create IDA")]),_vm._v(" "),_c('div',{staticClass:"md-subhead"},[_vm._v("\n            Fill out this form to create an IDA. Being specific about promises will help you raise more funds.\n            Remember to nominate a validator who will verify your promise fulfillment.\n          ")])])],1),_vm._v(" "),_c('md-card-content',[_c('form',{attrs:{"novalidate":""}},[_c('div',{staticClass:"form"},[_c('div',{staticClass:"md-layout md-gutter"},[_c('div',{staticClass:"md-layout-item md-size-50"},[_c('md-field',{class:_vm.getValidationClass('idaForm', 'name')},[_c('label',[_vm._v("Project name")]),_vm._v(" "),_c('md-input',{attrs:{"name":"name"},model:{value:(_vm.idaForm.name),callback:function ($$v) {_vm.$set(_vm.idaForm, "name", $$v)},expression:"idaForm.name"}}),_vm._v(" "),(!_vm.$v.idaForm.name.required)?_c('span',{staticClass:"md-error"},[_vm._v("Please provide the name")]):(!_vm.$v.idaForm.name.maxLength)?_c('span',{staticClass:"md-error"},[_vm._v("The name cannot be longer than 32 characters")]):_vm._e()],1)],1),_vm._v(" "),_c('div',{staticClass:"md-layout-item md-size-50"},[_c('md-field',{class:_vm.getValidationClass('idaForm', 'projectDescription')},[_c('label',[_vm._v("Project description")]),_vm._v(" "),_c('md-input',{model:{value:(_vm.idaForm.projectDescription),callback:function ($$v) {_vm.$set(_vm.idaForm, "projectDescription", $$v)},expression:"idaForm.projectDescription"}}),_vm._v(" "),(!_vm.$v.idaForm.projectDescription.required)?_c('span',{staticClass:"md-error"},[_vm._v("Please provide the description")]):(!_vm.$v.idaForm.projectDescription.maxLength)?_c('span',{staticClass:"md-error"},[_vm._v("The description cannot be longer than 256 characters")]):_vm._e()],1)],1),_vm._v(" "),_c('div',{staticClass:"md-layout-item md-size-50"},[_c('md-field',{class:_vm.getValidationClass('idaForm', 'organisationName')},[_c('label',[_vm._v("Your name or organization name")]),_vm._v(" "),_c('md-input',{model:{value:(_vm.idaForm.organisationName),callback:function ($$v) {_vm.$set(_vm.idaForm, "organisationName", $$v)},expression:"idaForm.organisationName"}}),_vm._v(" "),(!_vm.$v.idaForm.organisationName.required)?_c('span',{staticClass:"md-error"},[_vm._v("Please provide the name")]):(!_vm.$v.idaForm.organisationName.maxLength)?_c('span',{staticClass:"md-error"},[_vm._v("The name cannot be longer than 64 characters")]):_vm._e()],1)],1),_vm._v(" "),_c('div',{staticClass:"md-layout-item md-size-50"},[_c('md-field',{class:_vm.getValidationClass('idaForm', 'organisationDescription')},[_c('label',[_vm._v("Describe who you are")]),_vm._v(" "),_c('md-input',{model:{value:(_vm.idaForm.organisationDescription),callback:function ($$v) {_vm.$set(_vm.idaForm, "organisationDescription", $$v)},expression:"idaForm.organisationDescription"}}),_vm._v(" "),(!_vm.$v.idaForm.organisationDescription.required)?_c('span',{staticClass:"md-error"},[_vm._v("Please provide the description")]):(!_vm.$v.idaForm.organisationDescription.maxLength)?_c('span',{staticClass:"md-error"},[_vm._v("The description cannot be longer than 256 characters")]):_vm._e()],1)],1),_vm._v(" "),_c('div',{staticClass:"md-layout-item md-size-50"},[_c('md-field',{class:_vm.getValidationClass('idaForm', 'promiseNumber')},[_c('label',[_vm._v("Number of promises")]),_vm._v(" "),_c('md-input',{model:{value:(_vm.idaForm.promiseNumber),callback:function ($$v) {_vm.$set(_vm.idaForm, "promiseNumber", $$v)},expression:"idaForm.promiseNumber"}}),_vm._v(" "),(!_vm.$v.idaForm.promiseNumber.required)?_c('span',{staticClass:"md-error"},[_vm._v("Please provide the number of promises")]):_vm._e(),_vm._v(" "),(!_vm.$v.idaForm.promiseNumber.numeric)?_c('span',{staticClass:"md-error"},[_vm._v("Please provide a valid number")]):_vm._e()],1)],1),_vm._v(" "),_c('div',{staticClass:"md-layout-item md-size-50"},[_c('md-field',{class:_vm.getValidationClass('idaForm', 'promiseDescription')},[_c('label',[_vm._v("Promise description")]),_vm._v(" "),_c('md-input',{model:{value:(_vm.idaForm.promiseDescription),callback:function ($$v) {_vm.$set(_vm.idaForm, "promiseDescription", $$v)},expression:"idaForm.promiseDescription"}}),_vm._v(" "),(!_vm.$v.idaForm.promiseDescription.required)?_c('span',{staticClass:"md-error"},[_vm._v("Please provide the promise description")]):(!_vm.$v.idaForm.promiseDescription.maxLength)?_c('span',{staticClass:"md-error"},[_vm._v("The description cannot be longer than 256 characters")]):_vm._e()],1)],1),_vm._v(" "),_c('div',{staticClass:"md-layout-item md-size-50"},[_c('md-field',{class:_vm.getValidationClass('idaForm', 'promisePrice')},[_c('label',[_vm._v("Price per promise")]),_vm._v(" "),_c('md-input',{model:{value:(_vm.idaForm.promisePrice),callback:function ($$v) {_vm.$set(_vm.idaForm, "promisePrice", $$v)},expression:"idaForm.promisePrice"}}),_vm._v(" "),(!_vm.$v.idaForm.promisePrice.required)?_c('span',{staticClass:"md-error"},[_vm._v("Please provide the price per promise")]):_vm._e(),_vm._v(" "),(_vm.$v.idaForm.promisePrice.required && !_vm.$v.idaForm.promisePrice.numeric)?_c('span',{staticClass:"md-error"},[_vm._v("\n                  Please provide a valid number\n                ")]):_vm._e()],1)],1),_vm._v(" "),_c('div',{staticClass:"md-layout-item md-size-50"},[_c('md-field',{class:_vm.getValidationClass('idaForm', 'paymentToken')},[_c('label',{attrs:{"for":"paymentToken"}},[_vm._v("Payment Token")]),_vm._v(" "),_c('md-select',{attrs:{"name":"paymentToken","id":"paymentToken"},model:{value:(_vm.idaForm.paymentToken),callback:function ($$v) {_vm.$set(_vm.idaForm, "paymentToken", $$v)},expression:"idaForm.paymentToken"}},_vm._l((_vm.paymentTokens),function(p,index){return _c('md-option',{key:p.address,attrs:{"value":p.address}},[_vm._v(_vm._s(p.name)+"\n                  ")])}),1),_vm._v(" "),(!_vm.$v.idaForm.paymentToken.required)?_c('span',{staticClass:"md-error"},[_vm._v("Please provide the payment token")]):_vm._e()],1)],1),_vm._v(" "),_c('div',{staticClass:"md-layout-item md-size-50"},[_c('md-field',{class:_vm.getValidationClass('idaForm', 'validatorName')},[_c('label',[_vm._v("Validator Name and Description")]),_vm._v(" "),_c('md-input',{model:{value:(_vm.idaForm.validatorName),callback:function ($$v) {_vm.$set(_vm.idaForm, "validatorName", $$v)},expression:"idaForm.validatorName"}}),_vm._v(" "),(!_vm.$v.idaForm.validatorName.required)?_c('span',{staticClass:"md-error"},[_vm._v("Please provide the validator name")]):(!_vm.$v.idaForm.validatorName.maxLength)?_c('span',{staticClass:"md-error"},[_vm._v("The description cannot be longer than 64 characters")]):_vm._e()],1)],1),_vm._v(" "),_c('div',{staticClass:"md-layout-item md-size-50"},[_c('md-field',{class:_vm.getValidationClass('idaForm', 'validator')},[_c('label',[_vm._v("Validator Ethereum Address")]),_vm._v(" "),_c('md-input',{model:{value:(_vm.idaForm.validator),callback:function ($$v) {_vm.$set(_vm.idaForm, "validator", $$v)},expression:"idaForm.validator"}}),_vm._v(" "),(!_vm.$v.idaForm.validator.required)?_c('span',{staticClass:"md-error"},[_vm._v("Please provide the validator Ethereum address")]):_vm._e(),_vm._v(" "),(_vm.$v.idaForm.validator.required && !_vm.$v.idaForm.validator.ethAddress)?_c('span',{staticClass:"md-error"},[_vm._v("\n                  Please provide the valid Ethereum address\n                ")]):_vm._e()],1)],1),_vm._v(" "),_c('div',{staticClass:"md-layout-item md-size-50"},[_c('md-datepicker',{class:_vm.getValidationClass('idaForm', 'endTime'),model:{value:(_vm.idaForm.endTime),callback:function ($$v) {_vm.$set(_vm.idaForm, "endTime", $$v)},expression:"idaForm.endTime"}},[_c('label',[_vm._v("Project deadline")]),_vm._v(" "),(!_vm.$v.idaForm.endTime.required)?_c('span',{staticClass:"md-error"},[_vm._v("Please provide the project deadline")]):_vm._e(),_vm._v(" "),(_vm.$v.idaForm.endTime.required && !_vm.$v.idaForm.endTime.notInThePast)?_c('span',{staticClass:"md-error"},[_vm._v("\n                The project deadline must be in the future\n              ")]):_vm._e()])],1)])])])]),_vm._v(" "),_c('div',{staticClass:"button-box"},[_c('md-button',{staticClass:"md-primary create-if md-raised",on:{"click":function($event){return _vm.deployIda()}}},[_vm._v("Deploy")])],1)],1)],1)],1)}
-var staticRenderFns = []
-var esExports = { render: render, staticRenderFns: staticRenderFns }
-/* harmony default export */ __webpack_exports__["a"] = (esExports);
-
-/***/ }),
-
 /***/ "/ZFL":
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -213,6 +202,17 @@ var Component = normalizeComponent(
 /***/ (function(module, exports) {
 
 /* (ignored) */
+
+/***/ }),
+
+/***/ "3J+0":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"page"},[_c('md-dialog',{attrs:{"md-active":_vm.deploying,"md-click-outside-to-close":false},on:{"update:mdActive":function($event){_vm.deploying=$event},"update:md-active":function($event){_vm.deploying=$event}}},[_c('md-dialog-title',[_vm._v("Deploying the contract")]),_vm._v(" "),_c('md-dialog-content',{staticStyle:{"text-align":"center"}},[_c('md-progress-spinner',{attrs:{"md-mode":"indeterminate"}}),_vm._v(" "),_c('div',[_vm._v("\n        Please wait....\n      ")])],1)],1),_vm._v(" "),_c('md-card',{staticClass:"card-center creator"},[_c('md-ripple',[_c('md-card-header',{staticClass:"md-layout-item md-size-100"},[_c('md-card-header-text',[_c('div',{staticClass:"md-title"},[_vm._v("Create IDA")]),_vm._v(" "),_c('div',{staticClass:"md-subhead"},[_vm._v("\n            Fill out this form to create an IDA. Being specific about promises will help you raise more funds.\n            Remember to nominate a validator who will verify your promise fulfillment.\n          ")])])],1),_vm._v(" "),_c('md-card-content',[_c('form',{attrs:{"novalidate":""}},[_c('div',{staticClass:"form"},[_c('div',{staticClass:"md-layout md-gutter"},[_c('div',{staticClass:"md-layout-item md-size-50"},[_c('md-field',{class:_vm.getValidationClass('idaForm', 'name')},[_c('label',[_vm._v("Project name")]),_vm._v(" "),_c('md-input',{attrs:{"name":"name"},model:{value:(_vm.idaForm.name),callback:function ($$v) {_vm.$set(_vm.idaForm, "name", $$v)},expression:"idaForm.name"}}),_vm._v(" "),(!_vm.$v.idaForm.name.required)?_c('span',{staticClass:"md-error"},[_vm._v("Please provide the name")]):(!_vm.$v.idaForm.name.maxLength)?_c('span',{staticClass:"md-error"},[_vm._v("The name cannot be longer than 32 characters")]):_vm._e()],1)],1),_vm._v(" "),_c('div',{staticClass:"md-layout-item md-size-50"},[_c('md-field',{class:_vm.getValidationClass('idaForm', 'projectDescription')},[_c('label',[_vm._v("Project description")]),_vm._v(" "),_c('md-input',{model:{value:(_vm.idaForm.projectDescription),callback:function ($$v) {_vm.$set(_vm.idaForm, "projectDescription", $$v)},expression:"idaForm.projectDescription"}}),_vm._v(" "),(!_vm.$v.idaForm.projectDescription.required)?_c('span',{staticClass:"md-error"},[_vm._v("Please provide the description")]):(!_vm.$v.idaForm.projectDescription.maxLength)?_c('span',{staticClass:"md-error"},[_vm._v("The description cannot be longer than 256 characters")]):_vm._e()],1)],1),_vm._v(" "),_c('div',{staticClass:"md-layout-item md-size-50"},[_c('md-field',{class:_vm.getValidationClass('idaForm', 'organisationName')},[_c('label',[_vm._v("Your name or organization name")]),_vm._v(" "),_c('md-input',{model:{value:(_vm.idaForm.organisationName),callback:function ($$v) {_vm.$set(_vm.idaForm, "organisationName", $$v)},expression:"idaForm.organisationName"}}),_vm._v(" "),(!_vm.$v.idaForm.organisationName.required)?_c('span',{staticClass:"md-error"},[_vm._v("Please provide the name")]):(!_vm.$v.idaForm.organisationName.maxLength)?_c('span',{staticClass:"md-error"},[_vm._v("The name cannot be longer than 64 characters")]):_vm._e()],1)],1),_vm._v(" "),_c('div',{staticClass:"md-layout-item md-size-50"},[_c('md-field',{class:_vm.getValidationClass('idaForm', 'organisationDescription')},[_c('label',[_vm._v("Describe who you are")]),_vm._v(" "),_c('md-input',{model:{value:(_vm.idaForm.organisationDescription),callback:function ($$v) {_vm.$set(_vm.idaForm, "organisationDescription", $$v)},expression:"idaForm.organisationDescription"}}),_vm._v(" "),(!_vm.$v.idaForm.organisationDescription.required)?_c('span',{staticClass:"md-error"},[_vm._v("Please provide the description")]):(!_vm.$v.idaForm.organisationDescription.maxLength)?_c('span',{staticClass:"md-error"},[_vm._v("The description cannot be longer than 256 characters")]):_vm._e()],1)],1),_vm._v(" "),_c('div',{staticClass:"md-layout-item md-size-50"},[_c('md-field',{class:_vm.getValidationClass('idaForm', 'promiseNumber')},[_c('label',[_vm._v("Number of promises")]),_vm._v(" "),_c('md-input',{model:{value:(_vm.idaForm.promiseNumber),callback:function ($$v) {_vm.$set(_vm.idaForm, "promiseNumber", $$v)},expression:"idaForm.promiseNumber"}}),_vm._v(" "),(!_vm.$v.idaForm.promiseNumber.required)?_c('span',{staticClass:"md-error"},[_vm._v("Please provide the number of promises")]):_vm._e(),_vm._v(" "),(!_vm.$v.idaForm.promiseNumber.numeric)?_c('span',{staticClass:"md-error"},[_vm._v("Please provide a valid number")]):_vm._e()],1)],1),_vm._v(" "),_c('div',{staticClass:"md-layout-item md-size-50"},[_c('md-field',{class:_vm.getValidationClass('idaForm', 'promiseDescription')},[_c('label',[_vm._v("Promise description")]),_vm._v(" "),_c('md-input',{model:{value:(_vm.idaForm.promiseDescription),callback:function ($$v) {_vm.$set(_vm.idaForm, "promiseDescription", $$v)},expression:"idaForm.promiseDescription"}}),_vm._v(" "),(!_vm.$v.idaForm.promiseDescription.required)?_c('span',{staticClass:"md-error"},[_vm._v("Please provide the promise description")]):(!_vm.$v.idaForm.promiseDescription.maxLength)?_c('span',{staticClass:"md-error"},[_vm._v("The description cannot be longer than 256 characters")]):_vm._e()],1)],1),_vm._v(" "),_c('div',{staticClass:"md-layout-item md-size-50"},[_c('md-field',{class:_vm.getValidationClass('idaForm', 'promisePrice')},[_c('label',[_vm._v("Price per promise")]),_vm._v(" "),_c('md-input',{model:{value:(_vm.idaForm.promisePrice),callback:function ($$v) {_vm.$set(_vm.idaForm, "promisePrice", $$v)},expression:"idaForm.promisePrice"}}),_vm._v(" "),(!_vm.$v.idaForm.promisePrice.required)?_c('span',{staticClass:"md-error"},[_vm._v("Please provide the price per promise")]):_vm._e(),_vm._v(" "),(_vm.$v.idaForm.promisePrice.required && !_vm.$v.idaForm.promisePrice.numeric)?_c('span',{staticClass:"md-error"},[_vm._v("\n                  Please provide a valid number\n                ")]):_vm._e()],1)],1),_vm._v(" "),_c('div',{staticClass:"md-layout-item md-size-50"},[_c('md-field',{class:_vm.getValidationClass('idaForm', 'paymentToken')},[_c('label',{attrs:{"for":"paymentToken"}},[_vm._v("Payment Token")]),_vm._v(" "),_c('md-select',{attrs:{"name":"paymentToken","id":"paymentToken"},model:{value:(_vm.idaForm.paymentToken),callback:function ($$v) {_vm.$set(_vm.idaForm, "paymentToken", $$v)},expression:"idaForm.paymentToken"}},_vm._l((_vm.paymentTokens),function(p,index){return _c('md-option',{key:p.name,attrs:{"value":p.name}},[_vm._v(_vm._s(p.name)+"\n                  ")])}),1),_vm._v(" "),(!_vm.$v.idaForm.paymentToken.required)?_c('span',{staticClass:"md-error"},[_vm._v("Please provide the payment token")]):_vm._e()],1)],1),_vm._v(" "),_c('div',{staticClass:"md-layout-item md-size-50"},[_c('md-field',{class:_vm.getValidationClass('idaForm', 'validatorName')},[_c('label',[_vm._v("Validator Name and Description")]),_vm._v(" "),_c('md-input',{model:{value:(_vm.idaForm.validatorName),callback:function ($$v) {_vm.$set(_vm.idaForm, "validatorName", $$v)},expression:"idaForm.validatorName"}}),_vm._v(" "),(!_vm.$v.idaForm.validatorName.required)?_c('span',{staticClass:"md-error"},[_vm._v("Please provide the validator name")]):(!_vm.$v.idaForm.validatorName.maxLength)?_c('span',{staticClass:"md-error"},[_vm._v("The description cannot be longer than 64 characters")]):_vm._e()],1)],1),_vm._v(" "),_c('div',{staticClass:"md-layout-item md-size-50"},[_c('md-field',{class:_vm.getValidationClass('idaForm', 'validator')},[_c('label',[_vm._v("Validator Ethereum Address")]),_vm._v(" "),_c('md-input',{model:{value:(_vm.idaForm.validator),callback:function ($$v) {_vm.$set(_vm.idaForm, "validator", $$v)},expression:"idaForm.validator"}}),_vm._v(" "),(!_vm.$v.idaForm.validator.required)?_c('span',{staticClass:"md-error"},[_vm._v("Please provide the validator Ethereum address")]):_vm._e(),_vm._v(" "),(_vm.$v.idaForm.validator.required && !_vm.$v.idaForm.validator.ethAddress)?_c('span',{staticClass:"md-error"},[_vm._v("\n                  Please provide the valid Ethereum address\n                ")]):_vm._e()],1)],1),_vm._v(" "),_c('div',{staticClass:"md-layout-item md-size-50"},[_c('md-datepicker',{class:_vm.getValidationClass('idaForm', 'endTime'),model:{value:(_vm.idaForm.endTime),callback:function ($$v) {_vm.$set(_vm.idaForm, "endTime", $$v)},expression:"idaForm.endTime"}},[_c('label',[_vm._v("Project deadline")]),_vm._v(" "),(!_vm.$v.idaForm.endTime.required)?_c('span',{staticClass:"md-error"},[_vm._v("Please provide the project deadline")]):_vm._e(),_vm._v(" "),(_vm.$v.idaForm.endTime.required && !_vm.$v.idaForm.endTime.notInThePast)?_c('span',{staticClass:"md-error"},[_vm._v("\n                The project deadline must be in the future\n              ")]):_vm._e()])],1)])])])]),_vm._v(" "),_c('div',{staticClass:"button-box"},[_c('md-button',{staticClass:"md-primary create-if md-raised",on:{"click":function($event){return _vm.deployIda()}}},[_vm._v("Deploy")])],1)],1)],1)],1)}
+var staticRenderFns = []
+var esExports = { render: render, staticRenderFns: staticRenderFns }
+/* harmony default export */ __webpack_exports__["a"] = (esExports);
 
 /***/ }),
 
@@ -1383,17 +1383,19 @@ var Contracts = {
               console.log(newIda);
               console.log("Deploying IDA for: " + newIda.promiseNumber + " of promises with price: " + newIda.promisePrice);
 
-              _context12.next = 4;
+              newIda.paymentToken = __WEBPACK_IMPORTED_MODULE_3__state__["a" /* default */].paymentTokens[newIda.paymentToken];
+
+              _context12.next = 5;
               return saveDetailsIn3Box(newIda);
 
-            case 4:
-              _context12.next = 6;
+            case 5:
+              _context12.next = 7;
               return idaFactory.createIda(newIda.paymentToken, newIda.name, newIda.promiseNumber, web3.toWei(newIda.promisePrice, 'ether'), newIda.validator, newIda.endTime.getTime() / 1000,
               //To test refunds:
               //Math.round(new Date().getTime()/1000) + 300,
               { from: main, gas: 7000000 });
 
-            case 6:
+            case 7:
               tx = _context12.sent;
 
               console.log(tx);
@@ -1402,7 +1404,7 @@ var Contracts = {
               console.log("New IDA deployed to: " + idaAddress);
               return _context12.abrupt('return', idaAddress);
 
-            case 11:
+            case 12:
             case 'end':
               return _context12.stop();
           }
@@ -3476,6 +3478,13 @@ var Component = normalizeComponent(
 
 /***/ }),
 
+/***/ "JkH3":
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
+
+/***/ }),
+
 /***/ "KS52":
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -3815,9 +3824,9 @@ var state = {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_Creator_vue__ = __webpack_require__("CN0s");
 /* unused harmony namespace reexport */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_1405e3ea_hasScoped_true_transformToRequire_video_src_source_src_img_src_image_xlink_href_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_Creator_vue__ = __webpack_require__("/6hf");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_405e6e69_hasScoped_true_transformToRequire_video_src_source_src_img_src_image_xlink_href_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_Creator_vue__ = __webpack_require__("3J+0");
 function injectStyle (ssrContext) {
-  __webpack_require__("nMJc")
+  __webpack_require__("JkH3")
 }
 var normalizeComponent = __webpack_require__("VU/8")
 /* script */
@@ -3830,12 +3839,12 @@ var __vue_template_functional__ = false
 /* styles */
 var __vue_styles__ = injectStyle
 /* scopeId */
-var __vue_scopeId__ = "data-v-1405e3ea"
+var __vue_scopeId__ = "data-v-405e6e69"
 /* moduleIdentifier (server only) */
 var __vue_module_identifier__ = null
 var Component = normalizeComponent(
   __WEBPACK_IMPORTED_MODULE_0__babel_loader_node_modules_vue_loader_lib_selector_type_script_index_0_Creator_vue__["a" /* default */],
-  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_1405e3ea_hasScoped_true_transformToRequire_video_src_source_src_img_src_image_xlink_href_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_Creator_vue__["a" /* default */],
+  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_405e6e69_hasScoped_true_transformToRequire_video_src_source_src_img_src_image_xlink_href_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_Creator_vue__["a" /* default */],
   __vue_template_functional__,
   __vue_styles__,
   __vue_scopeId__,
@@ -5115,13 +5124,6 @@ module.exports = {"contractName":"ImpactPromiseFactory","abi":[{"constant":false
 
 /***/ }),
 
-/***/ "nMJc":
-/***/ (function(module, exports) {
-
-// removed by extract-text-webpack-plugin
-
-/***/ }),
-
 /***/ "nyB7":
 /***/ (function(module, exports) {
 
@@ -5866,4 +5868,4 @@ var esExports = { render: render, staticRenderFns: staticRenderFns }
 /***/ })
 
 },["NHnr"]);
-//# sourceMappingURL=app.80e5ea2e04c42b796da3.js.map
+//# sourceMappingURL=app.36c8d26e7b0986ea0e99.js.map
