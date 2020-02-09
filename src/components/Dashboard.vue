@@ -224,7 +224,7 @@
             <md-card-header-text>
               <div class="md-title" v-if="balance.tokens == 0">
                 You currently don't have any tokens to fund or invest with
-                <md-button class="funds-button" @click="getDemoTokens()">Get $1000 demo tokens</md-button>
+                <md-button class="funds-button" @click="getDemoTokens()">Get $1000 tokens</md-button>
               </div>
               <div class="md-title" v-else>
                 You currently have <b>${{balance.tokens}}</b> to fund or invest with
