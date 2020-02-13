@@ -5,6 +5,8 @@ Alice is a decentralised financial protocol for projects that make a verifiable 
 
 This can be helpful in many different use cases, such as allowing service providers to transfer the risk of failure to investors. The “investable bounties” dApp built on Alice, for example, allows service providers to create IDAs, raise funds for their promises, and create markets to sell their future payment rights to investors at a discount: https://ida.alice.si/
 
+A high level overview is available at: https://medium.com/@Raphalice/a-new-alice-is-coming-15dca7992469
+
 # Building
 
 To build the application please install first all of the dependencies by running:
