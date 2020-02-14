@@ -3,7 +3,6 @@ pragma solidity ^0.5.2;
 import 'openzeppelin-solidity/contracts/token/ERC20/ERC20.sol';
 import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
 import './Escrow.sol';
-import './FluidEscrow.sol';
 import './PaymentRights.sol';
 import './ImpactPromise.sol';
 import './ClaimsRegistry.sol';
@@ -45,6 +44,7 @@ contract Ida {
     constructor(
       ERC20 _paymentToken,
       ImpactPromise _impactPromise,
+      Escrow _escrow,
       ClaimsRegistry _claimsRegistry,
       string memory _name,
       uint256 _promiseNumber,
@@ -66,9 +66,8 @@ contract Ida {
         endTime = _endTime;
         serviceProvider = _serviceProvider;
 
-        escrow = new FluidEscrow(_paymentToken, promisePrice.mul(promiseNumber), address(this));
+        escrow = _escrow;
         paymentRights = PaymentRights(escrow.recipient());
-        paymentRights.transfer(serviceProvider, promisePrice.mul(promiseNumber));
 
         emit Created(serviceProvider, promiseNumber, promisePrice, name);
     }

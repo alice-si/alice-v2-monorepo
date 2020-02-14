@@ -9,7 +9,4 @@ contract PaymentRights is FluidToken {
   string public symbol = "IDA-PR";
   string public version = '1.0';
 
-  constructor(uint256 _initialSupply)
-    public FluidToken(_initialSupply) { }
-
 }
