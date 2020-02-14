@@ -1,4 +1,10 @@
 
+
+<p align="center">
+  <a href="https://travis-ci.org/alice-si/alice-v2-monorepo"><img src="https://travis-ci.com/alice-si/alice-v2-monorepo.svg?branch=master" alt="Build Status"></a>
+</p>
+
+
 # Overview
 
 Alice is a decentralised financial protocol for projects that make a verifiable impact. It allows service providers to make promises about impact they want to achieve, and ensures that they are held accountable by only rewarding them if that impact is verified. Unlike a traditional bounty mechanism however, Alice allows future rewards to be transferred to third parties thanks to a new financial primitive called the Impact Delivery Agreement (IDA).
