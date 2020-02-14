@@ -56,11 +56,11 @@ contract Escrow is Ownable {
    * @dev Withdraw part of the escrow reserved for recipient
    * @param _amount The amount of funds intended to be taken out
    */
-  function withdraw(address _recipient, uint256 _amount) public onlyRecipient {
+  function withdraw(address _to, uint256 _amount) public onlyRecipient {
     withdrawn = withdrawn.add(_amount);
     require(withdrawn <= unlocked, "Cannot withdraw more funds than has been unlocked");
 
-    require(paymentToken.transfer(_recipient, _amount));
+    require(paymentToken.transfer(_to, _amount));
 
     emit Withdrawn(msg.sender, _amount);
   }

@@ -3,6 +3,7 @@ var AUSD = artifacts.require("AliceUSD");
 var ImpactPromise = artifacts.require("ImpactPromise");
 var FluidToken = artifacts.require("FluidToken");
 var Escrow = artifacts.require("Escrow");
+var FluidEscrowFactory = artifacts.require("FluidEscrowFactory");
 var Sts = artifacts.require("SimpleTokenSeller");
 var StsFactory = artifacts.require("SimpleTokenSellerFactory");
 var ImpactPromiseFactory = artifacts.require("ImpactPromiseFactory");
@@ -25,16 +26,16 @@ contract('Ida Factory', function ([owner, validator, investor, unauthorised]) {
 
   before("deploy Ida factory & usd", async function () {
     usd = await AUSD.new();
-    end = (await time.latest()).add(time.duration.years(1));
     let impactPromiseFactory = await ImpactPromiseFactory.new();
     let stsFactory = await StsFactory.new();
+    let escrowFactory = await FluidEscrowFactory.new();
     claimsRegistry = await ClaimsRegistry.new();
-    factory = await IdaFactory.new(stsFactory.address, impactPromiseFactory.address, claimsRegistry.address, {gas: 6500000});
+    factory = await IdaFactory.new(stsFactory.address, impactPromiseFactory.address, escrowFactory.address, claimsRegistry.address, {gas: 6500000});
   });
 
   it("should create a new Ida", async function () {
-
-    let tx = await factory.createIda(usd.address, "TEST", 10, 100, validator, end);
+    let end = (await time.latest()).add(time.duration.years(1));
+    let tx = await factory.createIda(usd.address, "TEST", 10, 100, validator, end, {gas: 7000000});
     console.log("Gas used: " + tx.receipt.gasUsed);
 
     let idaAddress = tx.receipt.logs[0].args.ida;
@@ -47,7 +48,6 @@ contract('Ida Factory', function ([owner, validator, investor, unauthorised]) {
     (await paymentRights.totalSupply()).should.be.bignumber.equal('1000');
 
     let impactPromiseAddress = await ida.impactPromise();
-    console.log("Impact promise token: " + impactPromiseAddress);
     impactPromise = await ImpactPromise.at(impactPromiseAddress);
     (await impactPromise.balanceOf(owner)).should.be.bignumber.equal('0');
     (await impactPromise.totalSupply()).should.be.bignumber.equal('0');
@@ -91,6 +91,5 @@ contract('Ida Factory', function ([owner, validator, investor, unauthorised]) {
   });
 
 });
-
 
 

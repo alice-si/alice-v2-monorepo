@@ -1,4 +1,5 @@
 var Escrow = artifacts.require("Escrow");
+var FluidEscrowFactory = artifacts.require("FluidEscrowFactory");
 var ImpactPromise = artifacts.require("ImpactPromise");
 var FluidToken = artifacts.require("FluidToken");
 var AUSD = artifacts.require("AliceUSD");
@@ -13,7 +14,7 @@ require("./test-setup");
 const { time } = require('openzeppelin-test-helpers');
 
 contract('Impact Delivery Agreement', function ([owner, validator, funder, investor, unauthorised]) {
-  var escrow;
+  var escrow, factory;
   var ausd;
   var ida, sts;
   var paymentRights;
@@ -22,25 +23,30 @@ contract('Impact Delivery Agreement', function ([owner, validator, funder, inves
 
   before("deploy escrow and token contracts", async function () {
     ausd = await AUSD.new();
-    let end = (await time.latest()).add(time.duration.years(1));
-
     let impactPromiseFactory = await ImpactPromiseFactory.new();
     let stsFactory = await StsFactory.new();
+    let escrowFactory = await FluidEscrowFactory.new();
     claimsRegistry = await ClaimsRegistry.new();
-    let factory = await IdaFactory.new(stsFactory.address, impactPromiseFactory.address, claimsRegistry.address, {gas: 6500000});
+    factory = await IdaFactory.new(stsFactory.address, impactPromiseFactory.address, escrowFactory.address, claimsRegistry.address, {gas: 6500000});
+  });
 
-    let tx = await factory.createIda(ausd.address, "TEST", 10, 100, validator, end);
+
+  it("should create a new Ida", async function () {
+    let end = (await time.latest()).add(time.duration.years(1));
+    let tx = await factory.createIda(ausd.address, "TEST", 10, 100, validator, end, {gas: 7000000});
+    console.log("Gas used for Ida deployment: " + tx.receipt.gasUsed);
+
     let idaAddress = tx.receipt.logs[0].args.ida;
-    ida = await Ida.at(idaAddress);
-
     let stsAddress = tx.receipt.logs[0].args.sts;
+    ida = await Ida.at(idaAddress);
     sts = await Sts.at(stsAddress);
 
     paymentRights = await FluidToken.at(await ida.paymentRights());
     (await paymentRights.balanceOf(owner)).should.be.bignumber.equal('1000');
     (await paymentRights.totalSupply()).should.be.bignumber.equal('1000');
 
-    impactPromise = await ImpactPromise.at(await ida.impactPromise());
+    let impactPromiseAddress = await ida.impactPromise();
+    impactPromise = await ImpactPromise.at(impactPromiseAddress);
     (await impactPromise.balanceOf(owner)).should.be.bignumber.equal('0');
     (await impactPromise.totalSupply()).should.be.bignumber.equal('0');
 
@@ -113,7 +119,7 @@ contract('Impact Delivery Agreement', function ([owner, validator, funder, inves
   });
 
 
-  it("should not be refund the money before", async function () {
+  it("should not refund the money before the project ends", async function () {
     (await ida.hasEnded()).should.be.false;
     await ida.refund({from: funder}).shouldBeReverted("Refund is only available after the project has ended");
   });
@@ -139,11 +145,13 @@ contract('Impact Delivery Agreement', function ([owner, validator, funder, inves
 
   });
 
+
   it("should not allow validating promises after project is ended", async function () {
     let key = web3.utils.fromAscii("TEST2");
     await claimsRegistry.setClaim(ida.address, key, web3.utils.padLeft(web3.utils.numberToHex(100), 64));
     await ida.validatePromise(web3.utils.fromAscii("TEST2"), {from: validator}).shouldBeReverted("Cannot validate after project end");
   });
+
 
   it("should withdraw rest of funds from escrow by ida creator", async function () {
     await paymentRights.redeem(40, {from: owner});
