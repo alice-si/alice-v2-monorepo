@@ -7,8 +7,7 @@ import './Escrow.sol';
 /**
  * @title RefundableEscrow
  * @dev An extension to the Escrow contract that allows the owner to withdraw
- * the funds that haven't been yet unlocked so that they can be returned to
- * ImpactPromise token holders after an IDA's endTime.
+ * the funds that haven't been yet unlocked.
  *
  */
 contract RefundableEscrow is Escrow {
@@ -18,10 +17,10 @@ contract RefundableEscrow is Escrow {
 
   uint256 public refunded;
 
-  constructor(ERC20 _paymentToken, uint256 _capacity, address _operator, address _recipient) public
-    Escrow(_paymentToken, _capacity, _operator, _recipient) { }
+  constructor(ERC20 _paymentToken, uint256 _capacity) public
+  Escrow(_paymentToken, _capacity) { }
 
-  function refund(address _recipient, uint256 _amount) public onlyOperator {
+  function refund(address _recipient, uint256 _amount) public onlyOwner {
     uint256 committed = unlocked.sub(withdrawn);
     uint256 available = paymentToken.balanceOf(address(this)).sub(committed);
     require(_amount <= available, "Cannot refund more than is available");
