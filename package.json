@@ -12,7 +12,7 @@
     "e2e": "node test/e2e/runner.js",
     "test/truffle": "truffle test test/truffle/*",
     "test/dapp": "npm run unit && npm run e2e",
-    "test": "npx truffle compile && npx buidler test --network buidlerevm",
+    "test": "npx buidler test --network buidlerevm",
     "lint": "eslint --ext .js,.vue src test/unit/specs test/e2e/specs"
   },
   "dependencies": {
