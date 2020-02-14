@@ -11,12 +11,15 @@ import './FluidToken.sol';
  */
 contract FluidEscrowFactory {
 
+  event FluidTokenCreated(FluidToken token, Escrow escrow);
+
   function createFluidEscrow(ERC20 _paymentToken, uint256 _capacity, address creator) public returns(Escrow) {
     Escrow escrow = new Escrow(_paymentToken, _capacity);
-    FluidToken paymentRights = new FluidToken(escrow, _capacity);
-    escrow.setRecipient(address(paymentRights));
-    paymentRights.transfer(creator, _capacity);
+    FluidToken fluidToken = new FluidToken(escrow, _capacity);
+    escrow.setRecipient(address(fluidToken));
+    fluidToken.transfer(creator, _capacity);
     escrow.transferOwnership(msg.sender);
+    emit FluidTokenCreated(fluidToken, escrow);
     return escrow;
   }
 

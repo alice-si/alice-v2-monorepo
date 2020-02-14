@@ -15,7 +15,7 @@ import './FluidEscrowFactory.sol';
 contract IdaFactory {
   using SafeMath for uint256;
 
-  event IdaCreated(address indexed ida, address indexed sts);
+  event IdaCreated(address indexed ida);
 
   SimpleTokenSellerFactory simpleTokenSellerFactory;
   ImpactPromiseFactory impactPromiseFactory;
@@ -45,9 +45,9 @@ contract IdaFactory {
     Ida ida = new Ida(_paymentToken, promiseToken, escrow, claimsRegistry, _name, _outcomesNumber, _outcomesPrice, _validator, _endTime, msg.sender);
     escrow.transferOwnership(address(ida));
     promiseToken.addMinter(address(ida));
-    SimpleTokenSeller sts = simpleTokenSellerFactory.createSimpleTokenSeller(ida.paymentToken(), ida.paymentRights(), msg.sender);
+    //SimpleTokenSeller sts = simpleTokenSellerFactory.createSimpleTokenSeller(ida.paymentToken(), ida.paymentRights(), msg.sender);
 
-    emit IdaCreated(address(ida), address(sts));
+    emit IdaCreated(address(ida));
     return ida;
   }
 
