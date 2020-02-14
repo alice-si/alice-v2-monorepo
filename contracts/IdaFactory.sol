@@ -17,14 +17,14 @@ contract IdaFactory {
 
   event IdaCreated(address indexed ida);
 
-  SimpleTokenSellerFactory simpleTokenSellerFactory;
   ImpactPromiseFactory impactPromiseFactory;
   FluidEscrowFactory fluidEscrowFactory;
   ClaimsRegistry public claimsRegistry;
+  SimpleTokenSeller public simpleTokenSeller;
 
 
-  constructor(SimpleTokenSellerFactory _simpleTokenSellerFactory, ImpactPromiseFactory _impactPromiseFactory, FluidEscrowFactory _fluidEscrowFactory, ClaimsRegistry _claimsRegistry) public {
-    simpleTokenSellerFactory = _simpleTokenSellerFactory;
+  constructor(SimpleTokenSellerFactory _stsFactory, ImpactPromiseFactory _impactPromiseFactory, FluidEscrowFactory _fluidEscrowFactory, ClaimsRegistry _claimsRegistry) public {
+    simpleTokenSeller = _stsFactory.createSimpleTokenSeller();
     impactPromiseFactory = _impactPromiseFactory;
     fluidEscrowFactory = _fluidEscrowFactory;
     claimsRegistry = _claimsRegistry;
@@ -45,8 +45,7 @@ contract IdaFactory {
     Ida ida = new Ida(_paymentToken, promiseToken, escrow, claimsRegistry, _name, _outcomesNumber, _outcomesPrice, _validator, _endTime, msg.sender);
     escrow.transferOwnership(address(ida));
     promiseToken.addMinter(address(ida));
-    //SimpleTokenSeller sts = simpleTokenSellerFactory.createSimpleTokenSeller(ida.paymentToken(), ida.paymentRights(), msg.sender);
-
+    simpleTokenSeller.addMarket(msg.sender, PaymentRights(escrow.recipient()), _paymentToken);
     emit IdaCreated(address(ida));
     return ida;
   }

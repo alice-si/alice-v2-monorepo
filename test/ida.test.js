@@ -28,6 +28,7 @@ contract('Impact Delivery Agreement', function ([owner, validator, funder, inves
     let escrowFactory = await FluidEscrowFactory.new();
     claimsRegistry = await ClaimsRegistry.new();
     factory = await IdaFactory.new(stsFactory.address, impactPromiseFactory.address, escrowFactory.address, claimsRegistry.address, {gas: 6500000});
+    sts = await Sts.at(await factory.simpleTokenSeller());
   });
 
 
@@ -37,9 +38,7 @@ contract('Impact Delivery Agreement', function ([owner, validator, funder, inves
     console.log("Gas used for Ida deployment: " + tx.receipt.gasUsed);
 
     let idaAddress = tx.receipt.logs[0].args.ida;
-    let stsAddress = tx.receipt.logs[0].args.sts;
     ida = await Ida.at(idaAddress);
-    sts = await Sts.at(stsAddress);
 
     paymentRights = await FluidToken.at(await ida.paymentRights());
     (await paymentRights.balanceOf(owner)).should.be.bignumber.equal('1000');
@@ -68,7 +67,7 @@ contract('Impact Delivery Agreement', function ([owner, validator, funder, inves
     (await ausd.balanceOf(investor)).should.be.bignumber.equal('100');
     (await paymentRights.balanceOf(investor)).should.be.bignumber.equal('0');
 
-    await sts.buy(100, {from: investor});
+    await sts.buy(owner, 100, {from: investor});
 
     (await ausd.balanceOf(owner)).should.be.bignumber.equal('50');
     (await ausd.balanceOf(investor)).should.be.bignumber.equal('50');

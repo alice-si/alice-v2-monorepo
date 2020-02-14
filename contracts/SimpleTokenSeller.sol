@@ -9,7 +9,7 @@ import './PaymentRights.sol';
  * by automatically deploying and linking payment rights seller contract
  *
  */
-contract SimpleTokenSeller is Ownable {
+contract SimpleTokenSeller {
   using SafeMath for uint256;
 
   event MarketAdded(address indexed operator, PaymentRights offeredToken, ERC20 indexed paymentToken);
@@ -27,7 +27,7 @@ contract SimpleTokenSeller is Ownable {
 
   mapping (address => Market) public markets;
 
-  function addMarket(address _operator, PaymentRights _offeredToken, ERC20 _paymentToken) public onlyOwner {
+  function addMarket(address _operator, PaymentRights _offeredToken, ERC20 _paymentToken) public {
     markets[_operator] = Market(_paymentToken, _offeredToken, 0, 0);
     emit MarketAdded(_operator, _offeredToken, _paymentToken);
   }
@@ -79,6 +79,20 @@ contract SimpleTokenSeller is Ownable {
     uint256 unRedeemedAmount = unRedeemed.mul(amount).div(market.offeredToken.balanceOf(address(this)));
 
     return FULL_PERCENTAGE.sub(market.discount).mul(unRedeemedAmount).div(FULL_PERCENTAGE);
+  }
+
+  function getSupply(address operator) public view returns(uint256) {
+    Market storage market = markets[operator];
+    require(address(market.paymentToken) != address(0), "There is no market defined for a given Ida");
+
+    return market.supply;
+  }
+
+  function getDiscount(address operator) public view returns(uint256) {
+    Market storage market = markets[operator];
+    require(address(market.paymentToken) != address(0), "There is no market defined for a given Ida");
+
+    return market.discount;
   }
 
 }
