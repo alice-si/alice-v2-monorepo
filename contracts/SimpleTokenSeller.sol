@@ -2,7 +2,6 @@ pragma solidity ^0.5.2;
 
 import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
 import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
-import './Ida.sol';
 import './PaymentRights.sol';
 
 /**
@@ -13,67 +12,81 @@ import './PaymentRights.sol';
 contract SimpleTokenSeller is Ownable {
   using SafeMath for uint256;
 
-  event TokensSold(ERC20 indexed soldToken, ERC20 indexed paymentToken, uint256 amountSold, uint256 discount);
-  event ConditionsChanged(ERC20 indexed paymentRightsToken, uint256 amountAvailable, uint256 discount);
+  event MarketAdded(address indexed operator, PaymentRights offeredToken, ERC20 indexed paymentToken);
+  event TokensSold(address indexed operator, PaymentRights indexed offeredToken, ERC20 indexed paymentToken, uint256 amountSold, uint256 discount);
+  event ConditionsUpdated(address indexed operator, PaymentRights indexed offeredToken, uint256 amountAvailable, uint256 discount);
 
   uint256 public constant FULL_PERCENTAGE = 100;
 
-  ERC20 public paymentToken;
-  PaymentRights public offeredToken;
-  uint256 public currentSupply;
-  uint256 public currentDiscount;
-
-  constructor(ERC20 _paymentToken, PaymentRights _offeredToken, address owner) public {
-    paymentToken = _paymentToken;
-    offeredToken = _offeredToken;
-    _transferOwnership(owner);
+  struct Market {
+    ERC20 paymentToken;
+    PaymentRights offeredToken;
+    uint256 supply;
+    uint256 discount;
   }
 
-  function updateConditions(uint256 supply, uint256 discount) public onlyOwner {
-    require(supply <= offeredToken.balanceOf(address(owner())).add(currentSupply), "Cannot set supply greater than the amount of tokens available");
-    require(discount < 100, "Discount must be less than 100%");
+  mapping (address => Market) public markets;
+
+  function addMarket(address _operator, PaymentRights _offeredToken, ERC20 _paymentToken) public onlyOwner {
+    markets[_operator] = Market(_paymentToken, _offeredToken, 0, 0);
+    emit MarketAdded(_operator, _offeredToken, _paymentToken);
+  }
+
+  function updateConditions(uint256 supply, uint256 discount) public {
+    Market storage market = markets[msg.sender];
+    require(address(market.paymentToken) != address(0), "There is no market defined for a given operator");
+
+    require(market.supply <= market.offeredToken.balanceOf(msg.sender).add(market.supply),
+      "Cannot set supply greater than the amount of tokens available");
+    require(market.discount < FULL_PERCENTAGE, "Discount must be less than 100%");
 
     //Unlock unsold tokens
-    if (currentSupply > 0) {
-      offeredToken.transfer(owner(), currentSupply);
+    if (market.supply > 0) {
+      market.offeredToken.transfer(msg.sender, market.supply);
     }
 
-    currentSupply = supply;
-    currentDiscount = discount;
+    market.supply = supply;
+    market.discount = discount;
 
     //Lock offered tokens under this contract
-    offeredToken.transferFrom(owner(), address(this), supply);
+    market.offeredToken.transferFrom(msg.sender, address(this), supply);
 
-    emit ConditionsChanged(offeredToken, currentSupply, discount);
+    emit ConditionsUpdated(msg.sender, market.offeredToken, market.supply, market.discount);
   }
 
-  function buy(uint256 amount) public {
+  function buy(address operator, uint256 amount) public {
+    Market storage market = markets[operator];
+    require(address(market.paymentToken) != address(0), "There is no market defined for a given Ida");
+
     require(amount > 0);
-    require(amount <= currentSupply);
+    require(amount <= market.supply);
 
-    uint256 price = getEffectivePrice(amount);
-    currentSupply = currentSupply.sub(amount);
+    uint256 price = getEffectivePrice(operator, amount);
+    market.supply = market.supply.sub(amount);
 
-    offeredToken.transfer(msg.sender, amount);
-    paymentToken.transferFrom(msg.sender, owner(), price);
+    market.offeredToken.transfer(msg.sender, amount);
+    market.paymentToken.transferFrom(msg.sender, operator, price);
 
-    emit TokensSold(offeredToken, paymentToken, amount, currentDiscount);
-    emit ConditionsChanged(offeredToken, currentSupply, currentDiscount);
+    emit TokensSold(msg.sender, market.offeredToken, market.paymentToken, amount, market.discount);
+    emit ConditionsUpdated(msg.sender, market.offeredToken, market.supply, market.discount);
   }
 
-  function getEffectivePrice(uint256 amount) public view returns(uint256) {
-    uint256 unRedeemed = offeredToken.balanceOf(address(this)).sub(offeredToken.getRedeemed(address(this)));
-    uint256 unRedeemedAmount = unRedeemed.mul(amount).div(offeredToken.balanceOf(address(this)));
+  function getEffectivePrice(address operator, uint256 amount) public view returns(uint256) {
+    Market storage market = markets[operator];
+    require(address(market.paymentToken) != address(0), "There is no market defined for a given Ida");
 
-    return FULL_PERCENTAGE.sub(currentDiscount).mul(unRedeemedAmount).div(100);
+    uint256 unRedeemed = market.offeredToken.balanceOf(address(this)).sub(market.offeredToken.getRedeemed(address(this)));
+    uint256 unRedeemedAmount = unRedeemed.mul(amount).div(market.offeredToken.balanceOf(address(this)));
+
+    return FULL_PERCENTAGE.sub(market.discount).mul(unRedeemedAmount).div(FULL_PERCENTAGE);
   }
 
 }
 
 contract SimpleTokenSellerFactory {
 
-  function createSimpleTokenSeller(ERC20 _paymentToken, PaymentRights _offeredToken, address owner) public returns (SimpleTokenSeller) {
-    return new SimpleTokenSeller(_paymentToken, _offeredToken, owner);
+  function createSimpleTokenSeller() public returns (SimpleTokenSeller) {
+    return new SimpleTokenSeller();
   }
 
 }
