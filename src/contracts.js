@@ -22,8 +22,12 @@ let ethereum = window.ethereum;
 let web3 = window.web3;
 
 const START_BLOCK = 1;
-const AUSD_ADDRESS = "0x562281C65A18f9aDfe6eE3C2c8841662EC7417Ee";
-const IDA_FACTORY_ADDRESS = "0x65049b58C8F1Ace86FBe75F41491809E708813A9";
+//Rinkeby;
+//const AUSD_ADDRESS = "0x495026f122CB281590e1CeEf2A1A3e54CEf1fBD4";
+//const IDA_FACTORY_ADDRESS = "0x2484F2519783509b3ff7864bD8c2CeB2D9704C7b";
+//Local
+const AUSD_ADDRESS = "0x2afc0Aa63841FAf0e120119481daE22EC9643F9A";
+const IDA_FACTORY_ADDRESS = "0x4F029BaF7E71fc677841Cbe4b5C8A84663559e7D";
 
 
 var setup = function(json) {
@@ -107,12 +111,15 @@ async function updateInvestments() {
   state.ida.investingUnlocked = investingAllowance > 0;
 
   //Distribution
-  let rawSupply = await sts.currentSupply();
+  let rawSupply = await sts.getSupply(owner);
   state.ida.distributeAmount = web3.fromWei(rawSupply, 'ether');
-  state.ida.distributeDiscount = (await sts.currentDiscount()).toString();
-  state.ida.distributePrice = web3.fromWei((await sts.getEffectivePrice(rawSupply)), 'ether');
+  state.ida.distributeDiscount = (await sts.getDiscount(owner)).toString();
+  console.log("Market state: Distribute: " + state.ida.distributeAmount + " with discount: " + state.ida.distributeDiscount);
 
-  console.log("Loaded... Distribute: " + state.ida.distributeAmount + " with discount: " + state.ida.distributeDiscount);
+  if (state.ida.distributeAmount > 0) {
+    state.ida.distributePrice = web3.fromWei((await sts.getEffectivePrice(owner, rawSupply)), 'ether');
+  }
+
 
   state.balance.invested = web3.fromWei((await paymentRights.balanceOf(main)), 'ether');
   console.log("Invested by you: " + state.balance.invested);
@@ -307,7 +314,7 @@ const Contracts = {
 
   invest: async (amount) => {
     console.log("Investing: " + amount);
-    await sts.buy(web3.toWei(amount, 'ether'), {from: main, gas: 1000000});
+    await sts.buy(owner, web3.toWei(amount, 'ether'), {from: main, gas: 1000000});
 
     setTimeout(updateInvestments, 3000);
     setTimeout(updateHoldings, 3000);
@@ -419,6 +426,9 @@ const Contracts = {
 
     idaFactory = await IDA_FACTORY.at(IDA_FACTORY_ADDRESS);
     console.log("Linked IDA factory: " + idaFactory.address);
+    let stsAddress = await idaFactory.simpleTokenSeller();
+    sts = await STS.at(stsAddress);
+    console.log("Linked STS: " + sts.address);
 
     if (idaAddress) {
       console.log("Fetching IDA: " + idaAddress);
@@ -451,36 +461,24 @@ const Contracts = {
       state.ida.hasEnded =  (new Date().getTime()) > endTime * 1000;
       console.log("Has Ida ended: " + state.ida.hasEnded);
 
+      owner = state.ida.serviceProvider;
+      state.ida.isOwner = (main.toLocaleLowerCase() == owner.toLocaleLowerCase());
+      state.ida.isValidator = (main.toLocaleLowerCase() == state.ida.validator.toLocaleLowerCase());
+
       //Get description from 3Box
       state.ida.data = await Box.getSpace(state.ida.serviceProvider, state.ida.name);
 
-      //Get sts
-      let stsFilter = web3.eth.filter({
-        fromBlock: START_BLOCK,
-        topics: [
-          "0x3aedc386eb06c3badc9815fdc61ff1ac848d8263144b24a174804ca1cd30e742",
-          "0x000000000000000000000000" + ida.address.substring(2)
-        ]
-      });
-      stsFilter.get(async function(err, results) {
-        sts = await STS.at('0x'+results[0].topics[2].substring(26));
-        console.log("STS linked: " + sts.address);
-        owner = await sts.owner();
-        console.log("Ida owner: " + owner);
-        state.ida.isOwner = (main.toLocaleLowerCase() == owner.toLocaleLowerCase());
-        state.ida.isValidator = (main.toLocaleLowerCase() == state.ida.validator.toLocaleLowerCase());
 
+      if (state.ida.isOwner) {
+        let ownerAllowance = await paymentRights.allowance(main, sts.address);
+        console.log("Owner allowance: " + ownerAllowance);
+        state.ida.distributionUnlocked = ownerAllowance > 0
+      }
 
-        if (state.ida.isOwner) {
-          let ownerAllowance = await paymentRights.allowance(main, sts.address);
-          console.log("Owner allowance: " + ownerAllowance);
-          state.ida.distributionUnlocked = ownerAllowance > 0
-        }
+      updateInvestments();
 
-        updateInvestments();
+      await getAllClaims();
 
-        await getAllClaims();
-      });
 
       updateFunding();
       updateHoldings();
