@@ -14,15 +14,16 @@ import ESCROW_JSON from '@contracts/Escrow.json'
 import IDA_FACTORY_JSON from '@contracts/IdaFactory.json'
 import IP_FACTORY_JSON from '@contracts/ImpactPromiseFactory.json'
 import STS_FACTORY_JSON from '@contracts/SimpleTokenSellerFactory.json'
+import ESCROW_FACTORY_JSON from '@contracts/FluidEscrowFactory.json'
 import STS_JSON from '@contracts/SimpleTokenSeller.json'
 import CLAIMS_REGISTRY_JSON from '@contracts/ClaimsRegistry.json'
 
 let ethereum = window.ethereum;
 let web3 = window.web3;
 
-const START_BLOCK = 5912191;
-const AUSD_ADDRESS = "0xb9Cbf7381Baa11FF0287648a82904BbB4118586B";
-const IDA_FACTORY_ADDRESS = "0x53C9f8df4B7d3A5016e5D4e5B050Fe4072bE479C";
+const START_BLOCK = 1;
+const AUSD_ADDRESS = "0x562281C65A18f9aDfe6eE3C2c8841662EC7417Ee";
+const IDA_FACTORY_ADDRESS = "0x65049b58C8F1Ace86FBe75F41491809E708813A9";
 
 
 var setup = function(json) {
@@ -41,6 +42,7 @@ const Escrow = setup(ESCROW_JSON);
 const IDA_FACTORY = setup(IDA_FACTORY_JSON);
 const STS_FACTORY = setup(STS_FACTORY_JSON);
 const IP_FACTORY = setup(IP_FACTORY_JSON);
+const ESCROW_FACTORY = setup(ESCROW_FACTORY_JSON);
 const STS = setup(STS_JSON);
 const CLAIMS_REGISTRY = setup(CLAIMS_REGISTRY_JSON);
 
@@ -61,9 +63,11 @@ var connectWeb3 = async function() {
 
   getBlockNumber = promisify(web3.eth.getBlockNumber);
 
-  if (network.id != 4) {
-    throw 'WRONG_NETWORK'
-  }
+  console.log("Connected to network: " + network.id);
+
+  // if (network.id != 4) {
+  //   throw 'WRONG_NETWORK'
+  // }
 };
 
 var getBox = async function() {
@@ -224,10 +228,12 @@ const Contracts = {
     console.log("STS deployed: " + stsFactory.address);
     let impactPromiseFactory = await IP_FACTORY.new({from: main, gas: 8500000});
     console.log("IP factory deployed: " + impactPromiseFactory.address);
+    let escrowFactory = await ESCROW_FACTORY.new({from: main, gas: 8500000});
+    console.log("Escrow factory deployed: " + escrowFactory.address);
     let claimsRegistry = await CLAIMS_REGISTRY.new({from: main, gas: 8500000});
     console.log("Claims registry deployed: " + impactPromiseFactory.address);
 
-    idaFactory = await IDA_FACTORY.new(stsFactory.address, impactPromiseFactory.address, claimsRegistry.address, {from: main, gas: 8500000});
+    idaFactory = await IDA_FACTORY.new(stsFactory.address, impactPromiseFactory.address, escrowFactory.address, claimsRegistry.address, {from: main, gas: 8500000});
     console.log("IDA factory address: " + idaFactory.address);
   },
 
