@@ -86,7 +86,12 @@ contract('Impact Delivery Agreement', function ([owner, validator, funder, inves
 
 
   it("should not validate before registering a claim", async function () {
-    await ida.validatePromise(web3.utils.fromAscii("TEST"), {from: validator}).shouldBeReverted();;
+    let key = web3.utils.fromAscii("TEST");
+    await claimsRegistry.setClaim(ida.address, key, web3.utils.padLeft(web3.utils.numberToHex(100), 64));
+    // A report can't be validated without registration, but registration itself requires a claim to be set, so just remove the claim after registration to peform this check.
+    await ida.registerReport(web3.utils.fromAscii("TEST"), {from: validator});
+    await claimsRegistry.removeClaim(ida.address, key);
+    await ida.validatePromise(web3.utils.fromAscii("TEST"), {from: validator}).shouldBeReverted("A claim must be registered before validation");
   });
 
 

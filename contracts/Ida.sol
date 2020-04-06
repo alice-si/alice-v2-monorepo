@@ -17,6 +17,7 @@ contract Ida {
     event Created(address indexed creator, uint256 indexed promiseNumber, uint256 promisePrice, string name);
     event Funded(address indexed funder, uint256 amount, uint256 totalFunded);
     event Validated(uint256 amount);
+    event Rejected(bytes32 key);
 
     /**
      * @dev Throws if called by any account other than the Validator.
@@ -40,6 +41,9 @@ contract Ida {
     address public validator;
     uint256 public endTime;
     address public serviceProvider;
+    uint256 public nbPending;
+
+    mapping (bytes32 => bool) public reportRegistered;
 
     constructor(
       ERC20 _paymentToken,
@@ -84,10 +88,19 @@ contract Ida {
         emit Funded(msg.sender, _amount, impactPromise.totalSupply());
     }
 
+    function registerReport(bytes32 key) public onlyValidator {
+      require(!hasEnded(), "Cannot register after project end");
+      require(!reportRegistered[key], "The report is already registered!");
+      reportRegistered[key] = true;
+      require(claimsRegistry.getClaim(serviceProvider, address(this), key) == bytes32(promisePrice), "A claim must be registered before registering a report");
+      nbPending = nbPending.add(1);
+    }
 
     function validatePromise(bytes32 key) public onlyValidator {
-        require(!hasEnded(), "Cannot validate after project end");
-        require(validatedNumber < promiseNumber, "All the promises have already been validated");
+      require(!hasEnded(), "Cannot validate after project end");
+      require(reportRegistered[key], "The report was not registered for this promise");
+      reportRegistered[key] = false;
+      if (validatedNumber < promiseNumber) {
         require(claimsRegistry.getClaim(serviceProvider, address(this), key) == bytes32(promisePrice), "A claim must be registered before validation");
         require(!claimsRegistry.isApproved(validator, serviceProvider, address(this), key), "This promise has already been validated");
 
@@ -95,11 +108,20 @@ contract Ida {
         escrow.unlock(promisePrice);
         validatedNumber = validatedNumber.add(1);
         emit Validated(promisePrice);
+      }
+      nbPending = nbPending.sub(1);
     }
 
+    function rejectPromise(bytes32 key) public onlyValidator {
+      require(!hasEnded(), "Cannot reject after project end");
+      require(reportRegistered[key], "The report was not registered for this promise");
+      reportRegistered[key] = false;
+      nbPending = nbPending.sub(1);
+      emit Rejected(key);
+    }
 
     function hasEnded() public view returns(bool) {
-      return now > endTime;
+      return now > endTime && nbPending == 0;
     }
 
 
