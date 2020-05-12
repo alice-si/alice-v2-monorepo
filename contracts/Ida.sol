@@ -93,6 +93,8 @@ contract Ida {
       require(!reportRegistered[key], "The report is already registered!");
       reportRegistered[key] = true;
       require(claimsRegistry.getClaim(serviceProvider, address(this), key) == bytes32(promisePrice), "A claim must be registered before registering a report");
+      require(!claimsRegistry.isApproved(validator, serviceProvider, address(this), key), "This promise has already been validated");
+      require(validatedNumber + nbPending < promiseNumber, "The number of reports is exceeded");
       nbPending = nbPending.add(1);
     }
 
@@ -100,15 +102,12 @@ contract Ida {
       require(!hasEnded(), "Cannot validate after project end");
       require(reportRegistered[key], "The report was not registered for this promise");
       reportRegistered[key] = false;
-      if (validatedNumber < promiseNumber) {
-        require(claimsRegistry.getClaim(serviceProvider, address(this), key) == bytes32(promisePrice), "A claim must be registered before validation");
-        require(!claimsRegistry.isApproved(validator, serviceProvider, address(this), key), "This promise has already been validated");
+      require(!claimsRegistry.isApproved(validator, serviceProvider, address(this), key), "This promise has already been validated");
 
-        claimsRegistry.approveClaim(serviceProvider, address(this), key);
-        escrow.unlock(promisePrice);
-        validatedNumber = validatedNumber.add(1);
-        emit Validated(promisePrice);
-      }
+      claimsRegistry.approveClaim(serviceProvider, address(this), key);
+      escrow.unlock(promisePrice);
+      validatedNumber = validatedNumber.add(1);
+      emit Validated(promisePrice);
       nbPending = nbPending.sub(1);
     }
 
