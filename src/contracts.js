@@ -14,15 +14,20 @@ import ESCROW_JSON from '@contracts/Escrow.json'
 import IDA_FACTORY_JSON from '@contracts/IdaFactory.json'
 import IP_FACTORY_JSON from '@contracts/ImpactPromiseFactory.json'
 import STS_FACTORY_JSON from '@contracts/SimpleTokenSellerFactory.json'
+import ESCROW_FACTORY_JSON from '@contracts/FluidEscrowFactory.json'
 import STS_JSON from '@contracts/SimpleTokenSeller.json'
 import CLAIMS_REGISTRY_JSON from '@contracts/ClaimsRegistry.json'
 
 let ethereum = window.ethereum;
 let web3 = window.web3;
 
-const START_BLOCK = 5912191;
-const AUSD_ADDRESS = "0xb9Cbf7381Baa11FF0287648a82904BbB4118586B";
-const IDA_FACTORY_ADDRESS = "0x53C9f8df4B7d3A5016e5D4e5B050Fe4072bE479C";
+const START_BLOCK = 1;
+//Rinkeby;
+//const AUSD_ADDRESS = "0x495026f122CB281590e1CeEf2A1A3e54CEf1fBD4";
+//const IDA_FACTORY_ADDRESS = "0x2484F2519783509b3ff7864bD8c2CeB2D9704C7b";
+//Local
+const AUSD_ADDRESS = "0x2afc0Aa63841FAf0e120119481daE22EC9643F9A";
+const IDA_FACTORY_ADDRESS = "0x4F029BaF7E71fc677841Cbe4b5C8A84663559e7D";
 
 
 var setup = function(json) {
@@ -41,6 +46,7 @@ const Escrow = setup(ESCROW_JSON);
 const IDA_FACTORY = setup(IDA_FACTORY_JSON);
 const STS_FACTORY = setup(STS_FACTORY_JSON);
 const IP_FACTORY = setup(IP_FACTORY_JSON);
+const ESCROW_FACTORY = setup(ESCROW_FACTORY_JSON);
 const STS = setup(STS_JSON);
 const CLAIMS_REGISTRY = setup(CLAIMS_REGISTRY_JSON);
 
@@ -61,9 +67,11 @@ var connectWeb3 = async function() {
 
   getBlockNumber = promisify(web3.eth.getBlockNumber);
 
-  if (network.id != 4) {
-    throw 'WRONG_NETWORK'
-  }
+  console.log("Connected to network: " + network.id);
+
+  // if (network.id != 4) {
+  //   throw 'WRONG_NETWORK'
+  // }
 };
 
 var getBox = async function() {
@@ -103,12 +111,15 @@ async function updateInvestments() {
   state.ida.investingUnlocked = investingAllowance > 0;
 
   //Distribution
-  let rawSupply = await sts.currentSupply();
+  let rawSupply = await sts.getSupply(owner);
   state.ida.distributeAmount = web3.fromWei(rawSupply, 'ether');
-  state.ida.distributeDiscount = (await sts.currentDiscount()).toString();
-  state.ida.distributePrice = web3.fromWei((await sts.getEffectivePrice(rawSupply)), 'ether');
+  state.ida.distributeDiscount = (await sts.getDiscount(owner)).toString();
+  console.log("Market state: Distribute: " + state.ida.distributeAmount + " with discount: " + state.ida.distributeDiscount);
 
-  console.log("Loaded... Distribute: " + state.ida.distributeAmount + " with discount: " + state.ida.distributeDiscount);
+  if (state.ida.distributeAmount > 0) {
+    state.ida.distributePrice = web3.fromWei((await sts.getEffectivePrice(owner, rawSupply)), 'ether');
+  }
+
 
   state.balance.invested = web3.fromWei((await paymentRights.balanceOf(main)), 'ether');
   console.log("Invested by you: " + state.balance.invested);
@@ -224,10 +235,12 @@ const Contracts = {
     console.log("STS deployed: " + stsFactory.address);
     let impactPromiseFactory = await IP_FACTORY.new({from: main, gas: 8500000});
     console.log("IP factory deployed: " + impactPromiseFactory.address);
+    let escrowFactory = await ESCROW_FACTORY.new({from: main, gas: 8500000});
+    console.log("Escrow factory deployed: " + escrowFactory.address);
     let claimsRegistry = await CLAIMS_REGISTRY.new({from: main, gas: 8500000});
     console.log("Claims registry deployed: " + impactPromiseFactory.address);
 
-    idaFactory = await IDA_FACTORY.new(stsFactory.address, impactPromiseFactory.address, claimsRegistry.address, {from: main, gas: 8500000});
+    idaFactory = await IDA_FACTORY.new(stsFactory.address, impactPromiseFactory.address, escrowFactory.address, claimsRegistry.address, {from: main, gas: 8500000});
     console.log("IDA factory address: " + idaFactory.address);
   },
 
@@ -301,7 +314,7 @@ const Contracts = {
 
   invest: async (amount) => {
     console.log("Investing: " + amount);
-    await sts.buy(web3.toWei(amount, 'ether'), {from: main, gas: 1000000});
+    await sts.buy(owner, web3.toWei(amount, 'ether'), {from: main, gas: 1000000});
 
     setTimeout(updateInvestments, 3000);
     setTimeout(updateHoldings, 3000);
@@ -413,6 +426,9 @@ const Contracts = {
 
     idaFactory = await IDA_FACTORY.at(IDA_FACTORY_ADDRESS);
     console.log("Linked IDA factory: " + idaFactory.address);
+    let stsAddress = await idaFactory.simpleTokenSeller();
+    sts = await STS.at(stsAddress);
+    console.log("Linked STS: " + sts.address);
 
     if (idaAddress) {
       console.log("Fetching IDA: " + idaAddress);
@@ -445,36 +461,24 @@ const Contracts = {
       state.ida.hasEnded =  (new Date().getTime()) > endTime * 1000;
       console.log("Has Ida ended: " + state.ida.hasEnded);
 
+      owner = state.ida.serviceProvider;
+      state.ida.isOwner = (main.toLocaleLowerCase() == owner.toLocaleLowerCase());
+      state.ida.isValidator = (main.toLocaleLowerCase() == state.ida.validator.toLocaleLowerCase());
+
       //Get description from 3Box
       state.ida.data = await Box.getSpace(state.ida.serviceProvider, state.ida.name);
 
-      //Get sts
-      let stsFilter = web3.eth.filter({
-        fromBlock: START_BLOCK,
-        topics: [
-          "0x3aedc386eb06c3badc9815fdc61ff1ac848d8263144b24a174804ca1cd30e742",
-          "0x000000000000000000000000" + ida.address.substring(2)
-        ]
-      });
-      stsFilter.get(async function(err, results) {
-        sts = await STS.at('0x'+results[0].topics[2].substring(26));
-        console.log("STS linked: " + sts.address);
-        owner = await sts.owner();
-        console.log("Ida owner: " + owner);
-        state.ida.isOwner = (main.toLocaleLowerCase() == owner.toLocaleLowerCase());
-        state.ida.isValidator = (main.toLocaleLowerCase() == state.ida.validator.toLocaleLowerCase());
 
+      if (state.ida.isOwner) {
+        let ownerAllowance = await paymentRights.allowance(main, sts.address);
+        console.log("Owner allowance: " + ownerAllowance);
+        state.ida.distributionUnlocked = ownerAllowance > 0
+      }
 
-        if (state.ida.isOwner) {
-          let ownerAllowance = await paymentRights.allowance(main, sts.address);
-          console.log("Owner allowance: " + ownerAllowance);
-          state.ida.distributionUnlocked = ownerAllowance > 0
-        }
+      updateInvestments();
 
-        updateInvestments();
+      await getAllClaims();
 
-        await getAllClaims();
-      });
 
       updateFunding();
       updateHoldings();
