@@ -85,14 +85,15 @@ contract('Impact Delivery Agreement', function ([owner, validator, funder, inves
   });
 
 
-  it("should not validate before registering a claim", async function () {
-    await ida.validatePromise(web3.utils.fromAscii("TEST"), {from: validator}).shouldBeReverted();;
+  it("should not register a report before registering a claim", async function () {
+    await ida.registerReport(web3.utils.fromAscii("TEST"), {from: validator}).shouldBeReverted("A claim must be registered before registering a report");
   });
 
 
   it("should validate", async function () {
     let key = web3.utils.fromAscii("TEST");
     await claimsRegistry.setClaim(ida.address, key, web3.utils.padLeft(web3.utils.numberToHex(100), 64));
+    await ida.registerReport(web3.utils.fromAscii("TEST"), {from: validator});
     await ida.validatePromise(web3.utils.fromAscii("TEST"), {from: validator});
 
     (await escrow.unlocked()).should.be.bignumber.equal('100');
