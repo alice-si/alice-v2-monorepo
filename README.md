@@ -36,7 +36,7 @@ To deploy the front-end on your local machine please type in your command line:
 
 ### Core contracts
   - Ida.sol: contains the core logic of the Impact Delivery Agreement primitive
-  - FluidBalanceToken.sol and PaymentRights.sol: a new “semi-fungible” token type with a “fluid balance” to manage the IDA’s payment rights (more details below)
+  - FluidBalanceToken.sol and PaymentRights.sol: a new “semi-fungible” token type with a “fluid balance” to manage the IDA’s payment rights (see more details below)
   - ImpactPromise: standard ERC20 token contract used to allow funders (or secondary funders) to claim refunds when the IDA ends.
   - Escrow.sol, FluidEscrow.sol and RefundableEscrow.sol: manage funds escrowed in the IDA
   - ClaimsRegistry.sol: registers promise fulfilment claims and validations
